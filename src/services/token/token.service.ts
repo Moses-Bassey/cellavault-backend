@@ -17,7 +17,7 @@ export class TokenService {
   async generateToken(payload: any) {
     const expiresIn =
       this.configService.get<string>('app.jwtTokenExpiry') || '1h';
-    return await this.jwtService.signAsync(payload, { expiresIn });
+    return await this.jwtService.signAsync(payload, { expiresIn: parseInt(expiresIn) });
   }
 
   async verifyToken(token: string) {

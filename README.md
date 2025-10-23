@@ -1,6 +1,6 @@
 # PePP Cruise Server
 
-A powerful NestJS-based backend server for the PePP Cruise platform, providing authentication, subscription management, and API services with built-in rate limiting and security features.
+A powerful NestJS-based backend server for the PePP Cruise platform, providing authentication, Booking management, and API services with built-in rate limiting and security features.
 
 ## 🚀 Features
 
