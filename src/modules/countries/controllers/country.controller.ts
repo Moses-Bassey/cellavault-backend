@@ -1,0 +1,71 @@
+import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import { Country } from './entities/country.entity';
+import { CountryService } from './services/country.service';
+import { AuthGuard } from '../../guards/auth.guard';
+import { RolesGuard } from '../../guards/roles.guard';
+import { Roles } from '../../decorators/roles.decorator';
+import { UserType } from '../../../enums/user-type.enum';
+
+@ApiTags('Countries')
+@ApiBearerAuth()
+@UseGuards(AuthGuard, RolesGuard)
+@Controller('countries')
+export class CountryController {
+  constructor(private readonly countryService: CountryService) {}
+
+  @Get()
+  @Roles(UserType.PEPP_ADMIN, UserType.SUPER_ADMIN)
+  @ApiOperation({ summary: 'Get all countries' })
+  @ApiResponse({ status: 200, description: 'Countries retrieved successfully' })
+  async findAll(): Promise<Country[]> {
+    return await this.countryService.findAll();
+  }
+
+  @Get(':id')
+  @Roles(UserType.PEPP_ADMIN, UserType.SUPER_ADMIN)
+  @ApiOperation({ summary: 'Get country by ID' })
+  @ApiResponse({ status: 200, description: 'Country retrieved successfully' })
+  @ApiResponse({ status: 404, description: 'Country not found' })
+  async findById(@Param('id') id: string): Promise<Country | null> {
+    return await this.countryService.findById(id);
+  }
+
+  @Post()
+  @Roles(UserType.SUPER_ADMIN)
+  @ApiOperation({ summary: 'Create new country' })
+  @ApiResponse({ status: 201, description: 'Country created successfully' })
+  async create(@Body() countryData: Partial<Country>): Promise<Country> {
+    return await this.countryService.create(countryData);
+  }
+
+  @Put(':id')
+  @Roles(UserType.SUPER_ADMIN)
+  @ApiOperation({ summary: 'Update country' })
+  @ApiResponse({ status: 200, description: 'Country updated successfully' })
+  @ApiResponse({ status: 404, description: 'Country not found' })
+  async update(
+    @Param('id') id: string,
+    @Body() countryData: Partial<Country>,
+  ): Promise<[number, Country[]]> {
+    return await this.countryService.update(id, countryData);
+  }
+
+  @Delete(':id')
+  @Roles(UserType.SUPER_ADMIN)
+  @ApiOperation({ summary: 'Soft delete country' })
+  @ApiResponse({ status: 200, description: 'Country deleted successfully' })
+  @ApiResponse({ status: 404, description: 'Country not found' })
+  async delete(@Param('id') id: string): Promise<number> {
+    return await this.countryService.delete(id);
+  }
+
+  @Put(':id/restore')
+  @Roles(UserType.SUPER_ADMIN)
+  @ApiOperation({ summary: 'Restore soft deleted country' })
+  @ApiResponse({ status: 200, description: 'Country restored successfully' })
+  @ApiResponse({ status: 404, description: 'Country not found' })
+  async restore(@Param('id') id: string): Promise<number> {
+    return await this.countryService.restore(id);
+  }
+}

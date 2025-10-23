@@ -1,0 +1,1 @@
+# All third-party service integrations, such as external APIs, payment gateways, email providers, and other external dependencies, should be placed in this folder. Organize each service in its own file or subfolder as needed to keep the codebase maintainable and modular.

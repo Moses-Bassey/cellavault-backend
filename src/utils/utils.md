@@ -1,0 +1,1 @@
+# This folder is intended for all utility functions used throughout the project. Place any reusable helper functions, common logic, or shared utilities here to keep the codebase organized and to promote code reuse. Organize your utility functions in separate files as needed for clarity and maintainability.
