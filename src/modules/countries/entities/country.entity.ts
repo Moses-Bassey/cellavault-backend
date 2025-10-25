@@ -11,6 +11,7 @@ import {
   Unique,
 } from 'sequelize-typescript';
 
+
 @Table({
   tableName: 'countries',
   timestamps: true,
