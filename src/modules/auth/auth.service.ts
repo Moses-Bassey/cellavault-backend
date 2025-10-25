@@ -31,6 +31,7 @@ import {
 import { TokenSubject } from 'src/enums/token.enum';
 import moment from 'moment';
 import { LoginType } from 'src/enums/login-type.enum';
+import { CountryService } from '../countries/services/country.service';
 
 @Injectable()
 export class AuthService {
@@ -39,6 +40,7 @@ export class AuthService {
     private mailService: MailService,
     private tokenService: TokenService,
     private emailEventService: EmailEventService,
+    private countryService: CountryService,
   ) {}
 
   async signUpPhoneNo(input: SignupPhone){
@@ -131,12 +133,39 @@ export class AuthService {
         throw new ConflictException("User with email already exist")
       }
 
+      const verifyPhoneOtp = await this.tokenService.validateOtp({
+        phoneNo: input.phoneNo,
+        token: input.otpPhone,
+        subject: TokenSubject.SIGN_UP_PHONE,
+      });
+
+      if (!verifyPhoneOtp) {
+        throw new BadRequestException('Invalid OTP');
+      }
+
+      const verifyEmailOtp = await this.tokenService.validateOtp({
+        email: input.email,
+        token: input.otpEmail,
+        subject: TokenSubject.SIGN_UP_EMAIL,
+      });
+
+      if (!verifyEmailOtp) {
+        throw new BadRequestException('Invalid OTP');
+      }
+
+      const country = await this.countryService.findById(input.country);
+
+      if (!country) {
+        throw new NotFoundException('Country not found');
+      }
+
       if (input.loginType == LoginType.NORMAL){
         const password = await PasswordUtil.hashPassword(input.password)
 
         const user = await this.userRepository.create({
           ...input,
           password: password,
+          country: country // Add the country object instead of string
         });
 
         const payload = {
@@ -150,7 +179,6 @@ export class AuthService {
 
         return ResponseUtil.success({...user, token}, 'User created successfully', HttpStatus.CREATED);
       }
-
     }
     catch (error: unknown) {
       return ResponseUtil.errorFromException(

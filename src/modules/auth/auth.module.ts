@@ -6,12 +6,14 @@ import { User } from '../users/entities/user.entity';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { UserRepository } from '../users/repositories/user.repository';
+import { CountriesModule } from '../countries/countries.module';
 
 @Module({
   imports: [
     SequelizeModule.forFeature([User]),
     TokenModule,
     MailModule,
+    CountriesModule
   ],
   providers: [AuthService, UserRepository],
   controllers: [AuthController],
