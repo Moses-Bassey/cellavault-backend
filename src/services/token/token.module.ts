@@ -6,6 +6,7 @@ import { TokenService } from './token.service';
 import { TokenRepository } from './repositories/token.repository';
 import { ConfigService } from '@nestjs/config';
 
+
 @Global()
 @Module({
   imports: [
@@ -13,10 +14,14 @@ import { ConfigService } from '@nestjs/config';
     JwtModule.registerAsync({
       global: true,
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        secret: configService.get<string>('app.jwtSecret'),
-        signOptions: { expiresIn: configService.get<string>('app.jwtExpiry') },
-      }),
+      useFactory: (configService: ConfigService) => {
+        return {
+          secret: configService.get<string>('app.jwtSecret') || 'default-secret',
+          signOptions: {
+            // No expiresIn means the token will not expire
+          },
+        };
+      },
     }),
   ],
   providers: [TokenService, TokenRepository],

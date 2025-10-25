@@ -1,17 +1,20 @@
 import { Global, Module } from '@nestjs/common';
 import { MailerModule } from '@nestjs-modules/mailer';
-import { MailController } from './mail.controller';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 import { MailService } from './mail.service';
+import { EmailEventService } from './email-event.service';
+import { EmailEventListener } from './listeners/email.listener';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { join } from 'path';
 import { ConfigService } from '@nestjs/config';
 
 @Global()
 @Module({
-  controllers: [MailController],
-  providers: [MailService],
-  exports: [MailService],
+  controllers: [],
+  providers: [MailService, EmailEventService, EmailEventListener],
+  exports: [MailService, EmailEventService],
   imports: [
+    EventEmitterModule.forRoot(),
     MailerModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
@@ -29,10 +32,10 @@ import { ConfigService } from '@nestjs/config';
           from: configService.get<string>('app.emailFrom'),
         },
         template: {
-          dir: join(__dirname, './templates'),
+          dir: join(process.cwd(), 'src/services/mail/templates'),
           adapter: new HandlebarsAdapter(),
           options: {
-            strict: true,
+            strict: false,
           },
         },
       }),

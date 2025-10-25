@@ -21,6 +21,12 @@ export class UserRepository {
     });
   }
 
+  async findByPhone(phoneNo: string): Promise<User | null> {
+    return await this.userModel.findOne({
+      where: { phoneNo },
+    });
+  }
+
   async findByEmailAndRole(email: string, userType: UserType): Promise<User | null> {
     return await this.userModel.findOne({
       where: { email, userType },

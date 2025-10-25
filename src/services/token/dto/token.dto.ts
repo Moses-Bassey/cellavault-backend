@@ -1,17 +1,31 @@
-import { IsDate, IsString } from 'class-validator';
+import { IsDate, IsOptional, IsString } from 'class-validator';
+import { TokenSubject } from 'src/enums/token.enum';
 
-export class CreateCustomTokenDto {
+export class CreateTokenDto {
   @IsString()
-  email: string;
+  @IsOptional()
+  email?: string;
+
+  @IsString()
+  @IsOptional()
+  phoneNo?: string;
 
   @IsDate()
   expiry: Date;
 
   @IsString()
-  subject: string;
+  subject: TokenSubject;
 }
 
 export class VerifyCustomTokenDto {
   @IsString()
   token: string;
+
+  @IsString()
+  @IsOptional()
+  email: string;
+
+  @IsString()
+  @IsOptional()
+  phoneNo: string;
 }

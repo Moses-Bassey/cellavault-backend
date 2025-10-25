@@ -1,7 +1,7 @@
-import { QueryInterface, DataTypes } from 'sequelize';
+const { QueryInterface, DataTypes } = require('sequelize');
 
-export = {
-  up: async (queryInterface: QueryInterface): Promise<void> => {
+module.exports = {
+  up: async (queryInterface) => {
     await queryInterface.createTable('users', {
       id: {
         type: DataTypes.UUID,
@@ -9,7 +9,7 @@ export = {
         primaryKey: true,
       },
       fullName: {
-        type: DataTypes.STRING(100),
+        type: DataTypes.STRING(150),
         allowNull: false,
       },
       phoneNo: {
@@ -22,12 +22,16 @@ export = {
         unique: true,
       },
       password: {
-        type: DataTypes.STRING(255),
+        type: DataTypes.STRING(1000),
         allowNull: false,
       },
       userType: {
         type: DataTypes.ENUM('SUPER_ADMIN', 'PEPP_ADMIN', 'USER'),
         allowNull: false,
+      },
+      loginType: {
+        type: DataTypes.ENUM('NORMAL', 'GOOGLE', 'APPLE'),
+        allowNull: true,
       },
       isEmailVerified: {
         type: DataTypes.BOOLEAN,
@@ -39,7 +43,7 @@ export = {
         defaultValue: false,
         allowNull: false,
       },
-      isVerified: {
+      isActive: {
         type: DataTypes.BOOLEAN,
         defaultValue: true,
         allowNull: false,
@@ -67,7 +71,7 @@ export = {
     });
   },
 
-  down: async (queryInterface: QueryInterface): Promise<void> => {
+  down: async (queryInterface) => {
     await queryInterface.dropTable('users');
   },
 };

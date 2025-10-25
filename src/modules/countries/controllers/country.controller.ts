@@ -1,11 +1,12 @@
 import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
-import { Country } from './entities/country.entity';
-import { CountryService } from './services/country.service';
-import { AuthGuard } from '../../guards/auth.guard';
-import { RolesGuard } from '../../guards/roles.guard';
-import { Roles } from '../../decorators/roles.decorator';
+import { Country } from '../entities/country.entity';
+import { CountryService } from '../services/country.service';
+import { AuthGuard } from '../../auth/guards/auth.guard';
+import { RolesGuard } from '../../auth/guards/roles.guard';
+import { Roles } from '../../auth/decorators/roles.decorator';
 import { UserType } from '../../../enums/user-type.enum';
+
 
 @ApiTags('Countries')
 @ApiBearerAuth()
@@ -58,14 +59,5 @@ export class CountryController {
   @ApiResponse({ status: 404, description: 'Country not found' })
   async delete(@Param('id') id: string): Promise<number> {
     return await this.countryService.delete(id);
-  }
-
-  @Put(':id/restore')
-  @Roles(UserType.SUPER_ADMIN)
-  @ApiOperation({ summary: 'Restore soft deleted country' })
-  @ApiResponse({ status: 200, description: 'Country restored successfully' })
-  @ApiResponse({ status: 404, description: 'Country not found' })
-  async restore(@Param('id') id: string): Promise<number> {
-    return await this.countryService.restore(id);
   }
 }

@@ -12,22 +12,23 @@ export class MailService {
   ): Promise<void> {
     await this.mailerService.sendMail({
       to: email,
-      subject: MAIL_SUBJECT.RESET_PASSWORD,
+      subject: MAIL_SUBJECT.SIGN_UP_OTP,
       template: 'forget-password',
       context: { resetLink },
     });
   }
 
-  async sendOrgOnboardingEmail(
+  async sendSignUpOtpEmail(
     email: string,
-    invitationLink: string,
+    otpCode: string,
     expiryDate: string,
   ): Promise<void> {
     await this.mailerService.sendMail({
       to: email,
-      subject: MAIL_SUBJECT.ORG_ONBOARDING,
-      template: 'org-invitation',
-      context: { invitationLink, expiryDate },
+      subject: MAIL_SUBJECT.SIGN_UP_OTP,
+      template: 'signup-otp',
+      context: { otpCode, expiryDate },
     });
   }
+
 }

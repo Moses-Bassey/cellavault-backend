@@ -1,7 +1,7 @@
-import { QueryInterface, DataTypes } from 'sequelize';
+const { QueryInterface, DataTypes } = require('sequelize');
 
-export = {
-  up: async (queryInterface: QueryInterface): Promise<void> => {
+module.exports = {
+  up: async (queryInterface) => {
     await queryInterface.createTable('countries', {
       id: {
         type: DataTypes.UUID,
@@ -40,7 +40,7 @@ export = {
     });
   },
 
-  down: async (queryInterface: QueryInterface): Promise<void> => {
+  down: async (queryInterface) => {
     await queryInterface.dropTable('countries');
   },
 };

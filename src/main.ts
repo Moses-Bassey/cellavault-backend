@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import { Logger, ValidationPipe, VersioningType } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { ApiKeyInterceptor } from './interceptors/api-key.interceptors';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -14,7 +15,7 @@ async function bootstrap() {
 
   // CORS configuration
   app.enableCors({
-    origin: configService.get<string>('app.corsOrigin'),
+    origin: "*",
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: [
@@ -24,6 +25,7 @@ async function bootstrap() {
       'Accept',
       'Authorization',
       'X-Forwarded-For',
+      'x-product-key',
     ],
   });
 
@@ -49,6 +51,10 @@ async function bootstrap() {
     }),
   );
 
+  // Global API key interceptor
+  const apiKeyInterceptor = app.get(ApiKeyInterceptor);
+  app.useGlobalInterceptors(apiKeyInterceptor);
+
   // Swagger documentation
   if (configService.get<string>('NODE_ENV') !== 'production') {
     const configSwagger = new DocumentBuilder()
@@ -73,16 +79,6 @@ async function bootstrap() {
     });
   }
 
-  //Configure webhooks to receive raw body
-  app.use('/webhooks', (req, res, next) => {
-    if (req.originalUrl.startsWith('/webhooks')) {
-      req.rawBody = Buffer.from('');
-      req.on('data', (chunk) => {
-        req.rawBody = Buffer.concat([req.rawBody, chunk]);
-      });
-    }
-    next();
-  });
 
   // Start server
   const port = configService.get<number>('app.port');

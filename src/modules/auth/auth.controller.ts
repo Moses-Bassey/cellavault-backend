@@ -13,6 +13,10 @@ import {
   ForgotPasswordDto,
   LoginUserDto,
   ResetPasswordDto,
+  SignupEmail,
+  SignupPhone,
+  SignUpUserDto,
+  VerifyOtpDto,
 } from './dto/auth.dto';
 import { Auth } from './decorators/auth.decorator';
 import { AuthGuard } from './guards/auth.guard';
@@ -21,6 +25,26 @@ import { ApiBearerAuth } from '@nestjs/swagger';
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
+
+  @Post('signup-phone')
+  async signUpPhoneNo(@Body() input: SignupPhone) {
+    return await this.authService.signUpPhoneNo(input);
+  }
+
+  @Post('signup-email')
+  async signUpEmail(@Body() input: SignupEmail) {
+    return await this.authService.signUpEmail(input);
+  }
+
+  @Post('verify-otp')
+  async verifyOtp(@Body() input: VerifyOtpDto) {
+    return await this.authService.verifyOtp(input);
+  }
+
+  @Post('sign-up')
+  async signUp(@Body() input: SignUpUserDto) {
+    return await this.authService.signUp(input);
+  }
 
   @Post('login')
   async login(@Body() input: LoginUserDto) {

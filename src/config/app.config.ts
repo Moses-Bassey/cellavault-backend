@@ -9,6 +9,7 @@ export default registerAs('app', () => ({
   jwtSecret: process.env.JWT_SECRET || '',
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || '1d',
   jwtTokenExpiry: process.env.JWT_TOKEN_EXPIRY || '1h',
+  apiKey: process.env.PEPPCRUISE_API_KEY || '',
   rateLimitTtl: parseInt(process.env.RATE_LIMIT_TTL || '60000', 10),
   rateLimitLimit: parseInt(process.env.RATE_LIMIT_LIMIT || '10', 10),
   emailHost: process.env.EMAIL_HOST || '',

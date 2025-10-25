@@ -15,6 +15,7 @@ import {
 } from 'sequelize-typescript';
 import { UserType } from '../../../enums/user-type.enum';
 import { Country } from '../../countries/entities/country.entity';
+import { LoginType } from 'src/enums/login-type.enum';
 
 @Table({
   tableName: 'users',
@@ -50,29 +51,25 @@ export class User extends Model<User> {
   })
   public userType: UserType;
 
-  @Column(DataType.STRING(255))
-  public password: string;
+  @Column(DataType.STRING(500))
+  public declare password: string;
+
+  @Column(DataType.ENUM(Object.values(LoginType).toString()))
+  public declare loginType: string;
 
   @Default(false)
   @Column({
     type: DataType.BOOLEAN,
     allowNull: false,
   })
-  public isEmailVerified: boolean;
+  public declare isEmailVerified: boolean;
 
   @Default(false)
   @Column({
     type: DataType.BOOLEAN,
     allowNull: false,
   })
-  public isPhoneVerified: boolean;
-
-  @Default(false)
-  @Column({
-    type: DataType.BOOLEAN,
-    allowNull: false,
-  })
-  public isVerified: boolean;
+  public declare isPhoneVerified: boolean;
 
   @Default(true)
   @Column({

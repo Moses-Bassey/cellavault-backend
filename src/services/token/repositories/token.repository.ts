@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Model } from 'sequelize-typescript';
 import { Token } from '../entities/token.entity';
+import { Op } from 'sequelize';
 
 @Injectable()
 export class TokenRepository {
@@ -19,6 +20,31 @@ export class TokenRepository {
     return await this.tokenModel.findOne({
       where: { token },
       attributes: ['id', 'expiry', 'email'],
+    });
+  }
+
+  async findByPhoneOrEmailToken(token: string, phoneNo: string, email: string): Promise<Token | null> {
+    return await this.tokenModel.findOne({
+      where: { [Op.or]: [
+        { email: email },
+        { phoneNo: phoneNo },
+        { token: token }
+        ], },
+      attributes: ['id', 'expiry', 'email', 'phoneNo', 'token'],
+    });
+  }
+
+  async findByEmailToken(token: string, email: string): Promise<Token | null> {
+    return await this.tokenModel.findOne({
+      where: { email, token },
+      attributes: ['id', 'expiry', 'email', 'phoneNo', 'token'],
+    });
+  }
+
+  async findByPhoneToken(token: string, phoneNo: string): Promise<Token | null> {
+    return await this.tokenModel.findOne({
+      where: { phoneNo, token },
+      attributes: ['id', 'expiry', 'email', 'phoneNo', 'token'],
     });
   }
 

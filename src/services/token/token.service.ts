@@ -2,9 +2,15 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { isAfter } from 'date-fns';
-import { Token } from './entities';
-import { CreateCustomTokenDto, VerifyCustomTokenDto } from './dto/token.dto';
+import { CreateTokenDto, VerifyCustomTokenDto } from './dto/token.dto';
 import { TokenRepository } from './repositories/token.repository';
+import { ITokenInterface } from './interface/IToken.interface';
+import * as randomstring from 'randomstring';
+import moment from 'moment';
+import { IOTPInterface } from './interface/IOTP.interface';
+import { TokenSubject } from 'src/enums/token.enum';
+import { Token } from './entities/token.entity';
+
 
 @Injectable()
 export class TokenService {
@@ -14,13 +20,46 @@ export class TokenService {
     private readonly configService: ConfigService,
   ) {}
 
-  async generateToken(payload: any) {
-    const expiresIn =
-      this.configService.get<string>('app.jwtTokenExpiry') || '1h';
-    return await this.jwtService.signAsync(payload, { expiresIn: parseInt(expiresIn) });
+
+  public async validateOtp(dto: IOTPInterface): Promise<{ token: string }> {
+    const { token, email, phoneNo, otpSubject } = dto;
+    
+    let userToken: Token | null = null;
+    
+    switch(otpSubject){
+      case TokenSubject.SIGN_UP_EMAIL:
+        userToken = await this.tokenRepository.findByEmailToken(token, email);
+        break;
+      case TokenSubject.SIGN_UP_PHONE:
+        userToken = await this.tokenRepository.findByPhoneToken(token, phoneNo);
+        break;
+      default:
+        throw new BadRequestException('Invalid OTP Subject');
+    }
+
+    if (!userToken) throw new BadRequestException('Invalid OTP');
+
+    return { token: userToken.token };
   }
 
-  async verifyToken(token: string) {
+  async generateOTPtoken(payload: CreateTokenDto) : Promise<ITokenInterface> {
+    const token = randomstring.generate({
+      length: 6,
+      charset: 'numeric',
+    })
+    
+    return await this.tokenRepository.create({
+      ...payload,
+      token: token
+    });
+  }
+
+  async generateJWTtoken(payload: any) {
+    const expiresIn = this.configService.get<string>('app.jwtTokenExpiry') || '1h';
+    return await this.jwtService.signAsync(payload, { expiresIn: Number(expiresIn) });
+  }
+
+  async verifyJWTtoken(token: string) {
     try {
       return await this.jwtService.verifyAsync(token);
     } catch (error) {
@@ -28,39 +67,7 @@ export class TokenService {
     }
   }
 
-  async generateCustomToken(dto: CreateCustomTokenDto): Promise<string> {
-    const token = await this.generateToken({ isCustom: true });
-
-    await this.tokenRepository.create({
-      token,
-      expiry: dto.expiry,
-      subject: dto.subject,
-      email: dto.email,
-    });
-
-    return token;
-  }
-
-  public async verifyCustomToken(dto: VerifyCustomTokenDto) {
-    const { token } = dto;
-
-    const userToken = await this.tokenRepository.findByToken(token);
-
-    if (!userToken) return false;
-
-    const isExpired = isAfter(new Date(), userToken.expiry);
-
-    if (isExpired) {
-      await this.tokenRepository.delete(userToken.id);
-      return false;
-    }
-
-    await this.tokenRepository.delete(userToken.id);
-
-    return { email: userToken.email };
-  }
-
-  private async delete(id: string) {
+  private async deleteOTPtoken(id: string) {
     await this.tokenRepository.delete(id);
   }
 }

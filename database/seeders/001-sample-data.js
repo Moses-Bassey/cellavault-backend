@@ -1,7 +1,7 @@
-import { QueryInterface } from 'sequelize';
+const { QueryInterface } = require('sequelize');
 
-export = {
-  up: async (queryInterface: QueryInterface): Promise<void> => {
+module.exports = {
+  up: async (queryInterface) => {
     // Insert sample country data
     await queryInterface.bulkInsert('countries', [
       {
@@ -33,9 +33,10 @@ export = {
         email: 'admin@peppcruise.com',
         password: '$2b$10$example.hash.password', // This should be a real hashed password
         userType: 'PEPP_ADMIN',
+        loginType: 'NORMAL',
         isEmailVerified: true,
         isPhoneVerified: true,
-        isVerified: true,
+        isActive: true,
         countryId: '550e8400-e29b-41d4-a716-446655440000',
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -43,8 +44,8 @@ export = {
     ]);
   },
 
-  down: async (queryInterface: QueryInterface): Promise<void> => {
-    await queryInterface.bulkDelete('users', null, {});
-    await queryInterface.bulkDelete('countries', null, {});
+  down: async (queryInterface) => {
+    await queryInterface.bulkDelete('users', {});
+    await queryInterface.bulkDelete('countries', {});
   },
 };

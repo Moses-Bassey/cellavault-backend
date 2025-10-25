@@ -13,6 +13,7 @@ import { CountriesModule } from './modules/countries/countries.module';
 import { TokenModule } from './services/token/token.module';
 import { MailModule } from './services/mail/mail.module';
 import { AxiosModule } from './services/axios/axios.module';
+import { ApiKeyInterceptor } from './interceptors/api-key.interceptors';
 
 // Import entities from their respective modules
 import { User } from './modules/users/entities';
@@ -59,6 +60,6 @@ import { Token } from './services/token/entities';
     AxiosModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, ApiKeyInterceptor],
 })
 export class AppModule {}
