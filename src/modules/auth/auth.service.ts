@@ -114,7 +114,7 @@ export class AuthService {
         throw new BadRequestException('Invalid OTP');
       }
       
-      return ResponseUtil.success(data, 'OTP Validated', HttpStatus.OK);
+      return ResponseUtil.success(data, 'OTP Validated successfully', HttpStatus.OK);
 
     } catch (error) {
       return ResponseUtil.errorFromException(
@@ -127,13 +127,22 @@ export class AuthService {
   async signUp(input: SignUpUserDto){
     try{
 
-      const user = await this.checkEmailExist(input.email);
+      const country = await this.countryService.findById(input.country);
+      if (!country) {
+        throw new NotFoundException('Country not found');
+      }
 
-      if(user) {
+      const emailUser = await this.checkEmailExist(input.email);
+      if(emailUser) {
         throw new ConflictException("User with email already exist")
       }
 
-      const verifyPhoneOtp = await this.tokenService.validateOtp({
+      const userPhone = await this.userRepository.findByPhone(input.phoneNo);
+      if(userPhone) {
+        throw new ConflictException("User with phone number already exist")
+      }
+
+      const verifyPhoneOtp = await this.tokenService.verifySignUpOTP({
         phoneNo: input.phoneNo,
         token: input.otpPhone,
         subject: TokenSubject.SIGN_UP_PHONE,
@@ -143,7 +152,7 @@ export class AuthService {
         throw new BadRequestException('Invalid OTP');
       }
 
-      const verifyEmailOtp = await this.tokenService.validateOtp({
+      const verifyEmailOtp = await this.tokenService.verifySignUpOTP({
         email: input.email,
         token: input.otpEmail,
         subject: TokenSubject.SIGN_UP_EMAIL,
@@ -152,33 +161,37 @@ export class AuthService {
       if (!verifyEmailOtp) {
         throw new BadRequestException('Invalid OTP');
       }
+      
+      const password = await PasswordUtil.hashPassword(input.password)
 
-      const country = await this.countryService.findById(input.country);
+      const user = await this.userRepository.create({
+        email: input.email,
+        phoneNo: input.phoneNo,
+        fullName: input.fullName,
+        password: password,
+        countryId: country.id,
+        userType: UserType.USER,
+        loginType: LoginType.NORMAL,
+        isEmailVerified: true,
+        isPhoneVerified: true,
+        isActive: true,
+      });
 
-      if (!country) {
-        throw new NotFoundException('Country not found');
-      }
+      const payload = {
+        sub: user.id,
+        userType: UserType.USER,
+        userId: user!.id,
+        email: input.email
+      };
 
-      if (input.loginType == LoginType.NORMAL){
-        const password = await PasswordUtil.hashPassword(input.password)
+      const token: string = await this.tokenService.generateJWTtoken(payload);
 
-        const user = await this.userRepository.create({
-          ...input,
-          password: password,
-          country: country // Add the country object instead of string
-        });
-
-        const payload = {
-          sub: user.id,
-          userType: user.userType,
-          userId: user.id,
-          email: user.email
-        };
-
-        const token: string = await this.tokenService.generateJWTtoken(payload);
-
-        return ResponseUtil.success({...user, token}, 'User created successfully', HttpStatus.CREATED);
-      }
+      return ResponseUtil.success({
+        email: input.email, 
+        userType: UserType.USER, 
+        id: user.id, 
+        token: token
+      }, 'User created successfully', HttpStatus.CREATED);
     }
     catch (error: unknown) {
       return ResponseUtil.errorFromException(
@@ -197,6 +210,8 @@ export class AuthService {
         throw new UnauthorizedException('Invalid Credentials');
       }
 
+      console.log(user);
+      
       if (!user.isActive) {
         throw new NotFoundException('Your account is disabled, contact Admin');
       }
@@ -221,7 +236,9 @@ export class AuthService {
 
       const { password, ...rest } = user;
 
-      const data = { token, user: rest };
+      const data = { token, userType: user.userType,
+        userId: user.id,
+        email: user.email };
 
       return ResponseUtil.success(data, 'Login Successful', HttpStatus.OK);
     } catch (error: unknown) {

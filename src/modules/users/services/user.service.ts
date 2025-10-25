@@ -6,6 +6,10 @@ import { UserRepository } from '../repositories/user.repository';
 export class UserService {
   constructor(private readonly userRepository: UserRepository) {}
 
+  async dashboard(){
+    
+  }
+
   async findById(id: string): Promise<User | null> {
     return await this.userRepository.findById(id);
   }

@@ -10,6 +10,7 @@ import appConfig from './config/app.config';
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { CountriesModule } from './modules/countries/countries.module';
+import { ClientDevicesModule } from './modules/client-devices/client-devices.module';
 import { TokenModule } from './services/token/token.module';
 import { MailModule } from './services/mail/mail.module';
 import { AxiosModule } from './services/axios/axios.module';
@@ -18,6 +19,7 @@ import { ApiKeyInterceptor } from './interceptors/api-key.interceptors';
 // Import entities from their respective modules
 import { User } from './modules/users/entities';
 import { Country } from './modules/countries/entities';
+import { ClientDevice } from './modules/client-devices/entities/client-device.entity';
 import { Token } from './services/token/entities';
 
 
@@ -38,6 +40,7 @@ import { Token } from './services/token/entities';
       models: [
         User,
         Country,
+        ClientDevice,
         Token,
       ],
       synchronize: process.env.NODE_ENV !== 'production', // Disable in production
@@ -55,6 +58,7 @@ import { Token } from './services/token/entities';
     AuthModule,
     UsersModule,
     CountriesModule,
+    ClientDevicesModule,
     TokenModule,
     MailModule,
     AxiosModule,

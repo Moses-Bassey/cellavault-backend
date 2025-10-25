@@ -83,8 +83,7 @@ export class TokenService {
   }
 
   async generateJWTtoken(payload: any) {
-    const expiresIn = this.configService.get<string>('app.jwtTokenExpiry') || '1h';
-    return await this.jwtService.signAsync(payload, { expiresIn: Number(expiresIn) });
+    return await this.jwtService.signAsync(payload);
   }
 
   async verifyJWTtoken(token: string) {

@@ -36,6 +36,16 @@ export class UserController {
     return await this.userService.update(id, userData);
   }
 
+  @Put('dashboard')
+  @ApiOperation({ summary: 'Dashboard user' })
+  @ApiResponse({ status: 200, description: 'User updated successfully' })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  async dashboard(
+    @Body() userData: Partial<User>,
+  ){
+    // return await this.userService.update(id, userData);
+  }
+
 //   @Delete(':id')
 //   @Roles(UserType.SUPER_ADMIN)
 //   @ApiOperation({ summary: 'Soft delete user' })

@@ -69,6 +69,10 @@ module.exports = {
         allowNull: true,
       },
     });
+
+    await queryInterface.addIndex('users', ['fullName']);
+    await queryInterface.addIndex('users', ['email']);
+    await queryInterface.addIndex('users', ['phoneNo']);
   },
 
   down: async (queryInterface) => {

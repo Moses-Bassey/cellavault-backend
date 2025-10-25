@@ -5,12 +5,12 @@ import { TokenSubject } from 'src/enums/token.enum';
 
 
 export class SignUpUserDto {
-  @ApiProperty({
-    description: 'Login type',
-    example: 'NORMAL',
-  })
-  @IsEnum(LoginType)
-  readonly loginType: LoginType;
+  // @ApiProperty({
+  //   description: 'Login type',
+  //   example: 'NORMAL',
+  // })
+  // @IsEnum(LoginType)
+  // readonly loginType: LoginType;
 
   @ApiProperty({
     description: 'User email address',
@@ -26,7 +26,7 @@ export class SignUpUserDto {
   })
   @IsString()
   @MinLength(8)
-  readonly password: string;
+  password: string;
 
   @ApiProperty({
     description: 'User Phone No',
@@ -34,16 +34,15 @@ export class SignUpUserDto {
   })
   @IsString()
   @MaxLength(15)
-  readonly phoneNo: string;
+  phoneNo: string;
 
   @IsString()
   @MaxLength(6)
-  readonly otpPhone: string;
+  otpPhone: string;
 
   @IsString()
   @MaxLength(6)
-  readonly otpEmail: string;
-
+  otpEmail: string;
 
   @ApiProperty({
     description: 'Country',
@@ -51,7 +50,15 @@ export class SignUpUserDto {
   })
   @IsString()
   @IsUUID()
-  readonly country: string;
+  country: string;
+
+  @ApiProperty({
+    description: 'User full name',
+    example: 'John Doe',
+  })
+  @IsString()
+  @MinLength(4)
+  readonly fullName: string;
 }
 
 export class LoginUserDto {
@@ -68,6 +75,13 @@ export class LoginUserDto {
   })
   @IsString()
   readonly password: string;
+
+  @ApiProperty({
+    description: 'Login type',
+    example: 'NORMAL',
+  })
+  @IsString()
+  readonly loginType: LoginType;
 }
 
 export class ForgotPasswordDto {

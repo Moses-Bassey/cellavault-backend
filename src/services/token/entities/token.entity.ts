@@ -21,15 +21,15 @@ export class Token extends Model<Token> {
   @PrimaryKey
   @Default(DataType.UUIDV4)
   @Column(DataType.UUID)
-  public declare id: string;
+  declare id: string;
 
   @Column(DataType.STRING(100))
-  public subject: TokenSubject;
+  subject: TokenSubject;
 
   @Column({
     type: DataType.TEXT,
   })
-  public token: string;
+  token: string;
 
   @Column({
     type: DataType.STRING,
@@ -38,28 +38,28 @@ export class Token extends Model<Token> {
       isEmail: true,
     },
   })
-  public email: string;
+  email: string;
 
   @Column({
     type: DataType.STRING(15),
     allowNull: true,
   })
-  public phoneNo: string;
+  phoneNo: string;
 
   @Column({
     type: DataType.ENUM(Object.values(TokenType).toString()),
   })
-  public tokenType: TokenType;
+  tokenType: TokenType;
 
   @Column(DataType.DATE)
-  public expiry: Date;
+  expiry: Date;
 
   @CreatedAt
-  public declare createdAt: Date;
+  declare createdAt: Date;
 
   @UpdatedAt
-  public declare updatedAt: Date;
+  declare updatedAt: Date;
 
   @DeletedAt
-  public declare deletedAt: Date | null;
+  declare deletedAt: Date | null;
 }
