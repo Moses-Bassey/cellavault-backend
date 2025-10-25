@@ -15,6 +15,11 @@ import {
   tableName: 'countries',
   timestamps: true,
   paranoid: true, // Enable soft delete
+  defaultScope: {
+    attributes: {
+      exclude: ['deletedAt', 'createdAt', 'updatedAt'],
+    },
+  },
 })
 export class Country extends Model<Country> {
   @PrimaryKey
@@ -34,6 +39,9 @@ export class Country extends Model<Country> {
 
   @Column(DataType.STRING(10))
   public declare currency: string;
+
+  @Column(DataType.INTEGER)
+  public declare phoneLength: number;
 
   @CreatedAt
   public declare createdAt: Date;

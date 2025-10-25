@@ -9,22 +9,22 @@ import { UserType } from '../../../enums/user-type.enum';
 
 
 @ApiTags('Countries')
-@ApiBearerAuth()
-@UseGuards(AuthGuard, RolesGuard)
 @Controller('countries')
 export class CountryController {
   constructor(private readonly countryService: CountryService) {}
 
   @Get()
-  @Roles(UserType.PEPP_ADMIN, UserType.SUPER_ADMIN)
   @ApiOperation({ summary: 'Get all countries' })
   @ApiResponse({ status: 200, description: 'Countries retrieved successfully' })
-  async findAll(): Promise<Country[]> {
-    return await this.countryService.findAll();
+  async findAll() {
+    const data = await this.countryService.findAll();
+    return data;
   }
 
   @Get(':id')
   @Roles(UserType.PEPP_ADMIN, UserType.SUPER_ADMIN)
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Get country by ID' })
   @ApiResponse({ status: 200, description: 'Country retrieved successfully' })
   @ApiResponse({ status: 404, description: 'Country not found' })
@@ -33,7 +33,9 @@ export class CountryController {
   }
 
   @Post()
+  @UseGuards(AuthGuard)
   @Roles(UserType.SUPER_ADMIN)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Create new country' })
   @ApiResponse({ status: 201, description: 'Country created successfully' })
   async create(@Body() countryData: Partial<Country>): Promise<Country> {
@@ -41,6 +43,8 @@ export class CountryController {
   }
 
   @Put(':id')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard)
   @Roles(UserType.SUPER_ADMIN)
   @ApiOperation({ summary: 'Update country' })
   @ApiResponse({ status: 200, description: 'Country updated successfully' })
@@ -53,6 +57,8 @@ export class CountryController {
   }
 
   @Delete(':id')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard)
   @Roles(UserType.SUPER_ADMIN)
   @ApiOperation({ summary: 'Soft delete country' })
   @ApiResponse({ status: 200, description: 'Country deleted successfully' })

@@ -21,6 +21,11 @@ import { LoginType } from 'src/enums/login-type.enum';
   tableName: 'users',
   timestamps: true,
   paranoid: true,
+  defaultScope: {
+    attributes: {
+      exclude: ['deletedAt'],
+    },
+  },
 })
 export class User extends Model<User> {
   @PrimaryKey
