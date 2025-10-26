@@ -8,6 +8,7 @@ import {
   WelcomeEmailEvent,
   BookingConfirmationEmailEvent,
   DriverVerificationEmailEvent,
+  PasswordChangedEmailEvent,
 } from '../events/email.events';
 
 @Injectable()
@@ -118,6 +119,28 @@ export class EmailEventListener {
       this.logger.log(`Driver verification email sent successfully to ${event.email}`);
     } catch (error) {
       this.logger.error(`Failed to send driver verification email to ${event.email}:`, error);
+    }
+  }
+
+  @OnEvent('email.password-changed')
+  async handlePasswordChangedEvent(event: PasswordChangedEmailEvent) {
+    try {
+      this.logger.log(`Sending password changed email to ${event.email}`);
+      
+      await this.mailerService.sendMail({
+        to: event.email,
+        subject: MAIL_SUBJECT.PASSWORD_CHANGED,
+        template: 'password-changed',
+        context: { 
+          fullName: event.fullName,
+          email: event.email,
+          changedAt: event.changedAt,
+        },
+      });
+
+      this.logger.log(`Password changed email sent successfully to ${event.email}`);
+    } catch (error) {
+      this.logger.error(`Failed to send password changed email to ${event.email}:`, error);
     }
   }
 }

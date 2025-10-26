@@ -38,3 +38,11 @@ export class DriverVerificationEmailEvent {
     public readonly reason?: string,
   ) {}
 }
+
+export class PasswordChangedEmailEvent {
+  constructor(
+    public readonly email: string,
+    public readonly fullName: string,
+    public readonly changedAt: string,
+  ) {}
+}

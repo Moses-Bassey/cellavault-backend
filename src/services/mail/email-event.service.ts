@@ -6,6 +6,7 @@ import {
   WelcomeEmailEvent,
   BookingConfirmationEmailEvent,
   DriverVerificationEmailEvent,
+  PasswordChangedEmailEvent,
 } from './events/email.events';
 
 @Injectable()
@@ -57,5 +58,10 @@ export class EmailEventService {
       reason,
     );
     this.eventEmitter.emit('email.driver-verification', event);
+  }
+
+  async emitPasswordChangedEmail(email: string, fullName: string, changedAt: string) {
+    const event = new PasswordChangedEmailEvent(email, fullName, changedAt);
+    this.eventEmitter.emit('email.password-changed', event);
   }
 }

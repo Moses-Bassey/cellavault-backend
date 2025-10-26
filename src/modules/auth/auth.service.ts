@@ -369,6 +369,14 @@ export class AuthService {
 
       await this.userRepository.update(user.id, { password: hashedPassword });
 
+      // Send password changed notification email
+      const changedAt = moment().format('MMMM Do YYYY, h:mm A');
+      await this.emailEventService.emitPasswordChangedEmail(
+        user.email,
+        user.fullName,
+        changedAt,
+      );
+
       return ResponseUtil.success({}, 'Password Changed', 200);
     } catch (error: unknown) {
       return ResponseUtil.errorFromException(error);
