@@ -33,9 +33,10 @@ export class User extends Model<User> {
   @Column(DataType.UUID)
   public declare id: string;
 
-  @Column(DataType.STRING(100))
+  @Column(DataType.STRING(150))
   public fullName: string;
 
+  @Unique
   @Column(DataType.STRING(15))
   public phoneNo: string;
 
@@ -56,25 +57,29 @@ export class User extends Model<User> {
   })
   public userType: UserType;
 
-  @Column(DataType.STRING(500))
-  public declare password: string;
+  @Column(DataType.STRING(1000))
+  public password: string;
 
-  @Column(DataType.ENUM(Object.values(LoginType).toString()))
-  public declare loginType: string;
+  @Column({
+    type: DataType.ENUM,
+    values: Object.values(LoginType),
+    allowNull: false,
+  })
+  public loginType: LoginType;
 
   @Default(false)
   @Column({
     type: DataType.BOOLEAN,
     allowNull: false,
   })
-  public declare isEmailVerified: boolean;
+  public isEmailVerified: boolean;
 
   @Default(false)
   @Column({
     type: DataType.BOOLEAN,
     allowNull: false,
   })
-  public declare isPhoneVerified: boolean;
+  public isPhoneVerified: boolean;
 
   @Default(true)
   @Column({

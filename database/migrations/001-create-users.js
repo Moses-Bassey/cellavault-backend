@@ -31,7 +31,7 @@ module.exports = {
       },
       loginType: {
         type: DataTypes.ENUM('NORMAL', 'GOOGLE', 'APPLE'),
-        allowNull: true,
+        allowNull: false,
       },
       isEmailVerified: {
         type: DataTypes.BOOLEAN,
@@ -70,9 +70,7 @@ module.exports = {
       },
     });
 
-    await queryInterface.addIndex('users', ['fullName']);
-    await queryInterface.addIndex('users', ['email']);
-    await queryInterface.addIndex('users', ['phoneNo']);
+    await queryInterface.addIndex('users', ['email', 'phoneNo', 'fullName']);
   },
 
   down: async (queryInterface) => {

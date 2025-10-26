@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/sequelize';
 import { Model } from 'sequelize-typescript';
 import { User } from '../entities/user.entity';
 import { UserType } from '../../../enums/user-type.enum';
+import { Op } from 'sequelize';
 
 @Injectable()
 export class UserRepository {
@@ -10,6 +11,18 @@ export class UserRepository {
     @InjectModel(User)
     private userModel: typeof User,
   ) {}
+
+  async findByIdentity(identity: string): Promise<User | null> {
+    return await this.userModel.findOne({
+      where: {
+        [Op.or]: [
+          { email: identity },
+          { phoneNo: identity },
+        ],
+      },
+      raw: true
+    });
+  }
 
   async findById(id: string): Promise<User | null> {
     return await this.userModel.findByPk(id);
@@ -35,6 +48,7 @@ export class UserRepository {
   }
 
   async create(userData: Partial<User>): Promise<User> {
+    console.log(userData);
     return await this.userModel.create(userData as any);
   }
 

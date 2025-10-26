@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsEnum, IsOptional, IsString, IsUUID, MaxLength, MinLength } from 'class-validator';
+import { IsEmail, IsEnum, IsOptional, IsPhoneNumber, IsString, IsUUID, MaxLength, MinLength } from 'class-validator';
+import { min } from 'date-fns';
 import { LoginType } from 'src/enums/login-type.enum';
 import { TokenSubject } from 'src/enums/token.enum';
 
@@ -63,11 +64,13 @@ export class SignUpUserDto {
 
 export class LoginUserDto {
   @ApiProperty({
-    description: 'User email address',
-    example: 'user@example.com',
+    description: 'User email address or phone number',
+    example: 'user@example.com or 08100000000',
   })
-  @IsEmail()
-  readonly email: string;
+  @IsString()
+  @MinLength(4)
+  @MaxLength(100)
+  readonly identity: string;
 
   @ApiProperty({
     description: 'User password',
@@ -76,17 +79,17 @@ export class LoginUserDto {
   @IsString()
   readonly password: string;
 
-  @ApiProperty({
-    description: 'Login type',
-    example: 'NORMAL',
-  })
-  @IsString()
-  readonly loginType: LoginType;
+  // @ApiProperty({
+  //   description: 'Login type',
+  //   example: 'NORMAL',
+  // })
+  // @IsString()
+  // readonly loginType: LoginType;
 }
 
 export class ForgotPasswordDto {
   @ApiProperty({
-    description: 'Email address to send password reset link',
+    description: 'Email address to send password otp',
     example: 'user@example.com',
   })
   @IsEmail()
@@ -99,21 +102,28 @@ export class ResetPasswordDto {
     example: 'token123',
   })
   @IsString()
-  readonly token: string;
+  token: string;
 
   @ApiProperty({
     description: 'New password',
     example: 'newPassword123',
   })
   @IsString()
-  readonly password: string;
+  password: string;
 
   @ApiProperty({
     description: 'Confirm new password',
     example: 'newPassword123',
   })
   @IsString()
-  readonly confirmPassword: string;
+  confirmPassword: string;
+
+  @ApiProperty({
+    description: 'Email address to reset password',
+    example: 'user@example.com',
+  })
+  @IsEmail()
+  public email: string;
 }
 
 export class ChangePasswordDto {

@@ -7,13 +7,15 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { UserRepository } from '../users/repositories/user.repository';
 import { CountriesModule } from '../countries/countries.module';
+import { UsersModule } from '../users/users.module';
 
 @Module({
   imports: [
     SequelizeModule.forFeature([User]),
     TokenModule,
     MailModule,
-    CountriesModule
+    CountriesModule,
+    UsersModule
   ],
   providers: [AuthService, UserRepository],
   controllers: [AuthController],

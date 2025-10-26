@@ -15,7 +15,6 @@ import { TokenSubject, TokenType } from 'src/enums/token.enum';
 @Table({
   tableName: 'tokens',
   timestamps: true,
-  paranoid: true, // Enable soft delete
 })
 export class Token extends Model<Token> {
   @PrimaryKey

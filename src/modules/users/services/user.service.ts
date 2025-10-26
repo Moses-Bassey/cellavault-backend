@@ -4,6 +4,7 @@ import { UserRepository } from '../repositories/user.repository';
 
 @Injectable()
 export class UserService {
+  
   constructor(private readonly userRepository: UserRepository) {}
 
   async dashboard(){
@@ -12,6 +13,10 @@ export class UserService {
 
   async findById(id: string): Promise<User | null> {
     return await this.userRepository.findById(id);
+  }
+
+  async findByIdentity(identity: string): Promise<User | null> {
+    return await this.userRepository.findByIdentity(identity);
   }
 
   async findByEmail(email: string): Promise<User | null> {

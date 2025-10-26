@@ -7,7 +7,7 @@ import { TokenRepository } from './repositories/token.repository';
 import { ITokenInterface } from './interface/IToken.interface';
 import * as randomstring from 'randomstring';
 import { IOTPInterface } from './interface/IOTP.interface';
-import { TokenSubject } from 'src/enums/token.enum';
+import { TokenSubject, TokenType } from 'src/enums/token.enum';
 import { Token } from './entities/token.entity';
 
 
@@ -47,6 +47,22 @@ export class TokenService {
     return { token: userToken.token };
   }
 
+  public async verifyOTP(input: IOTPInterface): Promise<{ token: string }> {
+    const { token, email, subject: subject } = input;
+    
+    let userToken: Token | null = await this.tokenRepository.findByEmailTokenAndSubject(token, email || "", subject);
+
+    if (!userToken) throw new BadRequestException('Invalid OTP');
+
+    const isExpired = isAfter(new Date(), userToken.expiry);
+    if (isExpired) {
+      await this.deleteOTPtoken(userToken.id);
+      throw new BadRequestException('Invalid or expired Token')
+    }
+
+    return userToken;
+  }
+
   public async verifySignUpOTP(dto: IOTPInterface): Promise<{ token: string }> {
     const { token, email, phoneNo, subject: otpSubject } = dto;
     
@@ -78,7 +94,8 @@ export class TokenService {
     
     return await this.tokenRepository.create({
       ...payload,
-      token: token
+      token: token,
+      tokenType: TokenType.OTP,
     });
   }
 

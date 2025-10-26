@@ -28,10 +28,11 @@ import {
   SignUpUserDto,
   VerifyOtpDto,
 } from './dto/auth.dto';
-import { TokenSubject } from 'src/enums/token.enum';
+import { TokenSubject, TokenType } from 'src/enums/token.enum';
 import moment from 'moment';
 import { LoginType } from 'src/enums/login-type.enum';
 import { CountryService } from '../countries/services/country.service';
+import { UserService } from '../users/services/user.service';
 
 @Injectable()
 export class AuthService {
@@ -41,11 +42,13 @@ export class AuthService {
     private tokenService: TokenService,
     private emailEventService: EmailEventService,
     private countryService: CountryService,
+    private userService: UserService,
   ) {}
 
   async signUpPhoneNo(input: SignupPhone){
     try{
-        const existingUser= await this.userRepository.findByPhone(input.phoneNo);
+      
+      const existingUser= await this.userRepository.findByPhone(input.phoneNo);
 
       if(existingUser){
         throw new ConflictException('User with this phoneNo already exist');
@@ -142,25 +145,25 @@ export class AuthService {
         throw new ConflictException("User with phone number already exist")
       }
 
-      const verifyPhoneOtp = await this.tokenService.verifySignUpOTP({
-        phoneNo: input.phoneNo,
-        token: input.otpPhone,
-        subject: TokenSubject.SIGN_UP_PHONE,
-      });
+      // const verifyPhoneOtp = await this.tokenService.verifySignUpOTP({
+      //   phoneNo: input.phoneNo,
+      //   token: input.otpPhone,
+      //   subject: TokenSubject.SIGN_UP_PHONE,
+      // });
 
-      if (!verifyPhoneOtp) {
-        throw new BadRequestException('Invalid OTP');
-      }
+      // if (!verifyPhoneOtp) {
+      //   throw new BadRequestException('Invalid OTP');
+      // }
 
-      const verifyEmailOtp = await this.tokenService.verifySignUpOTP({
-        email: input.email,
-        token: input.otpEmail,
-        subject: TokenSubject.SIGN_UP_EMAIL,
-      });
+      // const verifyEmailOtp = await this.tokenService.verifySignUpOTP({
+      //   email: input.email,
+      //   token: input.otpEmail,
+      //   subject: TokenSubject.SIGN_UP_EMAIL,
+      // });
 
-      if (!verifyEmailOtp) {
-        throw new BadRequestException('Invalid OTP');
-      }
+      // if (!verifyEmailOtp) {
+      //   throw new BadRequestException('Invalid OTP');
+      // }
       
       const password = await PasswordUtil.hashPassword(input.password)
 
@@ -194,6 +197,7 @@ export class AuthService {
       }, 'User created successfully', HttpStatus.CREATED);
     }
     catch (error: unknown) {
+      console.log(error);
       return ResponseUtil.errorFromException(
         error,
         'An error occurred during sign up',
@@ -204,16 +208,23 @@ export class AuthService {
 
   async login(input: LoginUserDto) {
     try {
-      const user = await this.checkEmailExist(input.email);
+      const { identity } = input;
+      const user = await this.checkEmailExist(identity);
 
       if (!user) {
         throw new UnauthorizedException('Invalid Credentials');
       }
 
-      console.log(user);
+      if(user.loginType !== LoginType.NORMAL){
+        throw new BadRequestException('login with email and password');
+      }
       
       if (!user.isActive) {
         throw new NotFoundException('Your account is disabled, contact Admin');
+      }
+
+      if (!user.isEmailVerified || !user.isPhoneVerified){
+        throw new UnauthorizedException('Your account is not verified');
       }
 
       const verifyPassword = await PasswordUtil.verifyPassword(
@@ -236,9 +247,12 @@ export class AuthService {
 
       const { password, ...rest } = user;
 
-      const data = { token, userType: user.userType,
+      const data = { 
+        token, 
+        userType: user.userType,
         userId: user.id,
-        email: user.email };
+        email: user.email 
+      };
 
       return ResponseUtil.success(data, 'Login Successful', HttpStatus.OK);
     } catch (error: unknown) {
@@ -262,22 +276,23 @@ export class AuthService {
         );
       }
 
-      const expiry: Date = add(new Date(), { minutes: 10 });
+      if (user.loginType !== LoginType.NORMAL) {
+        throw new BadRequestException('Only normal login type is allowed to reset password');
+      }
 
-      // const token: string = await this.tokenService.generateCustomToken({
-      //   expiry,
-      //   subject: TOKEN_SUBJECT.RESET_PASSWORD,
-      //   email: user.email,
-      // });
+      const expiry: Date = moment().add(10, 'minutes').toDate();
 
-      // const resetLink: string = `${process.env.PEPP_APP_CLIENT_URL}/reset-password?token=${token}`;
+      const otpToken = await this.tokenService.generateOTPtoken({
+        phoneNo: input.email,
+        expiry: expiry,
+        subject: TokenSubject.FORGOT_PASSWORD,
+      })
 
-      // // Send forget password email
-      // await this.emailEventService.emitForgetPasswordEmail(user.email, resetLink);
+      await this.emailEventService.emitForgetPasswordEmail(user.email, otpToken.token);
 
       return ResponseUtil.success(
         {},
-        'Reset link has been sent to your email',
+        'Reset OTP has been sent to your email',
         200,
       );
     } catch (error: unknown) {
@@ -289,24 +304,35 @@ export class AuthService {
   }
 
   async resetPassword(input: ResetPasswordDto) {
-    const { confirmPassword, password } = input;
+    const { confirmPassword, password, email, token } = input;
 
     if (password !== confirmPassword) {
       throw new BadRequestException('Passwords do not match');
     }
 
-    // const tokenResult = await this.tokenService.verifyCustomToken({
-    //   token: input.token,
-    // });
+    const tokenResult = await this.tokenService.verifyOTP({
+      token: token,
+      subject: TokenSubject.FORGOT_PASSWORD,
+      email: email,
+    });
 
-    // if (!tokenResult) {
-    //   throw new BadRequestException('Invalid or expired reset token');
-    // }
+    if (!tokenResult) {
+      throw new BadRequestException('Invalid or expired reset token');
+    }
 
-    // await this.userRepository.update(
-    //   tokenResult.email,
-    //   { password: await PasswordUtil.hashPassword(password) },
-    // );
+    const user = await this.checkEmailExist(email);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    if (user.loginType !== LoginType.NORMAL) {
+      throw new BadRequestException('Only normal login type is allowed to reset password');
+    }
+
+    const data = await this.userService.update(
+      user.id,
+      {password: await PasswordUtil.hashPassword(password) },
+    );
 
     return ResponseUtil.success({}, 'Password reset successful', 200);
   }

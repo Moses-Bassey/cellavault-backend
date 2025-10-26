@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/sequelize';
 import { Model } from 'sequelize-typescript';
 import { Token } from '../entities/token.entity';
 import { Op } from 'sequelize';
+import { TokenSubject } from 'src/enums/token.enum';
 
 @Injectable()
 export class TokenRepository {
@@ -35,6 +36,13 @@ export class TokenRepository {
   }
 
   async findByEmailToken(token: string, email: string): Promise<Token | null> {
+    return await this.tokenModel.findOne({
+      where: { email, token },
+      attributes: ['id', 'expiry', 'email', 'phoneNo', 'token'],
+    });
+  }
+
+  async findByEmailTokenAndSubject(token: string, email: string, subject: TokenSubject): Promise<Token | null> {
     return await this.tokenModel.findOne({
       where: { email, token },
       attributes: ['id', 'expiry', 'email', 'phoneNo', 'token'],

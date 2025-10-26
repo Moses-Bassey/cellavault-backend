@@ -1,5 +1,5 @@
 import { IsDate, IsOptional, IsString } from 'class-validator';
-import { TokenSubject } from 'src/enums/token.enum';
+import { TokenSubject, TokenType } from 'src/enums/token.enum';
 
 export class CreateTokenDto {
   @IsString()
@@ -15,6 +15,7 @@ export class CreateTokenDto {
 
   @IsString()
   subject: TokenSubject;
+
 }
 
 export class VerifyCustomTokenDto {

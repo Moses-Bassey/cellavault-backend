@@ -28,8 +28,8 @@ module.exports = {
         allowNull: true,
       },
       tokenType: {
-        type: DataTypes.ENUM('OTP', 'JWT', 'REFRESH'),
-        allowNull: true,
+        type: DataTypes.STRING(225),
+        allowNull: false,
       },
       expiry: {
         type: DataTypes.DATE,
