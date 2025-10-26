@@ -48,13 +48,17 @@ export class TokenService {
   }
 
   public async verifyOTP(input: IOTPInterface): Promise<{ token: string }> {
+    console.log(input);
     const { token, email, subject: subject } = input;
     
-    let userToken: Token | null = await this.tokenRepository.findByEmailTokenAndSubject(token, email || "", subject);
+    let userToken: Token | null = await this.tokenRepository.findByTokenEmailAndSubject(token, email || "", subject || TokenSubject.FORGOT_PASSWORD);
 
-    if (!userToken) throw new BadRequestException('Invalid OTP');
+    if (!userToken){
+      throw new BadRequestException('Invalid OTP');
+    } 
 
     const isExpired = isAfter(new Date(), userToken.expiry);
+
     if (isExpired) {
       await this.deleteOTPtoken(userToken.id);
       throw new BadRequestException('Invalid or expired Token')

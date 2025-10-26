@@ -51,7 +51,7 @@ export class AuthController {
     return await this.authService.login(input);
   }
 
-  @Post('forget-password')
+  @Post('forgot-password')
   async forgotPassword(
     @Body() input: ForgotPasswordDto,
     @Request() req: ExpressRequest,

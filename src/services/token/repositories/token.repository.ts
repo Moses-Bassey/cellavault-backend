@@ -42,9 +42,9 @@ export class TokenRepository {
     });
   }
 
-  async findByEmailTokenAndSubject(token: string, email: string, subject: TokenSubject): Promise<Token | null> {
+  async findByTokenEmailAndSubject(token: string, email: string, subject: TokenSubject): Promise<Token | null> {
     return await this.tokenModel.findOne({
-      where: { email, token },
+      where: { email, token, subject },
       attributes: ['id', 'expiry', 'email', 'phoneNo', 'token'],
     });
   }

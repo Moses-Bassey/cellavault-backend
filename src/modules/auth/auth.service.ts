@@ -283,7 +283,7 @@ export class AuthService {
       const expiry: Date = moment().add(10, 'minutes').toDate();
 
       const otpToken = await this.tokenService.generateOTPtoken({
-        phoneNo: input.email,
+        email: input.email,
         expiry: expiry,
         subject: TokenSubject.FORGOT_PASSWORD,
       })
