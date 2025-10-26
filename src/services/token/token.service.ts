@@ -92,17 +92,23 @@ export class TokenService {
     return { token: userToken.token };
   }
 
-  async generateOTPtoken(payload: CreateTokenDto) : Promise<ITokenInterface> {
+  async generateOTPtoken(payload: CreateTokenDto) : Promise<ITokenInterface & { token: string }> {
     const token = randomstring.generate({
       length: 6,
       charset: 'numeric',
     })
     
-    return await this.tokenRepository.create({
+    const created = await this.tokenRepository.create({
       ...payload,
       token: token,
       tokenType: TokenType.OTP,
     });
+
+    // Return with the actual token for SMS/Email sending
+    return {
+      ...created,
+      token: token, // Include the actual token for SMS/Email
+    };
   }
 
   async generateJWTtoken(payload: any) {

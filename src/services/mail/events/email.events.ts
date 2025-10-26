@@ -9,7 +9,7 @@ export class SignUpOtpEmailEvent {
 export class ForgetPasswordEmailEvent {
   constructor(
     public readonly email: string,
-    public readonly resetLink: string,
+    public readonly otpCode: string,
   ) {}
 }
 

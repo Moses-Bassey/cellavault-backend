@@ -21,7 +21,7 @@ import { ConfigService } from '@nestjs/config';
         transport: {
           host: configService.get<string>('app.emailHost'),
           port: +(configService.get<number>('app.emailPort') || 587),
-          secure: false, // true for 465, false for other ports
+          secure: true, // true for 465, false for other ports
           ignoreTLS: false,
           auth: {
             user: configService.get<string>('app.emailId'), // generated ethereal user

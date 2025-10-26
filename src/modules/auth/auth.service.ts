@@ -12,6 +12,7 @@ import { User } from '../users/entities';
 import { UserType } from '../../enums/user-type.enum';
 import { MailService } from 'src/services/mail/mail.service';
 import { EmailEventService } from 'src/services/mail/email-event.service';
+import { SmsEventService } from 'src/services/sms/sms-event.service';
 import { TOKEN_SUBJECT } from 'src/services/token/token.constants';
 import { TokenService } from 'src/services/token/token.service';
 import { PasswordUtil } from 'src/utils/password.util';
@@ -41,6 +42,7 @@ export class AuthService {
     private mailService: MailService,
     private tokenService: TokenService,
     private emailEventService: EmailEventService,
+    private smsEventService: SmsEventService,
     private countryService: CountryService,
     private userService: UserService,
   ) {}
@@ -60,8 +62,8 @@ export class AuthService {
         subject: TokenSubject.SIGN_UP_PHONE,
       })
 
-      // Send SMS token here
-      //  await this.mailService.sendSignUpOtpEmail(input.phoneNo, token.token)
+      // Send SMS with OTP
+      await this.smsEventService.emitSignUpOtpSms(input.phoneNo, otpToken.token);
 
       return ResponseUtil.success(
         {},
@@ -189,6 +191,9 @@ export class AuthService {
 
       const token: string = await this.tokenService.generateJWTtoken(payload);
 
+      // Send welcome email
+      await this.emailEventService.emitWelcomeEmail(user.email, user.fullName);
+
       return ResponseUtil.success({
         email: input.email, 
         userType: UserType.USER, 
@@ -287,7 +292,7 @@ export class AuthService {
         expiry: expiry,
         subject: TokenSubject.FORGOT_PASSWORD,
       })
-
+      console.log(otpToken);
       await this.emailEventService.emitForgetPasswordEmail(user.email, otpToken.token);
 
       return ResponseUtil.success(

@@ -17,8 +17,8 @@ export class EmailEventService {
     this.eventEmitter.emit('email.signup-otp', event);
   }
 
-  async emitForgetPasswordEmail(email: string, resetLink: string) {
-    const event = new ForgetPasswordEmailEvent(email, resetLink);
+  async emitForgetPasswordEmail(email: string, otp: string) {
+    const event = new ForgetPasswordEmailEvent(email, otp);
     this.eventEmitter.emit('email.forget-password', event);
   }
 

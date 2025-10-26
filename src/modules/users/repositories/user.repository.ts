@@ -25,7 +25,7 @@ export class UserRepository {
   }
 
   async findById(id: string): Promise<User | null> {
-    return await this.userModel.findByPk(id);
+    return await this.userModel.findByPk(id, {raw: true});
   }
 
   async findByEmail(email: string): Promise<User | null> {
@@ -38,18 +38,20 @@ export class UserRepository {
   async findByPhone(phoneNo: string): Promise<User | null> {
     return await this.userModel.findOne({
       where: { phoneNo },
+      raw: true
     });
   }
 
   async findByEmailAndRole(email: string, userType: UserType): Promise<User | null> {
     return await this.userModel.findOne({
       where: { email, userType },
+      raw: true
     });
   }
 
   async create(userData: Partial<User>): Promise<User> {
-    console.log(userData);
-    return await this.userModel.create(userData as any);
+    const user =  await this.userModel.create(userData as any, {raw: true, returning: true});
+    return user.toJSON() as User
   }
 
   async update(id: string, userData: Partial<User>): Promise<[number, User[]]> {

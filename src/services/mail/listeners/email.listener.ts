@@ -40,13 +40,13 @@ export class EmailEventListener {
   @OnEvent('email.forget-password')
   async handleForgetPasswordEvent(event: ForgetPasswordEmailEvent) {
     try {
-      this.logger.log(`Sending forget password email to ${event.email}`);
+      this.logger.log(`Sending forget password email to ${event.otpCode}`);
       
       await this.mailerService.sendMail({
         to: event.email,
         subject: MAIL_SUBJECT.FORGET_PASSWORD,
         template: 'forget-password',
-        context: { resetLink: event.resetLink },
+        context: { otpCode: event.otpCode },
       });
 
       this.logger.log(`Forget password email sent successfully to ${event.email}`);

@@ -17,6 +17,9 @@ export default registerAs('app', () => ({
   emailId: process.env.EMAIL_ID || '',
   emailPass: process.env.EMAIL_PASS || '',
   emailFrom: process.env.EMAIL_FROM || '',
+  twilioAccountSid: process.env.TWILIO_ACCOUNT_SID || '',
+  twilioAuthToken: process.env.TWILIO_AUTH_TOKEN || '',
+  twilioFromNumber: process.env.TWILIO_FROM_NUMBER || '',
   database: {
     host: process.env.DATABASE_HOST || 'localhost',
     port: parseInt(process.env.DATABASE_PORT || '3306', 10),

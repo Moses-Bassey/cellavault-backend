@@ -13,6 +13,7 @@ import { CountriesModule } from './modules/countries/countries.module';
 import { ClientDevicesModule } from './modules/client-devices/client-devices.module';
 import { TokenModule } from './services/token/token.module';
 import { MailModule } from './services/mail/mail.module';
+import { SmsModule } from './services/sms/sms.module';
 import { AxiosModule } from './services/axios/axios.module';
 import { ApiKeyInterceptor } from './interceptors/api-key.interceptors';
 
@@ -61,6 +62,7 @@ import { Token } from './services/token/entities';
     ClientDevicesModule,
     TokenModule,
     MailModule,
+    SmsModule,
     AxiosModule,
   ],
   controllers: [AppController],

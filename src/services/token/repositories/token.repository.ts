@@ -14,13 +14,15 @@ export class TokenRepository {
   ) {}
 
   async create(tokenData: Partial<Token>): Promise<Token> {
-    return await this.tokenModel.create(tokenData as any);
+    const token = await this.tokenModel.create(tokenData as any, {raw: true, returning: true});
+    return token.toJSON() as Token;
   }
 
   async findByToken(token: string): Promise<Token | null> {
     return await this.tokenModel.findOne({
       where: { token },
       attributes: ['id', 'expiry', 'email'],
+      raw: true
     });
   }
 
@@ -32,6 +34,7 @@ export class TokenRepository {
         { token: token }
         ], },
       attributes: ['id', 'expiry', 'email', 'phoneNo', 'token'],
+      raw: true
     });
   }
 
@@ -39,6 +42,7 @@ export class TokenRepository {
     return await this.tokenModel.findOne({
       where: { email, token },
       attributes: ['id', 'expiry', 'email', 'phoneNo', 'token'],
+      raw: true
     });
   }
 
@@ -46,6 +50,7 @@ export class TokenRepository {
     return await this.tokenModel.findOne({
       where: { email, token, subject },
       attributes: ['id', 'expiry', 'email', 'phoneNo', 'token'],
+      raw: true
     });
   }
 
@@ -53,6 +58,7 @@ export class TokenRepository {
     return await this.tokenModel.findOne({
       where: { phoneNo, token },
       attributes: ['id', 'expiry', 'email', 'phoneNo', 'token'],
+      raw: true
     });
   }
 
