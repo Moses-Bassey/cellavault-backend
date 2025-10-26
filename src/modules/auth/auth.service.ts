@@ -64,9 +64,9 @@ export class AuthService {
 
       // Send SMS with OTP
       await this.smsEventService.emitSignUpOtpSms(input.phoneNo, otpToken.token);
-
+      
       return ResponseUtil.success(
-        {},
+        {otpToken: otpToken.token},
         'Sign up OTP has been sent to your phoneNo',
         HttpStatus.OK,
       );
@@ -369,7 +369,6 @@ export class AuthService {
 
       await this.userRepository.update(user.id, { password: hashedPassword });
 
-      // Send password changed notification email
       const changedAt = moment().format('MMMM Do YYYY, h:mm A');
       await this.emailEventService.emitPasswordChangedEmail(
         user.email,

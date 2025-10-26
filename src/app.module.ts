@@ -9,6 +9,7 @@ import appConfig from './config/app.config';
 
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
+import { DriversModule } from './modules/drivers/drivers.module';
 import { CountriesModule } from './modules/countries/countries.module';
 import { ClientDevicesModule } from './modules/client-devices/client-devices.module';
 import { TokenModule } from './services/token/token.module';
@@ -19,6 +20,8 @@ import { ApiKeyInterceptor } from './interceptors/api-key.interceptors';
 
 // Import entities from their respective modules
 import { User } from './modules/users/entities';
+import { Driver } from './modules/drivers/entities';
+import { Guarantor } from './modules/drivers/entities/guarantor.entity';
 import { Country } from './modules/countries/entities';
 import { ClientDevice } from './modules/client-devices/entities/client-device.entity';
 import { Token } from './services/token/entities';
@@ -40,6 +43,8 @@ import { Token } from './services/token/entities';
       autoLoadModels: true,
       models: [
         User,
+        Driver,
+        Guarantor,
         Country,
         ClientDevice,
         Token,
@@ -58,6 +63,7 @@ import { Token } from './services/token/entities';
     }),
     AuthModule,
     UsersModule,
+    DriversModule,
     CountriesModule,
     ClientDevicesModule,
     TokenModule,
