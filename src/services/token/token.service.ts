@@ -64,6 +64,8 @@ export class TokenService {
       throw new BadRequestException('Invalid or expired Token')
     }
 
+    await this.deleteOTPtoken(userToken.id);
+
     return userToken;
   }
 

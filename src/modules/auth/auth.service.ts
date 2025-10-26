@@ -145,25 +145,25 @@ export class AuthService {
         throw new ConflictException("User with phone number already exist")
       }
 
-      // const verifyPhoneOtp = await this.tokenService.verifySignUpOTP({
-      //   phoneNo: input.phoneNo,
-      //   token: input.otpPhone,
-      //   subject: TokenSubject.SIGN_UP_PHONE,
-      // });
+      const verifyPhoneOtp = await this.tokenService.verifySignUpOTP({
+        phoneNo: input.phoneNo,
+        token: input.otpPhone,
+        subject: TokenSubject.SIGN_UP_PHONE,
+      });
 
-      // if (!verifyPhoneOtp) {
-      //   throw new BadRequestException('Invalid OTP');
-      // }
+      if (!verifyPhoneOtp) {
+        throw new BadRequestException('Invalid OTP');
+      }
 
-      // const verifyEmailOtp = await this.tokenService.verifySignUpOTP({
-      //   email: input.email,
-      //   token: input.otpEmail,
-      //   subject: TokenSubject.SIGN_UP_EMAIL,
-      // });
+      const verifyEmailOtp = await this.tokenService.verifySignUpOTP({
+        email: input.email,
+        token: input.otpEmail,
+        subject: TokenSubject.SIGN_UP_EMAIL,
+      });
 
-      // if (!verifyEmailOtp) {
-      //   throw new BadRequestException('Invalid OTP');
-      // }
+      if (!verifyEmailOtp) {
+        throw new BadRequestException('Invalid OTP');
+      }
       
       const password = await PasswordUtil.hashPassword(input.password)
 
