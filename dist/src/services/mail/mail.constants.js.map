@@ -1,0 +1,1 @@
+{"version":3,"file":"mail.constants.js","sourceRoot":"","sources":["../../../../src/services/mail/mail.constants.ts"],"names":[],"mappings":";;;AAAa,QAAA,YAAY,GAAG;IAC1B,WAAW,EAAE,0BAA0B;IACvC,kBAAkB,EAAE,iCAAiC;IACrD,eAAe,EAAE,kCAAkC;IACnD,OAAO,EAAE,wBAAwB;IACjC,oBAAoB,EAAE,gCAAgC;IACtD,mBAAmB,EAAE,yCAAyC;IAC9D,gBAAgB,EAAE,+BAA+B;CAClD,CAAC"}

@@ -1,0 +1,56 @@
+declare const _default: (() => {
+    port: number;
+    apiPrefix: string;
+    corsOrigin: string[];
+    jwtSecret: string;
+    jwtExpiresIn: string;
+    jwtTokenExpiry: string;
+    apiKey: string;
+    rateLimitTtl: number;
+    rateLimitLimit: number;
+    emailHost: string;
+    emailPort: number;
+    emailId: string;
+    emailPass: string;
+    emailFrom: string;
+    twilioAccountSid: string;
+    twilioAuthToken: string;
+    twilioFromNumber: string;
+    database: {
+        host: string;
+        port: number;
+        username: string;
+        password: string;
+        name: string;
+        synchronize: boolean;
+        logging: boolean;
+    };
+}) & import("@nestjs/config").ConfigFactoryKeyHost<{
+    port: number;
+    apiPrefix: string;
+    corsOrigin: string[];
+    jwtSecret: string;
+    jwtExpiresIn: string;
+    jwtTokenExpiry: string;
+    apiKey: string;
+    rateLimitTtl: number;
+    rateLimitLimit: number;
+    emailHost: string;
+    emailPort: number;
+    emailId: string;
+    emailPass: string;
+    emailFrom: string;
+    twilioAccountSid: string;
+    twilioAuthToken: string;
+    twilioFromNumber: string;
+    database: {
+        host: string;
+        port: number;
+        username: string;
+        password: string;
+        name: string;
+        synchronize: boolean;
+        logging: boolean;
+    };
+}>;
+export default _default;

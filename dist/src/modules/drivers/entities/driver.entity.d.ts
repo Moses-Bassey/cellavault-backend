@@ -1,0 +1,36 @@
+import { Model } from 'sequelize-typescript';
+import { UserType } from '../../../enums/user-type.enum';
+import { Country } from '../../countries/entities/country.entity';
+import { LoginType } from 'src/enums/login-type.enum';
+import { Guarantor } from './guarantor.entity';
+export declare class Driver extends Model<Driver> {
+    id: string;
+    fullName: string;
+    phoneNo: string;
+    email: string;
+    userType: UserType;
+    password: string;
+    loginType: LoginType;
+    isEmailVerified: boolean;
+    isPhoneVerified: boolean;
+    isActive: boolean;
+    isVerified: boolean;
+    verificationStatus: string;
+    licenseNumber: string;
+    vehicleModel: string;
+    vehicleColor: string;
+    vehiclePlateNumber: string;
+    vehicleYear: string;
+    vehicleType: string;
+    latitude: number;
+    longitude: number;
+    isAvailable: boolean;
+    rating: number;
+    totalTrips: number;
+    countryId: string;
+    country: Country;
+    guarantors: Guarantor[];
+    createdAt: Date;
+    updatedAt: Date;
+    deletedAt: Date | null;
+}
