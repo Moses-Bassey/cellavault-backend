@@ -13,11 +13,16 @@ import {
   ForeignKey,
   AllowNull,
   HasMany,
+  HasOne,
 } from 'sequelize-typescript';
 import { UserType } from '../../../enums/user-type.enum';
 import { Country } from '../../countries/entities/country.entity';
 import { LoginType } from 'src/enums/login-type.enum';
 import { Guarantor } from './guarantor.entity';
+import { Kyc1 } from './kyc1.entity';
+import { Kyc2 } from './kyc2.entity';
+import { Kyc3 } from './kyc3.entity';
+import { VerificationStatus } from 'src/enums/verification-status.enum';
 
 @Table({
   tableName: 'drivers',
@@ -33,7 +38,7 @@ export class Driver extends Model<Driver> {
   @PrimaryKey
   @Default(DataType.UUIDV4)
   @Column(DataType.UUID)
-  public declare id: string;
+  declare public id: string;
 
   @Column(DataType.STRING(150))
   public fullName: string;
@@ -76,12 +81,12 @@ export class Driver extends Model<Driver> {
   })
   public isEmailVerified: boolean;
 
-  @Default(false)
-  @Column({
-    type: DataType.BOOLEAN,
-    allowNull: false,
-  })
-  public isPhoneVerified: boolean;
+  // @Default(false)
+  // @Column({
+  //   type: DataType.BOOLEAN,
+  //   allowNull: false,
+  // })
+  // public isPhoneVerified: boolean;
 
   @Default(true)
   @Column({
@@ -97,48 +102,50 @@ export class Driver extends Model<Driver> {
   })
   public isVerified: boolean;
 
-  @AllowNull
+  // @AllowNull
   @Column({
-    type: DataType.TEXT,
-    allowNull: true,
+    type: DataType.ENUM,
+    allowNull: false,
+    values: Object.values(VerificationStatus),
+    defaultValue: VerificationStatus.PENDING,
   })
-  public verificationStatus: string;
+  public verificationStatus: VerificationStatus;
 
-  @Column({
-    type: DataType.STRING,
-    allowNull: true,
-  })
-  public licenseNumber: string;
+  // @Column({
+  //   type: DataType.STRING,
+  //   allowNull: true,
+  // })
+  // public licenseNumber: string;
 
-  @Column({
-    type: DataType.STRING,
-    allowNull: true,
-  })
-  public vehicleModel: string;
+  // @Column({
+  //   type: DataType.STRING,
+  //   allowNull: true,
+  // })
+  // public vehicleModel: string;
 
-  @Column({
-    type: DataType.STRING,
-    allowNull: true,
-  })
-  public vehicleColor: string;
+  // @Column({
+  //   type: DataType.STRING,
+  //   allowNull: true,
+  // })
+  // public vehicleColor: string;
 
-  @Column({
-    type: DataType.STRING,
-    allowNull: true,
-  })
-  public vehiclePlateNumber: string;
+  // @Column({
+  //   type: DataType.STRING,
+  //   allowNull: true,
+  // })
+  // public vehiclePlateNumber: string;
 
-  @Column({
-    type: DataType.STRING,
-    allowNull: true,
-  })
-  public vehicleYear: string;
+  // @Column({
+  //   type: DataType.STRING,
+  //   allowNull: true,
+  // })
+  // public vehicleYear: string;
 
-  @Column({
-    type: DataType.STRING,
-    allowNull: true,
-  })
-  public vehicleType: string;
+  // @Column({
+  //   type: DataType.STRING,
+  //   allowNull: true,
+  // })
+  // public vehicleType: string;
 
   @Column({
     type: DataType.DECIMAL(10, 8),
@@ -185,25 +192,33 @@ export class Driver extends Model<Driver> {
   @HasMany(() => Guarantor)
   public guarantors: Guarantor[];
 
+  @HasOne(() => Kyc1)
+  public driverPersonalInfoKyc: Kyc1;
+
+  @HasOne(() => Kyc2)
+  public driverIdKyc: Kyc2;
+
+  @HasOne(() => Kyc3)
+  public driverAddressKyc: Kyc3;
+
   @CreatedAt
   @Column({
     type: DataType.DATE,
     allowNull: false,
   })
-  public declare createdAt: Date;
+  declare public createdAt: Date;
 
   @UpdatedAt
   @Column({
     type: DataType.DATE,
-    allowNull: false,
+    allowNull: true,
   })
-  public declare updatedAt: Date;
+  declare public updatedAt: Date;
 
   @DeletedAt
   @Column({
     type: DataType.DATE,
     allowNull: true,
   })
-  public declare deletedAt: Date | null;
+  declare public deletedAt: Date | null;
 }
-
