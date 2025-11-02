@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthService = void 0;
 const common_1 = require("@nestjs/common");
+const express_1 = require("express");
 const user_type_enum_1 = require("../../enums/user-type.enum");
 const mail_service_1 = require("../../services/mail/mail.service");
 const email_event_service_1 = require("../../services/mail/email-event.service");
@@ -27,6 +28,7 @@ const moment_1 = __importDefault(require("moment"));
 const login_type_enum_1 = require("../../enums/login-type.enum");
 const country_service_1 = require("../countries/services/country.service");
 const user_service_1 = require("../users/services/user.service");
+const client_device_service_1 = require("../client-devices/services/client-device.service");
 let AuthService = class AuthService {
     userRepository;
     mailService;
@@ -35,7 +37,8 @@ let AuthService = class AuthService {
     smsEventService;
     countryService;
     userService;
-    constructor(userRepository, mailService, tokenService, emailEventService, smsEventService, countryService, userService) {
+    clientDeviceService;
+    constructor(userRepository, mailService, tokenService, emailEventService, smsEventService, countryService, userService, clientDeviceService) {
         this.userRepository = userRepository;
         this.mailService = mailService;
         this.tokenService = tokenService;
@@ -43,6 +46,7 @@ let AuthService = class AuthService {
         this.smsEventService = smsEventService;
         this.countryService = countryService;
         this.userService = userService;
+        this.clientDeviceService = clientDeviceService;
     }
     async signUpPhoneNo(input) {
         try {
@@ -177,6 +181,19 @@ let AuthService = class AuthService {
             if (!verifyPassword) {
                 throw new common_1.UnauthorizedException('Invalid Credentials');
             }
+            const clientDeviceToken = express_1.request.headers['x-client-device-token'];
+            if (clientDeviceToken) {
+                const clientDevice = await this.clientDeviceService.findByUserIdAndDeviceToken(user.id, clientDeviceToken);
+                if (!clientDevice) {
+                    const otpToken = await this.tokenService.generateOTPtoken({
+                        email: user.email,
+                        expiry: (0, moment_1.default)().add(5, 'minutes').toDate(),
+                        subject: token_enum_1.TokenSubject.NEW_DEVICE_LOGIN_OTP,
+                    });
+                    await this.emailEventService.emitNewDeviceLoginOtpEmail(user.email, otpToken.token);
+                    throw new common_1.UnauthorizedException('Detected new device login');
+                }
+            }
             const payload = {
                 sub: user.id,
                 userType: user.userType,
@@ -196,6 +213,57 @@ let AuthService = class AuthService {
         catch (error) {
             console.error(error);
             return response_utils_1.ResponseUtil.errorFromException(error, 'An error occurred during login');
+        }
+    }
+    async loginOtp(input) {
+        try {
+            const { identity, otp, password, deviceInfo } = input;
+            const user = await this.userService.findByIdentity(identity);
+            if (!user) {
+                throw new common_1.NotFoundException('User not found');
+            }
+            if (user.loginType !== login_type_enum_1.LoginType.NORMAL) {
+                throw new common_1.BadRequestException('Only normal login type is allowed to login with OTP');
+            }
+            if (!user.isActive) {
+                throw new common_1.NotFoundException('Your account is disabled, contact Admin');
+            }
+            if (!user.isEmailVerified) {
+                throw new common_1.UnauthorizedException('Your email account is not verified');
+            }
+            if (!user.isPhoneVerified) {
+                throw new common_1.UnauthorizedException('Your phone no. is not verified');
+            }
+            const verifyOtp = await this.tokenService.verifyOTP({
+                email: user.email,
+                token: otp,
+                subject: token_enum_1.TokenSubject.NEW_DEVICE_LOGIN_OTP,
+            });
+            if (!verifyOtp) {
+                throw new common_1.BadRequestException('Invalid OTP');
+            }
+            const verifyPassword = await password_util_1.PasswordUtil.verifyPassword(password, user.password);
+            if (!verifyPassword) {
+                throw new common_1.UnauthorizedException('Invalid Credentials');
+            }
+            const payload = {
+                sub: user.id,
+                userType: user_type_enum_1.UserType.USER,
+                userId: user.id,
+                email: user.email
+            };
+            const token = await this.tokenService.generateJWTtoken(payload);
+            const loginTime = (0, moment_1.default)().format('MMMM Do YYYY, h:mm A');
+            await this.emailEventService.emitNewLoginEmail(user.email, user.fullName, deviceInfo, loginTime);
+            return response_utils_1.ResponseUtil.success({
+                email: user.email,
+                userType: user_type_enum_1.UserType.USER,
+                id: user.id,
+                token: token
+            }, 'User created successfully', common_1.HttpStatus.CREATED);
+        }
+        catch (error) {
+            return response_utils_1.ResponseUtil.errorFromException(error, 'An error occurred during login with OTP');
         }
     }
     async forgotPassword(input) {
@@ -289,6 +357,7 @@ exports.AuthService = AuthService = __decorate([
         email_event_service_1.EmailEventService,
         sms_event_service_1.SmsEventService,
         country_service_1.CountryService,
-        user_service_1.UserService])
+        user_service_1.UserService,
+        client_device_service_1.ClientDeviceService])
 ], AuthService);
 //# sourceMappingURL=auth.service.js.map

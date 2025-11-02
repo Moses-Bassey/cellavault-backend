@@ -42,6 +42,14 @@ let EmailEventService = class EmailEventService {
         const event = new email_events_1.PasswordChangedEmailEvent(email, fullName, changedAt);
         this.eventEmitter.emit('email.password-changed', event);
     }
+    async emitNewLoginEmail(email, fullName, deviceInfo, loginTime, ipAddress) {
+        const event = new email_events_1.NewLoginEmailEvent(email, fullName, deviceInfo, loginTime, ipAddress);
+        this.eventEmitter.emit('email.new-login', event);
+    }
+    async emitNewDeviceLoginOtpEmail(email, otpCode) {
+        const event = new email_events_1.NewDeviceLoginOtpEmailEvent(email, otpCode);
+        this.eventEmitter.emit('email.new-device-login-otp', event);
+    }
 };
 exports.EmailEventService = EmailEventService;
 exports.EmailEventService = EmailEventService = __decorate([

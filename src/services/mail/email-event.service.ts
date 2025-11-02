@@ -7,6 +7,8 @@ import {
   BookingConfirmationEmailEvent,
   DriverVerificationEmailEvent,
   PasswordChangedEmailEvent,
+  NewLoginEmailEvent,
+  NewDeviceLoginOtpEmailEvent,
 } from './events/email.events';
 
 @Injectable()
@@ -63,5 +65,21 @@ export class EmailEventService {
   async emitPasswordChangedEmail(email: string, fullName: string, changedAt: string) {
     const event = new PasswordChangedEmailEvent(email, fullName, changedAt);
     this.eventEmitter.emit('email.password-changed', event);
+  }
+
+  async emitNewLoginEmail(
+    email: string,
+    fullName: string,
+    deviceInfo: string,
+    loginTime: string,
+    ipAddress?: string,
+  ) {
+    const event = new NewLoginEmailEvent(email, fullName, deviceInfo, loginTime, ipAddress);
+    this.eventEmitter.emit('email.new-login', event);
+  }
+
+  async emitNewDeviceLoginOtpEmail(email: string, otpCode: string) {
+    const event = new NewDeviceLoginOtpEmailEvent(email, otpCode);
+    this.eventEmitter.emit('email.new-device-login-otp', event);
   }
 }

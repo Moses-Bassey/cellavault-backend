@@ -7,10 +7,17 @@ export declare class SignUpUserDto {
     otpEmail: string;
     country: string;
     readonly fullName: string;
+    readonly referalCode: string;
 }
 export declare class LoginUserDto {
     readonly identity: string;
     readonly password: string;
+}
+export declare class LoginOtpDto {
+    readonly identity: string;
+    readonly password: string;
+    otp: string;
+    deviceInfo: string;
 }
 export declare class ForgotPasswordDto {
     readonly email: string;

@@ -81,6 +81,9 @@ export class TokenService {
       case TokenSubject.SIGN_UP_PHONE:
         userToken = await this.tokenRepository.findByPhoneToken(token, phoneNo || "");
         break;
+      case TokenSubject.SIGN_UP_PHONE:
+        userToken = await this.tokenRepository.findByPhoneToken(token, phoneNo || "");
+        break;
       default:
         throw new BadRequestException('Invalid OTP Subject');
     }

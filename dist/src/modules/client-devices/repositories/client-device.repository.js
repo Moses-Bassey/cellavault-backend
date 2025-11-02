@@ -42,6 +42,15 @@ let ClientDeviceRepository = class ClientDeviceRepository {
     async findAll(options) {
         return await this.clientDeviceModel.findAll(options);
     }
+    async findByUserIdAndDeviceToken(userId, deviceFCMToken) {
+        const data = await this.clientDeviceModel.findOne({
+            where: { userId, deviceFCMToken },
+            raw: true,
+        });
+        if (data != null)
+            return data.toJSON();
+        return null;
+    }
     async create(clientDeviceData) {
         return await this.clientDeviceModel.create(clientDeviceData);
     }

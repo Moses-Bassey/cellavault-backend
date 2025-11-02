@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.PasswordChangedEmailEvent = exports.DriverVerificationEmailEvent = exports.BookingConfirmationEmailEvent = exports.WelcomeEmailEvent = exports.ForgetPasswordEmailEvent = exports.SignUpOtpEmailEvent = void 0;
+exports.NewDeviceLoginOtpEmailEvent = exports.NewLoginEmailEvent = exports.PasswordChangedEmailEvent = exports.DriverVerificationEmailEvent = exports.BookingConfirmationEmailEvent = exports.WelcomeEmailEvent = exports.ForgetPasswordEmailEvent = exports.SignUpOtpEmailEvent = void 0;
 class SignUpOtpEmailEvent {
     email;
     otpCode;
@@ -69,4 +69,28 @@ class PasswordChangedEmailEvent {
     }
 }
 exports.PasswordChangedEmailEvent = PasswordChangedEmailEvent;
+class NewLoginEmailEvent {
+    email;
+    fullName;
+    deviceInfo;
+    loginTime;
+    ipAddress;
+    constructor(email, fullName, deviceInfo, loginTime, ipAddress) {
+        this.email = email;
+        this.fullName = fullName;
+        this.deviceInfo = deviceInfo;
+        this.loginTime = loginTime;
+        this.ipAddress = ipAddress;
+    }
+}
+exports.NewLoginEmailEvent = NewLoginEmailEvent;
+class NewDeviceLoginOtpEmailEvent {
+    email;
+    otpCode;
+    constructor(email, otpCode) {
+        this.email = email;
+        this.otpCode = otpCode;
+    }
+}
+exports.NewDeviceLoginOtpEmailEvent = NewDeviceLoginOtpEmailEvent;
 //# sourceMappingURL=email.events.js.map

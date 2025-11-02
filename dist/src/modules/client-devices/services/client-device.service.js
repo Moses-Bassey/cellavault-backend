@@ -39,8 +39,8 @@ let ClientDeviceService = class ClientDeviceService {
             return response_utils_1.ResponseUtil.errorFromException(error, 'An error occurred while retrieving devices by IP', common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    async findByDeviceToken(deviceFCMToken) {
-        return await this.clientDeviceRepository.findByDeviceToken(deviceFCMToken);
+    async findByUserIdAndDeviceToken(userId, deviceFCMToken) {
+        return await this.clientDeviceRepository.findByUserIdAndDeviceToken(userId, deviceFCMToken);
     }
     async findAll(options) {
         try {

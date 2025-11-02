@@ -35,3 +35,16 @@ export declare class PasswordChangedEmailEvent {
     readonly changedAt: string;
     constructor(email: string, fullName: string, changedAt: string);
 }
+export declare class NewLoginEmailEvent {
+    readonly email: string;
+    readonly fullName: string;
+    readonly deviceInfo: string;
+    readonly loginTime: string;
+    readonly ipAddress?: string | undefined;
+    constructor(email: string, fullName: string, deviceInfo: string, loginTime: string, ipAddress?: string | undefined);
+}
+export declare class NewDeviceLoginOtpEmailEvent {
+    readonly email: string;
+    readonly otpCode: string;
+    constructor(email: string, otpCode: string);
+}

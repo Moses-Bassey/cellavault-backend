@@ -106,6 +106,9 @@ let TokenService = class TokenService {
             case token_enum_1.TokenSubject.SIGN_UP_PHONE:
                 userToken = await this.tokenRepository.findByPhoneToken(token, phoneNo || "");
                 break;
+            case token_enum_1.TokenSubject.SIGN_UP_PHONE:
+                userToken = await this.tokenRepository.findByPhoneToken(token, phoneNo || "");
+                break;
             default:
                 throw new common_1.BadRequestException('Invalid OTP Subject');
         }

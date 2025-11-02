@@ -12,5 +12,6 @@ var TokenSubject;
     TokenSubject["FORGOT_PASSWORD"] = "PASSWORD_RESET";
     TokenSubject["SIGN_UP_PHONE"] = "SIGN_UP_PHONE";
     TokenSubject["SIGN_UP_EMAIL"] = "SIGN_UP_EMAIL";
+    TokenSubject["NEW_DEVICE_LOGIN_OTP"] = "NEW_DEVICE_LOGIN_OTP";
 })(TokenSubject || (exports.TokenSubject = TokenSubject = {}));
 //# sourceMappingURL=token.enum.js.map

@@ -46,3 +46,20 @@ export class PasswordChangedEmailEvent {
     public readonly changedAt: string,
   ) {}
 }
+
+export class NewLoginEmailEvent {
+  constructor(
+    public readonly email: string,
+    public readonly fullName: string,
+    public readonly deviceInfo: string,
+    public readonly loginTime: string,
+    public readonly ipAddress?: string,
+  ) {}
+}
+
+export class NewDeviceLoginOtpEmailEvent {
+  constructor(
+    public readonly email: string,
+    public readonly otpCode: string,
+  ) {}
+}

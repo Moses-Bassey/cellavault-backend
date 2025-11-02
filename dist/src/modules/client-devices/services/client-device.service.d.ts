@@ -7,7 +7,7 @@ export declare class ClientDeviceService {
     findById(id: string): Promise<ClientDevice | null>;
     findByUserId(userId: string): Promise<ApiResponse<null> | ApiResponse<ClientDevice[]>>;
     findByIpAddress(ipAddress: string): Promise<ApiResponse<null> | ApiResponse<ClientDevice[]>>;
-    findByDeviceToken(deviceFCMToken: string): Promise<ClientDevice | null>;
+    findByUserIdAndDeviceToken(userId: string, deviceFCMToken: string): Promise<ClientDevice | null>;
     findAll(options?: any): Promise<ApiResponse<null> | ApiResponse<ClientDevice[]>>;
     create(clientDeviceData: Partial<ClientDevice>): Promise<ClientDevice>;
     update(id: string, clientDeviceData: Partial<ClientDevice>): Promise<[number, ClientDevice[]]>;

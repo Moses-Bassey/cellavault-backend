@@ -17,6 +17,7 @@ const auth_service_1 = require("./auth.service");
 const user_repository_1 = require("../users/repositories/user.repository");
 const countries_module_1 = require("../countries/countries.module");
 const users_module_1 = require("../users/users.module");
+const client_devices_module_1 = require("../client-devices/client-devices.module");
 let AuthModule = class AuthModule {
 };
 exports.AuthModule = AuthModule;
@@ -27,7 +28,8 @@ exports.AuthModule = AuthModule = __decorate([
             token_module_1.TokenModule,
             mail_module_1.MailModule,
             countries_module_1.CountriesModule,
-            users_module_1.UsersModule
+            users_module_1.UsersModule,
+            client_devices_module_1.ClientDevicesModule
         ],
         providers: [auth_service_1.AuthService, user_repository_1.UserRepository],
         controllers: [auth_controller_1.AuthController],

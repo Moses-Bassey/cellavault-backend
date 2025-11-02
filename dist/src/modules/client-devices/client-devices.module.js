@@ -13,6 +13,7 @@ const client_device_entity_1 = require("./entities/client-device.entity");
 const client_device_controller_1 = require("./controllers/client-device.controller");
 const client_device_service_1 = require("./services/client-device.service");
 const client_device_repository_1 = require("./repositories/client-device.repository");
+const client_device_guard_1 = require("./guards/client-device.guard");
 let ClientDevicesModule = class ClientDevicesModule {
 };
 exports.ClientDevicesModule = ClientDevicesModule;
@@ -20,8 +21,8 @@ exports.ClientDevicesModule = ClientDevicesModule = __decorate([
     (0, common_1.Module)({
         imports: [sequelize_1.SequelizeModule.forFeature([client_device_entity_1.ClientDevice])],
         controllers: [client_device_controller_1.ClientDeviceController],
-        providers: [client_device_service_1.ClientDeviceService, client_device_repository_1.ClientDeviceRepository],
-        exports: [client_device_service_1.ClientDeviceService, client_device_repository_1.ClientDeviceRepository],
+        providers: [client_device_service_1.ClientDeviceService, client_device_repository_1.ClientDeviceRepository, client_device_guard_1.ClientDeviceGuard],
+        exports: [client_device_service_1.ClientDeviceService, client_device_repository_1.ClientDeviceRepository, client_device_guard_1.ClientDeviceGuard],
     })
 ], ClientDevicesModule);
 //# sourceMappingURL=client-devices.module.js.map

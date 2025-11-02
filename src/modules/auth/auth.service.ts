@@ -6,7 +6,7 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { Request as ExpressRequest } from 'express';
+import { Request as ExpressRequest, request } from 'express';
 import { add } from 'date-fns';
 import { User } from '../users/entities';
 import { UserType } from '../../enums/user-type.enum';
@@ -22,6 +22,7 @@ import { JwtAuthPayload } from './auth.interface';
 import {
   ChangePasswordDto,
   ForgotPasswordDto,
+  LoginOtpDto,
   LoginUserDto,
   ResetPasswordDto,
   SignupEmail,
@@ -34,6 +35,7 @@ import moment from 'moment';
 import { LoginType } from 'src/enums/login-type.enum';
 import { CountryService } from '../countries/services/country.service';
 import { UserService } from '../users/services/user.service';
+import { ClientDeviceService } from '../client-devices/services/client-device.service';
 
 @Injectable()
 export class AuthService {
@@ -45,6 +47,7 @@ export class AuthService {
     private smsEventService: SmsEventService,
     private countryService: CountryService,
     private userService: UserService,
+    private clientDeviceService: ClientDeviceService,
   ) {}
 
   async signUpPhoneNo(input: SignupPhone){
@@ -241,6 +244,22 @@ export class AuthService {
         throw new UnauthorizedException('Invalid Credentials');
       }
 
+      //Detect if the user login with a new device using the x-client-device-toke provided in the request header
+      const clientDeviceToken = request.headers['x-client-device-token'] as string;
+      if (clientDeviceToken) {
+        const clientDevice = await this.clientDeviceService.findByUserIdAndDeviceToken(user.id, clientDeviceToken);
+        if (!clientDevice) {
+          //send new device email with otp here 
+          const otpToken = await this.tokenService.generateOTPtoken({
+            email: user.email,
+            expiry: moment().add(5, 'minutes').toDate(),
+            subject: TokenSubject.NEW_DEVICE_LOGIN_OTP,
+          });
+          await this.emailEventService.emitNewDeviceLoginOtpEmail(user.email, otpToken.token);
+          throw new UnauthorizedException('Detected new device login');
+        }
+      }
+
       const payload = {
         sub: user.id,
         userType: user.userType,
@@ -265,6 +284,82 @@ export class AuthService {
       return ResponseUtil.errorFromException(
         error,
         'An error occurred during login',
+      );
+    }
+  }
+
+  async loginOtp(input: LoginOtpDto) {
+    try {
+      const { identity, otp, password, deviceInfo } = input;
+
+      const user = await this.userService.findByIdentity(identity);
+      if (!user) {
+        throw new NotFoundException('User not found');
+      }
+
+      if(user.loginType !== LoginType.NORMAL){
+        throw new BadRequestException('Only normal login type is allowed to login with OTP');
+      }
+
+      if (!user.isActive) {
+        throw new NotFoundException('Your account is disabled, contact Admin');
+      }
+
+      if (!user.isEmailVerified){
+        throw new UnauthorizedException('Your email account is not verified');
+      }
+
+      if (!user.isPhoneVerified){
+        throw new UnauthorizedException('Your phone no. is not verified');
+      }
+
+      const verifyOtp = await this.tokenService.verifyOTP({
+        email: user.email,
+        token: otp,
+        subject: TokenSubject.NEW_DEVICE_LOGIN_OTP,
+      });
+
+      if (!verifyOtp) {
+        throw new BadRequestException('Invalid OTP');
+      }
+
+      const verifyPassword = await PasswordUtil.verifyPassword(
+        password,
+        user.password,
+      );
+
+      if (!verifyPassword) {
+        throw new UnauthorizedException('Invalid Credentials');
+      }
+
+      const payload = {
+        sub: user.id,
+        userType: UserType.USER,
+        userId: user.id,
+        email: user.email
+      };
+
+      const token: string = await this.tokenService.generateJWTtoken(payload);
+
+       const loginTime = moment().format('MMMM Do YYYY, h:mm A');
+       await this.emailEventService.emitNewLoginEmail(
+         user.email,
+         user.fullName,
+         deviceInfo,
+         loginTime,
+       );
+
+      return ResponseUtil.success({
+        email: user.email, 
+        userType: UserType.USER, 
+        id: user.id, 
+        token: token
+      }, 'User created successfully', HttpStatus.CREATED);
+      
+    } catch (error: unknown) {
+      return ResponseUtil.errorFromException(
+        error,
+        'An error occurred during login with OTP',
       );
     }
   }

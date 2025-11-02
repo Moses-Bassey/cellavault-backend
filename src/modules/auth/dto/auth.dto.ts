@@ -60,6 +60,15 @@ export class SignUpUserDto {
   @IsString()
   @MinLength(4)
   readonly fullName: string;
+  
+  @ApiProperty({
+    description: 'Referal code',
+    example: '123456',
+  })
+  @IsString()
+  @IsOptional()
+  @MaxLength(10)
+  readonly referalCode: string;
 }
 
 export class LoginUserDto {
@@ -85,6 +94,38 @@ export class LoginUserDto {
   // })
   // @IsString()
   // readonly loginType: LoginType;
+}
+
+export class LoginOtpDto {
+  @ApiProperty({
+    description: 'User email address or phone number',
+    example: 'user@example.com or 08100000000',
+  })
+  @IsString()
+  @MinLength(4)
+  @MaxLength(100)
+  readonly identity: string;
+
+  @ApiProperty({
+    description: 'User password',
+    example: 'password123',
+  })
+  @IsString()
+  readonly password: string;
+
+  @IsString()
+  @MinLength(6)
+  @MaxLength(6)
+  otp: string;
+
+  @ApiProperty({
+    description: 'Device information',
+    example: 'Web Browser',
+  })
+  @IsString()
+  @MaxLength(50)
+  deviceInfo: string;
+
 }
 
 export class ForgotPasswordDto {

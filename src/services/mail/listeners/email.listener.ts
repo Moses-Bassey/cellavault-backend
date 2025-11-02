@@ -9,6 +9,8 @@ import {
   BookingConfirmationEmailEvent,
   DriverVerificationEmailEvent,
   PasswordChangedEmailEvent,
+  NewLoginEmailEvent,
+  NewDeviceLoginOtpEmailEvent,
 } from '../events/email.events';
 
 @Injectable()
@@ -141,6 +143,50 @@ export class EmailEventListener {
       this.logger.log(`Password changed email sent successfully to ${event.email}`);
     } catch (error) {
       this.logger.error(`Failed to send password changed email to ${event.email}:`, error);
+    }
+  }
+
+  @OnEvent('email.new-login')
+  async handleNewLoginEvent(event: NewLoginEmailEvent) {
+    try {
+      this.logger.log(`Sending new login email to ${event.email}`);
+      
+      await this.mailerService.sendMail({
+        to: event.email,
+        subject: MAIL_SUBJECT.NEW_LOGIN,
+        template: 'new-login',
+        context: { 
+          fullName: event.fullName,
+          email: event.email,
+          deviceInfo: event.deviceInfo,
+          loginTime: event.loginTime,
+          ipAddress: event.ipAddress,
+        },
+      });
+
+      this.logger.log(`New login email sent successfully to ${event.email}`);
+    } catch (error) {
+      this.logger.error(`Failed to send new login email to ${event.email}:`, error);
+    }
+  }
+
+  @OnEvent('email.new-device-login-otp')
+  async handleNewDeviceLoginOtpEvent(event: NewDeviceLoginOtpEmailEvent) {
+    try {
+      this.logger.log(`Sending new device login OTP email to ${event.email}`);
+      
+      await this.mailerService.sendMail({
+        to: event.email,
+        subject: MAIL_SUBJECT.NEW_DEVICE_LOGIN_OTP,
+        template: 'new-device-login',
+        context: { 
+          otpCode: event.otpCode,
+        },
+      });
+
+      this.logger.log(`New device login OTP email sent successfully to ${event.email}`);
+    } catch (error) {
+      this.logger.error(`Failed to send new device login OTP email to ${event.email}:`, error);
     }
   }
 }

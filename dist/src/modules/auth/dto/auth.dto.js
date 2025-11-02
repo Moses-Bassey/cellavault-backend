@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SignUserDto = exports.VerifyOtpDto = exports.SignupPhone = exports.SignupEmail = exports.ResendOtpDto = exports.ChangePasswordDto = exports.ResetPasswordDto = exports.ForgotPasswordDto = exports.LoginUserDto = exports.SignUpUserDto = void 0;
+exports.SignUserDto = exports.VerifyOtpDto = exports.SignupPhone = exports.SignupEmail = exports.ResendOtpDto = exports.ChangePasswordDto = exports.ResetPasswordDto = exports.ForgotPasswordDto = exports.LoginOtpDto = exports.LoginUserDto = exports.SignUpUserDto = void 0;
 const swagger_1 = require("@nestjs/swagger");
 const class_validator_1 = require("class-validator");
 const token_enum_1 = require("../../../enums/token.enum");
@@ -21,6 +21,7 @@ class SignUpUserDto {
     otpEmail;
     country;
     fullName;
+    referalCode;
 }
 exports.SignUpUserDto = SignUpUserDto;
 __decorate([
@@ -78,6 +79,16 @@ __decorate([
     (0, class_validator_1.MinLength)(4),
     __metadata("design:type", String)
 ], SignUpUserDto.prototype, "fullName", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        description: 'Referal code',
+        example: '123456',
+    }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.MaxLength)(10),
+    __metadata("design:type", String)
+], SignUpUserDto.prototype, "referalCode", void 0);
 class LoginUserDto {
     identity;
     password;
@@ -101,6 +112,46 @@ __decorate([
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], LoginUserDto.prototype, "password", void 0);
+class LoginOtpDto {
+    identity;
+    password;
+    otp;
+    deviceInfo;
+}
+exports.LoginOtpDto = LoginOtpDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        description: 'User email address or phone number',
+        example: 'user@example.com or 08100000000',
+    }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.MinLength)(4),
+    (0, class_validator_1.MaxLength)(100),
+    __metadata("design:type", String)
+], LoginOtpDto.prototype, "identity", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        description: 'User password',
+        example: 'password123',
+    }),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], LoginOtpDto.prototype, "password", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.MinLength)(6),
+    (0, class_validator_1.MaxLength)(6),
+    __metadata("design:type", String)
+], LoginOtpDto.prototype, "otp", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        description: 'Device information',
+        example: 'Web Browser',
+    }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.MaxLength)(50),
+    __metadata("design:type", String)
+], LoginOtpDto.prototype, "deviceInfo", void 0);
 class ForgotPasswordDto {
     email;
 }

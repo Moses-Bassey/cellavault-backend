@@ -11,6 +11,7 @@ import { AuthService } from './auth.service';
 import {
   ChangePasswordDto,
   ForgotPasswordDto,
+  LoginOtpDto,
   LoginUserDto,
   ResetPasswordDto,
   SignupEmail,
@@ -51,6 +52,11 @@ export class AuthController {
     return await this.authService.login(input);
   }
 
+  @Post('login-with-otp')
+  async loginOtp(@Body() input: LoginOtpDto) {
+    return await this.authService.loginOtp(input);
+  }
+
   @Post('forgot-password')
   async forgotPassword(
     @Body() input: ForgotPasswordDto,
@@ -63,6 +69,7 @@ export class AuthController {
   async resetPassword(@Body() input: ResetPasswordDto) {
     return await this.authService.resetPassword(input);
   }
+  
 
   @Auth()
   @ApiBearerAuth()

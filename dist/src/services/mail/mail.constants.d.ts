@@ -6,4 +6,6 @@ export declare const MAIL_SUBJECT: {
     BOOKING_CONFIRMATION: string;
     DRIVER_VERIFICATION: string;
     PASSWORD_CHANGED: string;
+    NEW_LOGIN: string;
+    NEW_DEVICE_LOGIN_OTP: string;
 };

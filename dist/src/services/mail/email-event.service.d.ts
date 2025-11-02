@@ -8,4 +8,6 @@ export declare class EmailEventService {
     emitBookingConfirmationEmail(email: string, bookingId: string, driverName: string, pickupTime: string, pickupLocation: string): Promise<void>;
     emitDriverVerificationEmail(email: string, fullName: string, verificationStatus: 'approved' | 'rejected', reason?: string): Promise<void>;
     emitPasswordChangedEmail(email: string, fullName: string, changedAt: string): Promise<void>;
+    emitNewLoginEmail(email: string, fullName: string, deviceInfo: string, loginTime: string, ipAddress?: string): Promise<void>;
+    emitNewDeviceLoginOtpEmail(email: string, otpCode: string): Promise<void>;
 }

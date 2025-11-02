@@ -37,8 +37,8 @@ export class ClientDeviceService {
     }
   }
 
-  async findByDeviceToken(deviceFCMToken: string): Promise<ClientDevice | null> {
-    return await this.clientDeviceRepository.findByDeviceToken(deviceFCMToken);
+  async findByUserIdAndDeviceToken(userId: string, deviceFCMToken: string): Promise<ClientDevice | null> {
+    return await this.clientDeviceRepository.findByUserIdAndDeviceToken(userId, deviceFCMToken);
   }
 
   async findAll(options?: any) {

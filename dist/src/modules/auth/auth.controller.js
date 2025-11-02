@@ -39,6 +39,9 @@ let AuthController = class AuthController {
     async login(input) {
         return await this.authService.login(input);
     }
+    async loginOtp(input) {
+        return await this.authService.loginOtp(input);
+    }
     async forgotPassword(input, req) {
         return await this.authService.forgotPassword(input);
     }
@@ -85,6 +88,13 @@ __decorate([
     __metadata("design:paramtypes", [auth_dto_1.LoginUserDto]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "login", null);
+__decorate([
+    (0, common_1.Post)('login-with-otp'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [auth_dto_1.LoginOtpDto]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "loginOtp", null);
 __decorate([
     (0, common_1.Post)('forgot-password'),
     __param(0, (0, common_1.Body)()),

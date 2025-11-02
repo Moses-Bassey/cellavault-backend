@@ -36,6 +36,16 @@ export class ClientDeviceRepository {
     return await this.clientDeviceModel.findAll(options);
   }
 
+  async findByUserIdAndDeviceToken(userId: string, deviceFCMToken: string): Promise<ClientDevice | null> {
+    const data =await this.clientDeviceModel.findOne({
+      where: { userId, deviceFCMToken },
+      raw: true,
+    });
+    if (data != null)
+      return data.toJSON() as ClientDevice;
+    return null;
+  } 
+
   async create(clientDeviceData: Partial<ClientDevice>): Promise<ClientDevice> {
     return await this.clientDeviceModel.create(clientDeviceData as any);
   }

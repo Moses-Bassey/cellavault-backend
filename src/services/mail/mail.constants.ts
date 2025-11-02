@@ -6,4 +6,6 @@ export const MAIL_SUBJECT = {
   BOOKING_CONFIRMATION: 'Booking Confirmed - PeppCruise',
   DRIVER_VERIFICATION: 'Driver Verification Update - PeppCruise',
   PASSWORD_CHANGED: 'Password Changed - PeppCruise',
+  NEW_LOGIN: 'New Login Detected - PeppCruise',
+  NEW_DEVICE_LOGIN_OTP: 'New Device Login Verification - PeppCruise',
 };

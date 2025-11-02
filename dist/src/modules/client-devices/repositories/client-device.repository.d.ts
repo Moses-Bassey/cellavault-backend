@@ -7,6 +7,7 @@ export declare class ClientDeviceRepository {
     findByIpAddress(ipAddress: string): Promise<ClientDevice[]>;
     findByDeviceToken(deviceFCMToken: string): Promise<ClientDevice | null>;
     findAll(options?: any): Promise<ClientDevice[]>;
+    findByUserIdAndDeviceToken(userId: string, deviceFCMToken: string): Promise<ClientDevice | null>;
     create(clientDeviceData: Partial<ClientDevice>): Promise<ClientDevice>;
     update(id: string, clientDeviceData: Partial<ClientDevice>): Promise<[number, ClientDevice[]]>;
     delete(id: string): Promise<number>;

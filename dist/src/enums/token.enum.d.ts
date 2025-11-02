@@ -6,5 +6,6 @@ export declare enum TokenType {
 export declare enum TokenSubject {
     FORGOT_PASSWORD = "PASSWORD_RESET",
     SIGN_UP_PHONE = "SIGN_UP_PHONE",
-    SIGN_UP_EMAIL = "SIGN_UP_EMAIL"
+    SIGN_UP_EMAIL = "SIGN_UP_EMAIL",
+    NEW_DEVICE_LOGIN_OTP = "NEW_DEVICE_LOGIN_OTP"
 }

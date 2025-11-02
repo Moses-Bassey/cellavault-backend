@@ -6,9 +6,10 @@ import { SmsEventService } from 'src/services/sms/sms-event.service';
 import { TokenService } from 'src/services/token/token.service';
 import { UserRepository } from '../users/repositories/user.repository';
 import { JwtAuthPayload } from './auth.interface';
-import { ChangePasswordDto, ForgotPasswordDto, LoginUserDto, ResetPasswordDto, SignupEmail, SignupPhone, SignUpUserDto, VerifyOtpDto } from './dto/auth.dto';
+import { ChangePasswordDto, ForgotPasswordDto, LoginOtpDto, LoginUserDto, ResetPasswordDto, SignupEmail, SignupPhone, SignUpUserDto, VerifyOtpDto } from './dto/auth.dto';
 import { CountryService } from '../countries/services/country.service';
 import { UserService } from '../users/services/user.service';
+import { ClientDeviceService } from '../client-devices/services/client-device.service';
 export declare class AuthService {
     private readonly userRepository;
     private mailService;
@@ -17,10 +18,11 @@ export declare class AuthService {
     private smsEventService;
     private countryService;
     private userService;
-    constructor(userRepository: UserRepository, mailService: MailService, tokenService: TokenService, emailEventService: EmailEventService, smsEventService: SmsEventService, countryService: CountryService, userService: UserService);
-    signUpPhoneNo(input: SignupPhone): Promise<import("src/utils/response.utils").ApiResponse<{
+    private clientDeviceService;
+    constructor(userRepository: UserRepository, mailService: MailService, tokenService: TokenService, emailEventService: EmailEventService, smsEventService: SmsEventService, countryService: CountryService, userService: UserService, clientDeviceService: ClientDeviceService);
+    signUpPhoneNo(input: SignupPhone): Promise<import("src/utils/response.utils").ApiResponse<null> | import("src/utils/response.utils").ApiResponse<{
         otpToken: string;
-    }> | import("src/utils/response.utils").ApiResponse<null>>;
+    }>>;
     signUpEmail(input: SignupEmail): Promise<import("src/utils/response.utils").ApiResponse<null> | import("src/utils/response.utils").ApiResponse<{}>>;
     verifyOtp(input: VerifyOtpDto): Promise<import("src/utils/response.utils").ApiResponse<null> | import("src/utils/response.utils").ApiResponse<{
         token: string;
@@ -36,6 +38,12 @@ export declare class AuthService {
         userType: UserType;
         userId: string;
         email: string;
+    }>>;
+    loginOtp(input: LoginOtpDto): Promise<import("src/utils/response.utils").ApiResponse<null> | import("src/utils/response.utils").ApiResponse<{
+        email: string;
+        userType: UserType;
+        id: string;
+        token: string;
     }>>;
     forgotPassword(input: ForgotPasswordDto): Promise<import("src/utils/response.utils").ApiResponse<null> | import("src/utils/response.utils").ApiResponse<{}>>;
     resetPassword(input: ResetPasswordDto): Promise<import("src/utils/response.utils").ApiResponse<{}>>;

@@ -1,6 +1,6 @@
 import type { Request as ExpressRequest } from 'express';
 import { AuthService } from './auth.service';
-import { ChangePasswordDto, ForgotPasswordDto, LoginUserDto, ResetPasswordDto, SignupEmail, SignupPhone, SignUpUserDto, VerifyOtpDto } from './dto/auth.dto';
+import { ChangePasswordDto, ForgotPasswordDto, LoginOtpDto, LoginUserDto, ResetPasswordDto, SignupEmail, SignupPhone, SignUpUserDto, VerifyOtpDto } from './dto/auth.dto';
 export declare class AuthController {
     private readonly authService;
     constructor(authService: AuthService);
@@ -22,6 +22,12 @@ export declare class AuthController {
         userType: import("../../enums").UserType;
         userId: string;
         email: string;
+    }>>;
+    loginOtp(input: LoginOtpDto): Promise<import("../../utils/response.utils").ApiResponse<null> | import("../../utils/response.utils").ApiResponse<{
+        email: string;
+        userType: import("../../enums").UserType;
+        id: string;
+        token: string;
     }>>;
     forgotPassword(input: ForgotPasswordDto, req: ExpressRequest): Promise<import("../../utils/response.utils").ApiResponse<null> | import("../../utils/response.utils").ApiResponse<{}>>;
     resetPassword(input: ResetPasswordDto): Promise<import("../../utils/response.utils").ApiResponse<{}>>;

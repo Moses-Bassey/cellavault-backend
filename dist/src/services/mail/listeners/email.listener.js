@@ -131,6 +131,44 @@ let EmailEventListener = EmailEventListener_1 = class EmailEventListener {
             this.logger.error(`Failed to send password changed email to ${event.email}:`, error);
         }
     }
+    async handleNewLoginEvent(event) {
+        try {
+            this.logger.log(`Sending new login email to ${event.email}`);
+            await this.mailerService.sendMail({
+                to: event.email,
+                subject: mail_constants_1.MAIL_SUBJECT.NEW_LOGIN,
+                template: 'new-login',
+                context: {
+                    fullName: event.fullName,
+                    email: event.email,
+                    deviceInfo: event.deviceInfo,
+                    loginTime: event.loginTime,
+                    ipAddress: event.ipAddress,
+                },
+            });
+            this.logger.log(`New login email sent successfully to ${event.email}`);
+        }
+        catch (error) {
+            this.logger.error(`Failed to send new login email to ${event.email}:`, error);
+        }
+    }
+    async handleNewDeviceLoginOtpEvent(event) {
+        try {
+            this.logger.log(`Sending new device login OTP email to ${event.email}`);
+            await this.mailerService.sendMail({
+                to: event.email,
+                subject: mail_constants_1.MAIL_SUBJECT.NEW_DEVICE_LOGIN_OTP,
+                template: 'new-device-login',
+                context: {
+                    otpCode: event.otpCode,
+                },
+            });
+            this.logger.log(`New device login OTP email sent successfully to ${event.email}`);
+        }
+        catch (error) {
+            this.logger.error(`Failed to send new device login OTP email to ${event.email}:`, error);
+        }
+    }
 };
 exports.EmailEventListener = EmailEventListener;
 __decorate([
@@ -169,6 +207,18 @@ __decorate([
     __metadata("design:paramtypes", [email_events_1.PasswordChangedEmailEvent]),
     __metadata("design:returntype", Promise)
 ], EmailEventListener.prototype, "handlePasswordChangedEvent", null);
+__decorate([
+    (0, event_emitter_1.OnEvent)('email.new-login'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [email_events_1.NewLoginEmailEvent]),
+    __metadata("design:returntype", Promise)
+], EmailEventListener.prototype, "handleNewLoginEvent", null);
+__decorate([
+    (0, event_emitter_1.OnEvent)('email.new-device-login-otp'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [email_events_1.NewDeviceLoginOtpEmailEvent]),
+    __metadata("design:returntype", Promise)
+], EmailEventListener.prototype, "handleNewDeviceLoginOtpEvent", null);
 exports.EmailEventListener = EmailEventListener = EmailEventListener_1 = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [mailer_1.MailerService])

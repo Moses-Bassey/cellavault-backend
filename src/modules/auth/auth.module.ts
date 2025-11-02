@@ -8,6 +8,9 @@ import { AuthService } from './auth.service';
 import { UserRepository } from '../users/repositories/user.repository';
 import { CountriesModule } from '../countries/countries.module';
 import { UsersModule } from '../users/users.module';
+import { ClientDeviceService } from '../client-devices/services/client-device.service';
+import { ClientDeviceRepository } from '../client-devices/repositories/client-device.repository';
+import { ClientDevicesModule } from '../client-devices/client-devices.module';
 
 @Module({
   imports: [
@@ -15,7 +18,8 @@ import { UsersModule } from '../users/users.module';
     TokenModule,
     MailModule,
     CountriesModule,
-    UsersModule
+    UsersModule,
+    ClientDevicesModule
   ],
   providers: [AuthService, UserRepository],
   controllers: [AuthController],
