@@ -19,10 +19,11 @@ import { UserType } from '../../../enums/user-type.enum';
 import { Country } from '../../countries/entities/country.entity';
 import { LoginType } from 'src/enums/login-type.enum';
 import { Guarantor } from './guarantor.entity';
-import { Kyc1 } from './kyc1.entity';
-import { Kyc2 } from './kyc2.entity';
-import { Kyc3 } from './kyc3.entity';
-import { VerificationStatus } from 'src/enums/verification-status.enum';
+import { Kyc1 } from './kyc-one.entity';
+import { Kyc2 } from './kyc-two.entity';
+import { Kyc3 } from './kyc-three.entity';
+import { GENDER } from 'src/enums/gender.enum';
+import { DRIVER_VERIFICATION_STATUS } from 'src/enums/driver-verification-status.enum';
 
 @Table({
   tableName: 'drivers',
@@ -74,42 +75,36 @@ export class Driver extends Model<Driver> {
   })
   public loginType: LoginType;
 
-  @Default(false)
   @Column({
     type: DataType.BOOLEAN,
     allowNull: false,
+    defaultValue: false,
   })
   public isEmailVerified: boolean;
 
-  // @Default(false)
-  // @Column({
-  //   type: DataType.BOOLEAN,
-  //   allowNull: false,
-  // })
-  // public isPhoneVerified: boolean;
+  @Column({
+    type: DataType.BOOLEAN,
+    allowNull: false,
+    defaultValue: false,
+  })
+  public isPhoneVerified: boolean;
 
   @Default(true)
   @Column({
     type: DataType.BOOLEAN,
     allowNull: false,
+    defaultValue: true,
   })
   public isActive: boolean;
 
-  @Default(false)
-  @Column({
-    type: DataType.BOOLEAN,
-    allowNull: false,
-  })
-  public isVerified: boolean;
 
-  // @AllowNull
   @Column({
     type: DataType.ENUM,
     allowNull: false,
-    values: Object.values(VerificationStatus),
-    defaultValue: VerificationStatus.PENDING,
+    values: Object.values(DRIVER_VERIFICATION_STATUS),
+    defaultValue: DRIVER_VERIFICATION_STATUS.PENDING,
   })
-  public verificationStatus: VerificationStatus;
+  public verificationStatus: DRIVER_VERIFICATION_STATUS;
 
   // @Column({
   //   type: DataType.STRING,
