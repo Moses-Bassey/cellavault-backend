@@ -83,37 +83,5 @@ export class DriverRepository {
   async findAll(options?: any): Promise<Driver[]> {
     return await this.driverModel.findAll(options);
   }
-
-  async findAvailableDrivers(): Promise<Driver[]> {
-    return await this.driverModel.findAll({
-      where: { 
-        isAvailable: true,
-        isActive: true,
-        isVerified: true
-      }
-    });
-  }
-
-  async findNearbyDrivers(latitude: number, longitude: number, radius: number = 5): Promise<Driver[]> {
-    return await this.driverModel.findAll({
-      where: { 
-        isAvailable: true,
-        isActive: true,
-        isVerified: true,
-        [Op.and]: [
-          {
-            latitude: {
-              [Op.between]: [latitude - radius, latitude + radius]
-            }
-          },
-          {
-            longitude: {
-              [Op.between]: [longitude - radius, longitude + radius]
-            }
-          }
-        ]
-      }
-    });
-  }
 }
 

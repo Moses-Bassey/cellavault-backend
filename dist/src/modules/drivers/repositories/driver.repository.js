@@ -83,36 +83,6 @@ let DriverRepository = class DriverRepository {
     async findAll(options) {
         return await this.driverModel.findAll(options);
     }
-    async findAvailableDrivers() {
-        return await this.driverModel.findAll({
-            where: {
-                isAvailable: true,
-                isActive: true,
-                isVerified: true
-            }
-        });
-    }
-    async findNearbyDrivers(latitude, longitude, radius = 5) {
-        return await this.driverModel.findAll({
-            where: {
-                isAvailable: true,
-                isActive: true,
-                isVerified: true,
-                [sequelize_2.Op.and]: [
-                    {
-                        latitude: {
-                            [sequelize_2.Op.between]: [latitude - radius, latitude + radius]
-                        }
-                    },
-                    {
-                        longitude: {
-                            [sequelize_2.Op.between]: [longitude - radius, longitude + radius]
-                        }
-                    }
-                ]
-            }
-        });
-    }
 };
 exports.DriverRepository = DriverRepository;
 exports.DriverRepository = DriverRepository = __decorate([

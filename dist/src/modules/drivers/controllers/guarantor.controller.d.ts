@@ -8,5 +8,4 @@ export declare class GuarantorController {
     findById(id: string): Promise<Guarantor | null>;
     update(id: string, guarantorData: Partial<Guarantor>): Promise<[number, Guarantor[]]>;
     delete(id: string): Promise<number>;
-    verify(id: string): Promise<[number, Guarantor[]]>;
 }

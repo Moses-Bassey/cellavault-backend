@@ -5,3 +5,9 @@ export enum UserType {
   USER = 'USER',
   DRIVER = 'DRIVER',
 }
+
+
+export enum UserLoginIdentityType{
+  PHONE_NO = "PHONE_NO",
+  EMAIL = "EMAIL",
+}

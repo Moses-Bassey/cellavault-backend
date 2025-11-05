@@ -50,15 +50,5 @@ export class GuarantorRepository {
       where: { driverId },
     });
   }
-
-  async verify(id: string): Promise<[number, Guarantor[]]> {
-    return await this.guarantorModel.update(
-      { isVerified: true },
-      {
-        where: { id },
-        returning: true,
-      }
-    );
-  }
 }
 

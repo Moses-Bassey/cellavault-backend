@@ -8,15 +8,16 @@ import {
   CreatedAt,
   UpdatedAt,
   DeletedAt,
+  Unique,
   BelongsTo,
   ForeignKey,
   AllowNull,
 } from 'sequelize-typescript';
 import { Driver } from './driver.entity';
-// import { Country } from '../../countries/entities/country.entity';
+import { IDENTIFICATION_TYPE } from 'src/enums/identification.enums';
 
 @Table({
-  tableName: 'kyc_3',
+  tableName: 'driver_kyc_2_id_information',
   timestamps: true,
   paranoid: true,
   defaultScope: {
@@ -25,31 +26,11 @@ import { Driver } from './driver.entity';
     },
   },
 })
-export class Kyc3 extends Model<Kyc3> {
+export class kyc2IdInformation extends Model<kyc2IdInformation> {
   @PrimaryKey
   @Default(DataType.UUIDV4)
   @Column(DataType.UUID)
   declare public id: string;
-
-  @Column({
-    type: DataType.STRING(255),
-    allowNull: false,
-  })
-  public stateId: string;
-  //a state model is required, for now we use string
-
-  @Column({
-    type: DataType.STRING(255),
-    allowNull: false,
-  })
-  public city: string;
-  //a city model is required, for now we use string
-
-  @Column({
-    type: DataType.BOOLEAN,
-    defaultValue: false,
-  })
-  verified: boolean;
 
   @AllowNull
   @ForeignKey(() => Driver)
@@ -61,6 +42,27 @@ export class Kyc3 extends Model<Kyc3> {
 
   @BelongsTo(() => Driver)
   public driver: Driver;
+
+  @Column({
+    type: DataType.ENUM,
+    values: Object.values(IDENTIFICATION_TYPE),
+    allowNull: false,
+  })
+  public identificationType: string;
+
+  @Unique
+  @Column(DataType.STRING(100))
+  public identificationNumber: string;
+
+  @Column(DataType.STRING(500))
+  public identificationImageUrl: string;
+
+  @Column({
+    type: DataType.BOOLEAN,
+    defaultValue: false,
+  })
+  public isVerified: boolean;
+
 
   @CreatedAt
   @Column({

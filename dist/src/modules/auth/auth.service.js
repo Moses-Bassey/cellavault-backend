@@ -29,6 +29,8 @@ const login_type_enum_1 = require("../../enums/login-type.enum");
 const country_service_1 = require("../countries/services/country.service");
 const user_service_1 = require("../users/services/user.service");
 const client_device_service_1 = require("../client-devices/services/client-device.service");
+const validators_utils_1 = require("../../utils/validators.utils");
+const utils_1 = require("../../utils/utils");
 let AuthService = class AuthService {
     userRepository;
     mailService;
@@ -56,7 +58,7 @@ let AuthService = class AuthService {
             }
             const otpToken = await this.tokenService.generateOTPtoken({
                 phoneNo: input.phoneNo,
-                expiry: (0, moment_1.default)().add(5, 'minutes').toDate(),
+                expiry: (0, moment_1.default)().add(10, 'minutes').toDate(),
                 subject: token_enum_1.TokenSubject.SIGN_UP_PHONE,
             });
             await this.smsEventService.emitSignUpOtpSms(input.phoneNo, otpToken.token);
@@ -68,11 +70,12 @@ let AuthService = class AuthService {
     }
     async signUpEmail(input) {
         try {
+            input.email = validators_utils_1.Validators.validateEmail(input.email);
             const existingUser = await this.userRepository.findByEmail(input.email);
             if (existingUser) {
                 throw new common_1.ConflictException('User with this email already exist');
             }
-            const expiryDate = (0, moment_1.default)().add(5, 'minutes').toDate();
+            const expiryDate = (0, moment_1.default)().add(10, 'minutes').toDate();
             const otpToken = await this.tokenService.generateOTPtoken({
                 email: input.email,
                 expiry: expiryDate,
@@ -104,6 +107,7 @@ let AuthService = class AuthService {
             if (!country) {
                 throw new common_1.NotFoundException('Country not found');
             }
+            input.email = validators_utils_1.Validators.validateEmail(input.email);
             const emailUser = await this.checkEmailExist(input.email);
             if (emailUser) {
                 throw new common_1.ConflictException("User with email already exist");
@@ -164,14 +168,21 @@ let AuthService = class AuthService {
     async login(input) {
         try {
             const { identity } = input;
-            const user = await this.checkEmailExist(identity);
+            const identityType = utils_1.Utils.getLoginIdentityType(identity);
+            let user;
+            if (identityType == user_type_enum_1.UserLoginIdentityType.EMAIL) {
+                user = await this.checkEmailExist(identity);
+            }
+            else {
+                user = await this.userRepository.findByPhone(identity);
+            }
             if (!user) {
                 throw new common_1.UnauthorizedException('Invalid Credentials');
             }
             if (user.loginType !== login_type_enum_1.LoginType.NORMAL) {
                 throw new common_1.BadRequestException('login with email and password');
             }
-            if (!user.isActive) {
+            if (user.isDisabled) {
                 throw new common_1.NotFoundException('Your account is disabled, contact Admin');
             }
             if (!user.isEmailVerified || !user.isPhoneVerified) {
@@ -187,7 +198,7 @@ let AuthService = class AuthService {
                 if (!clientDevice) {
                     const otpToken = await this.tokenService.generateOTPtoken({
                         email: user.email,
-                        expiry: (0, moment_1.default)().add(5, 'minutes').toDate(),
+                        expiry: (0, moment_1.default)().add(10, 'minutes').toDate(),
                         subject: token_enum_1.TokenSubject.NEW_DEVICE_LOGIN_OTP,
                     });
                     await this.emailEventService.emitNewDeviceLoginOtpEmail(user.email, otpToken.token);
@@ -268,6 +279,7 @@ let AuthService = class AuthService {
     }
     async forgotPassword(input) {
         try {
+            input.email = validators_utils_1.Validators.validateEmail(input.email);
             const user = await this.checkEmailExist(input.email);
             if (!user) {
                 return response_utils_1.ResponseUtil.success({}, 'Reset OTP has been sent to your email', 200);
@@ -281,7 +293,6 @@ let AuthService = class AuthService {
                 expiry: expiry,
                 subject: token_enum_1.TokenSubject.FORGOT_PASSWORD,
             });
-            console.log(otpToken);
             await this.emailEventService.emitForgetPasswordEmail(user.email, otpToken.token);
             return response_utils_1.ResponseUtil.success({}, 'Reset OTP has been sent to your email', 200);
         }
@@ -290,7 +301,8 @@ let AuthService = class AuthService {
         }
     }
     async resetPassword(input) {
-        const { confirmPassword, password, email, token } = input;
+        let { confirmPassword, password, email, token } = input;
+        email = validators_utils_1.Validators.validateEmail(email);
         if (password !== confirmPassword) {
             throw new common_1.BadRequestException('Passwords do not match');
         }

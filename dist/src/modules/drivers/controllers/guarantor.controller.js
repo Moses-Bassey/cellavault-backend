@@ -40,9 +40,6 @@ let GuarantorController = class GuarantorController {
     async delete(id) {
         return await this.guarantorService.delete(id);
     }
-    async verify(id) {
-        return await this.guarantorService.verify(id);
-    }
 };
 exports.GuarantorController = GuarantorController;
 __decorate([
@@ -101,16 +98,6 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], GuarantorController.prototype, "delete", null);
-__decorate([
-    (0, common_1.Put)(':id/verify'),
-    (0, roles_decorator_1.Roles)(user_type_enum_1.UserType.PEPP_ADMIN, user_type_enum_1.UserType.SUPER_ADMIN),
-    (0, swagger_1.ApiOperation)({ summary: 'Verify guarantor' }),
-    (0, swagger_1.ApiResponse)({ status: 200, description: 'Guarantor verified successfully' }),
-    __param(0, (0, common_1.Param)('id')),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", Promise)
-], GuarantorController.prototype, "verify", null);
 exports.GuarantorController = GuarantorController = __decorate([
     (0, swagger_1.ApiTags)('Guarantors'),
     (0, swagger_1.ApiBearerAuth)(),

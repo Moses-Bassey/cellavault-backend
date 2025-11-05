@@ -7,9 +7,6 @@ export class DriverService {
   
   constructor(private readonly driverRepository: DriverRepository) {}
 
-  async dashboard(){
-    
-  }
 
   async findById(id: string): Promise<Driver | null> {
     return await this.driverRepository.findById(id);
@@ -37,14 +34,6 @@ export class DriverService {
 
   async restore(id: string): Promise<void> {
     return await this.driverRepository.restore(id);
-  }
-
-  async findAvailableDrivers(): Promise<Driver[]> {
-    return await this.driverRepository.findAvailableDrivers();
-  }
-
-  async findNearbyDrivers(latitude: number, longitude: number, radius: number = 5): Promise<Driver[]> {
-    return await this.driverRepository.findNearbyDrivers(latitude, longitude, radius);
   }
 }
 

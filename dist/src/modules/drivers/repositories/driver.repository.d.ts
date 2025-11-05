@@ -14,6 +14,4 @@ export declare class DriverRepository {
     restore(id: string): Promise<void>;
     findWithCountry(email: string, userType: UserType): Promise<Driver | null>;
     findAll(options?: any): Promise<Driver[]>;
-    findAvailableDrivers(): Promise<Driver[]>;
-    findNearbyDrivers(latitude: number, longitude: number, radius?: number): Promise<Driver[]>;
 }

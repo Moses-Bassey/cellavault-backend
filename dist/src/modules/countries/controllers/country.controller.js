@@ -16,17 +16,23 @@ exports.CountryController = void 0;
 const common_1 = require("@nestjs/common");
 const swagger_1 = require("@nestjs/swagger");
 const country_service_1 = require("../services/country.service");
+const state_service_1 = require("../services/state.service");
 const auth_guard_1 = require("../../auth/guards/auth.guard");
 const roles_decorator_1 = require("../../auth/decorators/roles.decorator");
 const user_type_enum_1 = require("../../../enums/user-type.enum");
 let CountryController = class CountryController {
     countryService;
-    constructor(countryService) {
+    stateService;
+    constructor(countryService, stateService) {
         this.countryService = countryService;
+        this.stateService = stateService;
     }
     async findAll() {
         const data = await this.countryService.findAll();
         return data;
+    }
+    async getStatesByCountry(countryId) {
+        return await this.stateService.findByCountryId(countryId);
     }
     async findById(id) {
         return await this.countryService.findById(id);
@@ -50,6 +56,16 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], CountryController.prototype, "findAll", null);
+__decorate([
+    (0, common_1.Get)(':id/states'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get all states for a country' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'States retrieved successfully' }),
+    (0, swagger_1.ApiResponse)({ status: 404, description: 'Country not found' }),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], CountryController.prototype, "getStatesByCountry", null);
 __decorate([
     (0, common_1.Get)(':id'),
     (0, roles_decorator_1.Roles)(user_type_enum_1.UserType.PEPP_ADMIN, user_type_enum_1.UserType.SUPER_ADMIN),
@@ -105,6 +121,7 @@ __decorate([
 exports.CountryController = CountryController = __decorate([
     (0, swagger_1.ApiTags)('Countries'),
     (0, common_1.Controller)('countries'),
-    __metadata("design:paramtypes", [country_service_1.CountryService])
+    __metadata("design:paramtypes", [country_service_1.CountryService,
+        state_service_1.StateService])
 ], CountryController);
 //# sourceMappingURL=country.controller.js.map

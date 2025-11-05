@@ -19,11 +19,13 @@ import { UserType } from '../../../enums/user-type.enum';
 import { Country } from '../../countries/entities/country.entity';
 import { LoginType } from 'src/enums/login-type.enum';
 import { Guarantor } from './guarantor.entity';
-import { Kyc1 } from './kyc-one.entity';
-import { Kyc2 } from './kyc-two.entity';
-import { Kyc3 } from './kyc-three.entity';
+import { kyc1PersonalInfo } from './kyc1-personal-Info.entity';
+import { kyc2IdInformation } from './kyc2-Id-Information.entity';
+import { kyc3ResidentialInformation } from './kyc3-residential-Information.entity';
 import { GENDER } from 'src/enums/gender.enum';
 import { DRIVER_VERIFICATION_STATUS } from 'src/enums/driver-verification-status.enum';
+import { DRIVER_SHIFT } from 'src/enums/drivers-shift.enums';
+import { KYC_COMPLETED } from 'src/enums/kyc.enums';
 
 @Table({
   tableName: 'drivers',
@@ -45,8 +47,28 @@ export class Driver extends Model<Driver> {
   public fullName: string;
 
   @Unique
-  @Column(DataType.STRING(15))
+  @Column({
+    type: DataType.STRING(15),
+    unique: true,
+    allowNull: false,
+  })
   public phoneNo: string;
+
+    
+  @Column({
+    type: DataType.ENUM,
+    values: Object.values(KYC_COMPLETED),
+    allowNull: false,
+    defaultValue: KYC_COMPLETED.NOT_COMPLETED,
+  })
+  public kycCompleted: KYC_COMPLETED;
+
+  @Column({
+    type: DataType.BOOLEAN,
+    allowNull: false,
+    defaultValue: false,
+  })
+  public isGuarantorCompleted: boolean;
 
   @Unique
   @Column({
@@ -60,13 +82,36 @@ export class Driver extends Model<Driver> {
 
   @Column({
     type: DataType.ENUM,
+    values: Object.values(GENDER),
+    allowNull: false,
+  })
+  public gender: GENDER;
+
+  @Column({
+    type: DataType.ENUM,
     values: Object.values(UserType),
     allowNull: false,
+    defaultValue: UserType.DRIVER,
   })
   public userType: UserType;
 
-  @Column(DataType.STRING(1000))
+
+  @Column(DataType.STRING(2000))
   public password: string;
+
+  @Column({
+    type: DataType.STRING(1000),
+    allowNull: true,
+  })
+  public profileImageUrl: string;
+
+  @Column({
+    type: DataType.ENUM,
+    values: Object.values(DRIVER_SHIFT),
+    allowNull: false,
+    defaultValue: DRIVER_SHIFT.NO_SHIFT,
+  })
+  public driverShift: DRIVER_SHIFT;
 
   @Column({
     type: DataType.ENUM,
@@ -97,6 +142,12 @@ export class Driver extends Model<Driver> {
   })
   public isActive: boolean;
 
+  @Column({
+    type: DataType.BOOLEAN,
+    allowNull: false,
+    defaultValue: false,
+  })
+  public isDisabled: boolean;
 
   @Column({
     type: DataType.ENUM,
@@ -105,42 +156,6 @@ export class Driver extends Model<Driver> {
     defaultValue: DRIVER_VERIFICATION_STATUS.PENDING,
   })
   public verificationStatus: DRIVER_VERIFICATION_STATUS;
-
-  // @Column({
-  //   type: DataType.STRING,
-  //   allowNull: true,
-  // })
-  // public licenseNumber: string;
-
-  // @Column({
-  //   type: DataType.STRING,
-  //   allowNull: true,
-  // })
-  // public vehicleModel: string;
-
-  // @Column({
-  //   type: DataType.STRING,
-  //   allowNull: true,
-  // })
-  // public vehicleColor: string;
-
-  // @Column({
-  //   type: DataType.STRING,
-  //   allowNull: true,
-  // })
-  // public vehiclePlateNumber: string;
-
-  // @Column({
-  //   type: DataType.STRING,
-  //   allowNull: true,
-  // })
-  // public vehicleYear: string;
-
-  // @Column({
-  //   type: DataType.STRING,
-  //   allowNull: true,
-  // })
-  // public vehicleType: string;
 
   @Column({
     type: DataType.DECIMAL(10, 8),
@@ -162,16 +177,11 @@ export class Driver extends Model<Driver> {
   public isAvailable: boolean;
 
   @Column({
-    type: DataType.DECIMAL(3, 2),
-    allowNull: true,
+    type: DataType.BOOLEAN,
+    allowNull: false,
+    defaultValue: false,
   })
-  public rating: number;
-
-  @Column({
-    type: DataType.INTEGER,
-    allowNull: true,
-  })
-  public totalTrips: number;
+  public isPeppcruiseDriver: boolean;
 
   @AllowNull
   @ForeignKey(() => Country)
@@ -181,20 +191,39 @@ export class Driver extends Model<Driver> {
   })
   public countryId: string;
 
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+  })
+  public accountNo: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+  })
+  public bankName: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+  })
+  public accountName: string;
+
+
   @BelongsTo(() => Country)
   public country: Country;
 
   @HasMany(() => Guarantor)
   public guarantors: Guarantor[];
 
-  @HasOne(() => Kyc1)
-  public driverPersonalInfoKyc: Kyc1;
+  @HasOne(() => kyc1PersonalInfo)
+  public driverPersonalInfoKyc: kyc1PersonalInfo;
 
-  @HasOne(() => Kyc2)
-  public driverIdKyc: Kyc2;
+  @HasOne(() => kyc2IdInformation)
+  public driverIdKyc: kyc2IdInformation;
 
-  @HasOne(() => Kyc3)
-  public driverAddressKyc: Kyc3;
+  @HasOne(() => kyc3ResidentialInformation)
+  public driverAddressKyc: kyc3ResidentialInformation;
 
   @CreatedAt
   @Column({

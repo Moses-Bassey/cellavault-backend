@@ -5,10 +5,10 @@ export declare class ClientDeviceService {
     private readonly clientDeviceRepository;
     constructor(clientDeviceRepository: ClientDeviceRepository);
     findById(id: string): Promise<ClientDevice | null>;
-    findByUserId(userId: string): Promise<ApiResponse<null> | ApiResponse<ClientDevice[]>>;
-    findByIpAddress(ipAddress: string): Promise<ApiResponse<null> | ApiResponse<ClientDevice[]>>;
+    findByUserId(userId: string): Promise<ApiResponse<ClientDevice[]> | ApiResponse<null>>;
+    findByIpAddress(ipAddress: string): Promise<ApiResponse<ClientDevice[]> | ApiResponse<null>>;
     findByUserIdAndDeviceToken(userId: string, deviceFCMToken: string): Promise<ClientDevice | null>;
-    findAll(options?: any): Promise<ApiResponse<null> | ApiResponse<ClientDevice[]>>;
+    findAll(options?: any): Promise<ApiResponse<ClientDevice[]> | ApiResponse<null>>;
     create(clientDeviceData: Partial<ClientDevice>): Promise<ClientDevice>;
     update(id: string, clientDeviceData: Partial<ClientDevice>): Promise<[number, ClientDevice[]]>;
     delete(id: string): Promise<number>;

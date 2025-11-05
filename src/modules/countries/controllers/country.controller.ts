@@ -2,6 +2,7 @@ import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards } from '@nes
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { Country } from '../entities/country.entity';
 import { CountryService } from '../services/country.service';
+import { StateService } from '../services/state.service';
 import { AuthGuard } from '../../auth/guards/auth.guard';
 import { RolesGuard } from '../../auth/guards/roles.guard';
 import { Roles } from '../../auth/decorators/roles.decorator';
@@ -11,7 +12,10 @@ import { UserType } from '../../../enums/user-type.enum';
 @ApiTags('Countries')
 @Controller('countries')
 export class CountryController {
-  constructor(private readonly countryService: CountryService) {}
+  constructor(
+    private readonly countryService: CountryService,
+    private readonly stateService: StateService,
+  ) {}
 
   @Get()
   @ApiOperation({ summary: 'Get all countries' })
@@ -19,6 +23,14 @@ export class CountryController {
   async findAll() {
     const data = await this.countryService.findAll();
     return data;
+  }
+
+  @Get(':id/states')
+  @ApiOperation({ summary: 'Get all states for a country' })
+  @ApiResponse({ status: 200, description: 'States retrieved successfully' })
+  @ApiResponse({ status: 404, description: 'Country not found' })
+  async getStatesByCountry(@Param('id') countryId: string) {
+    return await this.stateService.findByCountryId(countryId);
   }
 
   @Get(':id')

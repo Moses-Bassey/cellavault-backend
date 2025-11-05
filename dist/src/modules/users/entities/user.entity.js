@@ -24,6 +24,7 @@ let User = class User extends sequelize_typescript_1.Model {
     isEmailVerified;
     isPhoneVerified;
     isActive;
+    isDisabled;
     countryId;
     country;
 };
@@ -98,6 +99,14 @@ __decorate([
     }),
     __metadata("design:type", Boolean)
 ], User.prototype, "isActive", void 0);
+__decorate([
+    (0, sequelize_typescript_1.Default)(false),
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.BOOLEAN,
+        allowNull: false,
+    }),
+    __metadata("design:type", Boolean)
+], User.prototype, "isDisabled", void 0);
 __decorate([
     sequelize_typescript_1.AllowNull,
     (0, sequelize_typescript_1.ForeignKey)(() => country_entity_1.Country),

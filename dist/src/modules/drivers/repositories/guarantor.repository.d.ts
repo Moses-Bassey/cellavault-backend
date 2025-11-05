@@ -9,5 +9,4 @@ export declare class GuarantorRepository {
     update(id: string, guarantorData: Partial<Guarantor>): Promise<[number, Guarantor[]]>;
     delete(id: string): Promise<number>;
     deleteByDriverId(driverId: string): Promise<number>;
-    verify(id: string): Promise<[number, Guarantor[]]>;
 }

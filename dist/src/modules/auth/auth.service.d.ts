@@ -20,9 +20,9 @@ export declare class AuthService {
     private userService;
     private clientDeviceService;
     constructor(userRepository: UserRepository, mailService: MailService, tokenService: TokenService, emailEventService: EmailEventService, smsEventService: SmsEventService, countryService: CountryService, userService: UserService, clientDeviceService: ClientDeviceService);
-    signUpPhoneNo(input: SignupPhone): Promise<import("src/utils/response.utils").ApiResponse<null> | import("src/utils/response.utils").ApiResponse<{
+    signUpPhoneNo(input: SignupPhone): Promise<import("src/utils/response.utils").ApiResponse<{
         otpToken: string;
-    }>>;
+    }> | import("src/utils/response.utils").ApiResponse<null>>;
     signUpEmail(input: SignupEmail): Promise<import("src/utils/response.utils").ApiResponse<null> | import("src/utils/response.utils").ApiResponse<{}>>;
     verifyOtp(input: VerifyOtpDto): Promise<import("src/utils/response.utils").ApiResponse<null> | import("src/utils/response.utils").ApiResponse<{
         token: string;
@@ -35,9 +35,9 @@ export declare class AuthService {
     }>>;
     login(input: LoginUserDto): Promise<import("src/utils/response.utils").ApiResponse<null> | import("src/utils/response.utils").ApiResponse<{
         token: string;
-        userType: UserType;
-        userId: string;
-        email: string;
+        userType: any;
+        userId: any;
+        email: any;
     }>>;
     loginOtp(input: LoginOtpDto): Promise<import("src/utils/response.utils").ApiResponse<null> | import("src/utils/response.utils").ApiResponse<{
         email: string;

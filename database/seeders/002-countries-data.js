@@ -185,7 +185,21 @@ module.exports = {
       },
     ];
 
-    await queryInterface.bulkInsert('countries', countries);
+    const countriesToInsert = [];
+    for (const country of countries) {
+      const results = await queryInterface.sequelize.query(
+        `SELECT id FROM countries WHERE id = '${country.id}' OR name = '${country.name}' LIMIT 1`,
+        { type: queryInterface.sequelize.QueryTypes.SELECT }
+      );
+      
+      if (!results || results.length === 0) {
+        countriesToInsert.push(country);
+      }
+    }
+
+    if (countriesToInsert.length > 0) {
+      await queryInterface.bulkInsert('countries', countriesToInsert);
+    }
   },
 
   down: async (queryInterface) => {

@@ -18,16 +18,9 @@ let Guarantor = class Guarantor extends sequelize_typescript_1.Model {
     fullName;
     phoneNo;
     email;
-    relationship;
-    address;
-    occupation;
-    homeAddress;
-    workAddress;
-    identificationType;
-    identificationNumber;
-    additionalInfo;
-    isVerified;
-    verificationStatus;
+    identificationImageUrl;
+    utilityBillImageUrl;
+    policeClearanceImageUrl;
 };
 exports.Guarantor = Guarantor;
 __decorate([
@@ -68,68 +61,26 @@ __decorate([
     __metadata("design:type", String)
 ], Guarantor.prototype, "email", void 0);
 __decorate([
-    (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.STRING),
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.STRING,
+        allowNull: true,
+    }),
     __metadata("design:type", String)
-], Guarantor.prototype, "relationship", void 0);
-__decorate([
-    (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.STRING),
-    __metadata("design:type", String)
-], Guarantor.prototype, "address", void 0);
-__decorate([
-    (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.STRING),
-    __metadata("design:type", String)
-], Guarantor.prototype, "occupation", void 0);
+], Guarantor.prototype, "identificationImageUrl", void 0);
 __decorate([
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.STRING,
         allowNull: true,
     }),
     __metadata("design:type", String)
-], Guarantor.prototype, "homeAddress", void 0);
+], Guarantor.prototype, "utilityBillImageUrl", void 0);
 __decorate([
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.STRING,
         allowNull: true,
     }),
     __metadata("design:type", String)
-], Guarantor.prototype, "workAddress", void 0);
-__decorate([
-    (0, sequelize_typescript_1.Column)({
-        type: sequelize_typescript_1.DataType.STRING,
-        allowNull: true,
-    }),
-    __metadata("design:type", String)
-], Guarantor.prototype, "identificationType", void 0);
-__decorate([
-    (0, sequelize_typescript_1.Column)({
-        type: sequelize_typescript_1.DataType.STRING,
-        allowNull: true,
-    }),
-    __metadata("design:type", String)
-], Guarantor.prototype, "identificationNumber", void 0);
-__decorate([
-    (0, sequelize_typescript_1.Column)({
-        type: sequelize_typescript_1.DataType.TEXT,
-        allowNull: true,
-    }),
-    __metadata("design:type", String)
-], Guarantor.prototype, "additionalInfo", void 0);
-__decorate([
-    (0, sequelize_typescript_1.Default)(false),
-    (0, sequelize_typescript_1.Column)({
-        type: sequelize_typescript_1.DataType.BOOLEAN,
-        allowNull: false,
-    }),
-    __metadata("design:type", Boolean)
-], Guarantor.prototype, "isVerified", void 0);
-__decorate([
-    sequelize_typescript_1.AllowNull,
-    (0, sequelize_typescript_1.Column)({
-        type: sequelize_typescript_1.DataType.TEXT,
-        allowNull: true,
-    }),
-    __metadata("design:type", String)
-], Guarantor.prototype, "verificationStatus", void 0);
+], Guarantor.prototype, "policeClearanceImageUrl", void 0);
 __decorate([
     sequelize_typescript_1.CreatedAt,
     (0, sequelize_typescript_1.Column)({

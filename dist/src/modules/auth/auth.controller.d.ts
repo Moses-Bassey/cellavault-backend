@@ -19,9 +19,9 @@ export declare class AuthController {
     }>>;
     login(input: LoginUserDto): Promise<import("../../utils/response.utils").ApiResponse<null> | import("../../utils/response.utils").ApiResponse<{
         token: string;
-        userType: import("../../enums").UserType;
-        userId: string;
-        email: string;
+        userType: any;
+        userId: any;
+        email: any;
     }>>;
     loginOtp(input: LoginOtpDto): Promise<import("../../utils/response.utils").ApiResponse<null> | import("../../utils/response.utils").ApiResponse<{
         email: string;

@@ -4,7 +4,6 @@ import { AppService } from './app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { SequelizeModule } from '@nestjs/sequelize';
-import { Dialect } from 'sequelize';
 import appConfig from './config/app.config';
 
 import { AuthModule } from './modules/auth/auth.module';
@@ -18,11 +17,16 @@ import { SmsModule } from './services/sms/sms.module';
 import { AxiosModule } from './services/axios/axios.module';
 import { ApiKeyInterceptor } from './interceptors/api-key.interceptors';
 
-// Import entities from their respective modules
 import { User } from './modules/users/entities';
 import { Driver } from './modules/drivers/entities';
 import { Guarantor } from './modules/drivers/entities/guarantor.entity';
+import { kyc1PersonalInfo } from './modules/drivers/entities/kyc1-personal-Info.entity';
+import { kyc2IdInformation } from './modules/drivers/entities/kyc2-Id-Information.entity';
+import { kyc3ResidentialInformation } from './modules/drivers/entities/kyc3-residential-Information.entity';
+import { Vehicle } from './modules/drivers/entities/vehicle.entity';
+import { PeppDriverVehicles } from './modules/drivers/entities/pepp-driver-vehicles.entity';
 import { Country } from './modules/countries/entities';
+import { State } from './modules/countries/entities/state.entity';
 import { ClientDevice } from './modules/client-devices/entities/client-device.entity';
 import { Token } from './services/token/entities';
 
@@ -45,7 +49,13 @@ import { Token } from './services/token/entities';
         User,
         Driver,
         Guarantor,
+        kyc1PersonalInfo,
+        kyc2IdInformation,
+        kyc3ResidentialInformation,
+        Vehicle,
+        PeppDriverVehicles,
         Country,
+        State,
         ClientDevice,
         Token,
       ],

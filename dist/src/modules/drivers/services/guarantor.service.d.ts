@@ -11,6 +11,5 @@ export declare class GuarantorService {
     update(id: string, guarantorData: Partial<Guarantor>): Promise<[number, Guarantor[]]>;
     delete(id: string): Promise<number>;
     deleteByDriverId(driverId: string): Promise<number>;
-    verify(id: string): Promise<[number, Guarantor[]]>;
     canAddMoreGuarantors(driverId: string): Promise<boolean>;
 }

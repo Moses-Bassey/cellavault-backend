@@ -30,7 +30,13 @@ const api_key_interceptors_1 = require("./interceptors/api-key.interceptors");
 const entities_1 = require("./modules/users/entities");
 const entities_2 = require("./modules/drivers/entities");
 const guarantor_entity_1 = require("./modules/drivers/entities/guarantor.entity");
+const kyc1_personal_Info_entity_1 = require("./modules/drivers/entities/kyc1-personal-Info.entity");
+const kyc2_Id_Information_entity_1 = require("./modules/drivers/entities/kyc2-Id-Information.entity");
+const kyc3_residential_Information_entity_1 = require("./modules/drivers/entities/kyc3-residential-Information.entity");
+const vehicle_entity_1 = require("./modules/drivers/entities/vehicle.entity");
+const pepp_driver_vehicles_entity_1 = require("./modules/drivers/entities/pepp-driver-vehicles.entity");
 const entities_3 = require("./modules/countries/entities");
+const state_entity_1 = require("./modules/countries/entities/state.entity");
 const client_device_entity_1 = require("./modules/client-devices/entities/client-device.entity");
 const entities_4 = require("./services/token/entities");
 let AppModule = class AppModule {
@@ -55,7 +61,13 @@ exports.AppModule = AppModule = __decorate([
                     entities_1.User,
                     entities_2.Driver,
                     guarantor_entity_1.Guarantor,
+                    kyc1_personal_Info_entity_1.kyc1PersonalInfo,
+                    kyc2_Id_Information_entity_1.kyc2IdInformation,
+                    kyc3_residential_Information_entity_1.kyc3ResidentialInformation,
+                    vehicle_entity_1.Vehicle,
+                    pepp_driver_vehicles_entity_1.PeppDriverVehicles,
                     entities_3.Country,
+                    state_entity_1.State,
                     client_device_entity_1.ClientDevice,
                     entities_4.Token,
                 ],

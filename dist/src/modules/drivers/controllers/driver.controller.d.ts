@@ -6,6 +6,4 @@ export declare class DriverController {
     findById(id: string): Promise<Driver | null>;
     update(id: string, driverData: Partial<Driver>): Promise<[number, Driver[]]>;
     dashboard(driverData: Partial<Driver>): Promise<void>;
-    findAvailableDrivers(): Promise<Driver[]>;
-    findNearby(latitude: number, longitude: number): Promise<Driver[]>;
 }

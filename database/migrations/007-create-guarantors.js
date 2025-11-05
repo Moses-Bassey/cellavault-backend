@@ -1,16 +1,15 @@
-'use strict';
+const { QueryInterface, DataTypes } = require('sequelize');
 
-/** @type {import('sequelize-cli').Migration} */
 module.exports = {
-  async up(queryInterface, Sequelize) {
+  up: async (queryInterface) => {
     await queryInterface.createTable('guarantors', {
       id: {
-        type: Sequelize.UUID,
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
         primaryKey: true,
-        defaultValue: Sequelize.UUIDV4,
       },
       driverId: {
-        type: Sequelize.UUID,
+        type: DataTypes.UUID,
         allowNull: false,
         references: {
           model: 'drivers',
@@ -20,81 +19,51 @@ module.exports = {
         onDelete: 'CASCADE',
       },
       fullName: {
-        type: Sequelize.STRING(150),
+        type: DataTypes.STRING(150),
         allowNull: false,
       },
       phoneNo: {
-        type: Sequelize.STRING(15),
+        type: DataTypes.STRING(15),
         allowNull: false,
       },
       email: {
-        type: Sequelize.STRING,
+        type: DataTypes.STRING,
         allowNull: false,
         validate: {
           isEmail: true,
         },
       },
-      relationship: {
-        type: Sequelize.STRING,
+      identificationImageUrl: {
+        type: DataTypes.STRING,
         allowNull: true,
       },
-      address: {
-        type: Sequelize.STRING,
+      utilityBillImageUrl: {
+        type: DataTypes.STRING,
         allowNull: true,
       },
-      occupation: {
-        type: Sequelize.STRING,
-        allowNull: true,
-      },
-      homeAddress: {
-        type: Sequelize.STRING,
-        allowNull: true,
-      },
-      workAddress: {
-        type: Sequelize.STRING,
-        allowNull: true,
-      },
-      identificationType: {
-        type: Sequelize.STRING,
-        allowNull: true,
-      },
-      identificationNumber: {
-        type: Sequelize.STRING,
-        allowNull: true,
-      },
-      additionalInfo: {
-        type: Sequelize.TEXT,
-        allowNull: true,
-      },
-      isVerified: {
-        type: Sequelize.BOOLEAN,
-        allowNull: false,
-        defaultValue: false,
-      },
-      verificationStatus: {
-        type: Sequelize.TEXT,
+      policeClearanceImageUrl: {
+        type: DataTypes.STRING,
         allowNull: true,
       },
       createdAt: {
-        type: Sequelize.DATE,
+        type: DataTypes.DATE,
         allowNull: false,
       },
       updatedAt: {
-        type: Sequelize.DATE,
+        type: DataTypes.DATE,
         allowNull: false,
       },
       deletedAt: {
-        type: Sequelize.DATE,
+        type: DataTypes.DATE,
         allowNull: true,
       },
     });
 
-    // Add constraint to ensure max 3 guarantors per driver
-    // Note: This constraint is enforced at application level
-    // MySQL doesn't support partial unique constraints easily
+    // Add index on driverId for better query performance
+    await queryInterface.addIndex('guarantors', ['driverId']);
   },
 
-  async down(queryInterface, Sequelize) {
+  down: async (queryInterface) => {
     await queryInterface.dropTable('guarantors');
   },
 };

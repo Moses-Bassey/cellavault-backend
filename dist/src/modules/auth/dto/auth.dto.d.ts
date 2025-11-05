@@ -1,6 +1,6 @@
 import { TokenSubject } from 'src/enums/token.enum';
 export declare class SignUpUserDto {
-    readonly email: string;
+    email: string;
     password: string;
     phoneNo: string;
     otpPhone: string;
@@ -20,7 +20,7 @@ export declare class LoginOtpDto {
     deviceInfo: string;
 }
 export declare class ForgotPasswordDto {
-    readonly email: string;
+    email: string;
 }
 export declare class ResetPasswordDto {
     token: string;
@@ -37,7 +37,7 @@ export declare class ResendOtpDto {
     readonly email: string;
 }
 export declare class SignupEmail {
-    readonly email: string;
+    email: string;
 }
 export declare class SignupPhone {
     readonly phoneNo: string;

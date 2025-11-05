@@ -9,7 +9,7 @@ import {
 import { Request as ExpressRequest, request } from 'express';
 import { add } from 'date-fns';
 import { User } from '../users/entities';
-import { UserType } from '../../enums/user-type.enum';
+import { UserLoginIdentityType, UserType } from '../../enums/user-type.enum';
 import { MailService } from 'src/services/mail/mail.service';
 import { EmailEventService } from 'src/services/mail/email-event.service';
 import { SmsEventService } from 'src/services/sms/sms-event.service';
@@ -36,6 +36,9 @@ import { LoginType } from 'src/enums/login-type.enum';
 import { CountryService } from '../countries/services/country.service';
 import { UserService } from '../users/services/user.service';
 import { ClientDeviceService } from '../client-devices/services/client-device.service';
+import { Validators } from 'src/utils/validators.utils';
+import { Utils } from 'src/utils/utils';
+import { IUserLoginData } from 'src/shared/interfaces/auth.interfaces';
 
 @Injectable()
 export class AuthService {
@@ -61,7 +64,7 @@ export class AuthService {
       
       const otpToken = await this.tokenService.generateOTPtoken({
         phoneNo: input.phoneNo,
-        expiry: moment().add(5, 'minutes').toDate(),
+        expiry: moment().add(10, 'minutes').toDate(),
         subject: TokenSubject.SIGN_UP_PHONE,
       })
 
@@ -83,12 +86,14 @@ export class AuthService {
 
   async signUpEmail(input: SignupEmail){
     try {
+
+      input.email = Validators.validateEmail(input.email);
       const existingUser= await this.userRepository.findByEmail(input.email);
 
       if(existingUser){
         throw new ConflictException('User with this email already exist');
       }
-      const expiryDate = moment().add(5, 'minutes').toDate();
+      const expiryDate = moment().add(10, 'minutes').toDate();
       const otpToken = await this.tokenService.generateOTPtoken({
         email: input.email,
         expiry: expiryDate,
@@ -139,6 +144,8 @@ export class AuthService {
       if (!country) {
         throw new NotFoundException('Country not found');
       }
+
+      input.email = Validators.validateEmail(input.email);
 
       const emailUser = await this.checkEmailExist(input.email);
       if(emailUser) {
@@ -217,7 +224,14 @@ export class AuthService {
   async login(input: LoginUserDto) {
     try {
       const { identity } = input;
-      const user = await this.checkEmailExist(identity);
+      const identityType = Utils.getLoginIdentityType(identity);
+
+      let user;
+      if (identityType == UserLoginIdentityType.EMAIL){
+        user = await this.checkEmailExist(identity);
+      } else {
+        user = await this.userRepository.findByPhone(identity);
+      }
 
       if (!user) {
         throw new UnauthorizedException('Invalid Credentials');
@@ -227,7 +241,7 @@ export class AuthService {
         throw new BadRequestException('login with email and password');
       }
       
-      if (!user.isActive) {
+      if (user.isDisabled) {
         throw new NotFoundException('Your account is disabled, contact Admin');
       }
 
@@ -252,7 +266,7 @@ export class AuthService {
           //send new device email with otp here 
           const otpToken = await this.tokenService.generateOTPtoken({
             email: user.email,
-            expiry: moment().add(5, 'minutes').toDate(),
+            expiry: moment().add(10, 'minutes').toDate(),
             subject: TokenSubject.NEW_DEVICE_LOGIN_OTP,
           });
           await this.emailEventService.emitNewDeviceLoginOtpEmail(user.email, otpToken.token);
@@ -271,11 +285,12 @@ export class AuthService {
 
       const { password, ...rest } = user;
 
-      const data = { 
+      const data: IUserLoginData = { 
+        id: user.id,
         token, 
         userType: user.userType,
         userId: user.id,
-        email: user.email 
+        email: user.email,
       };
 
       return ResponseUtil.success(data, 'Login Successful', HttpStatus.OK);
@@ -366,6 +381,8 @@ export class AuthService {
 
   async forgotPassword(input: ForgotPasswordDto) {
     try {
+
+      input.email = Validators.validateEmail(input.email);
       const user = await this.checkEmailExist(input.email);
 
       if (!user) {
@@ -387,7 +404,7 @@ export class AuthService {
         expiry: expiry,
         subject: TokenSubject.FORGOT_PASSWORD,
       })
-      console.log(otpToken);
+
       await this.emailEventService.emitForgetPasswordEmail(user.email, otpToken.token);
 
       return ResponseUtil.success(
@@ -404,7 +421,9 @@ export class AuthService {
   }
 
   async resetPassword(input: ResetPasswordDto) {
-    const { confirmPassword, password, email, token } = input;
+    let { confirmPassword, password, email, token } = input;
+
+    email = Validators.validateEmail(email);
 
     if (password !== confirmPassword) {
       throw new BadRequestException('Passwords do not match');

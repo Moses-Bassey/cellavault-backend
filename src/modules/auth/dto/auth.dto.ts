@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEmail, IsEnum, IsOptional, IsPhoneNumber, IsString, IsUUID, MaxLength, MinLength } from 'class-validator';
 import { min } from 'date-fns';
+import { GENDER } from 'src/enums/gender.enum';
 import { LoginType } from 'src/enums/login-type.enum';
 import { TokenSubject } from 'src/enums/token.enum';
 
@@ -19,7 +20,7 @@ export class SignUpUserDto {
   })
   @IsEmail()
   @MaxLength(320)
-  readonly email: string;
+  email: string;
 
   @ApiProperty({
     description: 'User password',
@@ -134,7 +135,7 @@ export class ForgotPasswordDto {
     example: 'user@example.com',
   })
   @IsEmail()
-  readonly email: string;
+  email: string;
 }
 
 export class ResetPasswordDto {
@@ -205,7 +206,7 @@ export class SignupEmail {
     example: 'user@example.com',
   })
   @IsEmail()
-  readonly email: string;
+  email: string;
 }
 
 export class SignupPhone {

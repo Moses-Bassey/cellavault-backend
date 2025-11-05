@@ -17,8 +17,6 @@ let DriverService = class DriverService {
     constructor(driverRepository) {
         this.driverRepository = driverRepository;
     }
-    async dashboard() {
-    }
     async findById(id) {
         return await this.driverRepository.findById(id);
     }
@@ -39,12 +37,6 @@ let DriverService = class DriverService {
     }
     async restore(id) {
         return await this.driverRepository.restore(id);
-    }
-    async findAvailableDrivers() {
-        return await this.driverRepository.findAvailableDrivers();
-    }
-    async findNearbyDrivers(latitude, longitude, radius = 5) {
-        return await this.driverRepository.findNearbyDrivers(latitude, longitude, radius);
     }
 };
 exports.DriverService = DriverService;

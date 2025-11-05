@@ -55,12 +55,6 @@ let GuarantorRepository = class GuarantorRepository {
             where: { driverId },
         });
     }
-    async verify(id) {
-        return await this.guarantorModel.update({ isVerified: true }, {
-            where: { id },
-            returning: true,
-        });
-    }
 };
 exports.GuarantorRepository = GuarantorRepository;
 exports.GuarantorRepository = GuarantorRepository = __decorate([

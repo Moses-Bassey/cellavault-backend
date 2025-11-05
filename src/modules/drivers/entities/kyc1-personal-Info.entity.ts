@@ -17,7 +17,7 @@ import { GENDER } from 'src/enums/gender.enum';
 import { Driver } from './driver.entity';
 
 @Table({
-  tableName: 'kyc_1',
+  tableName: 'driver_kyc_1_personal_information',
   timestamps: true,
   paranoid: true,
   defaultScope: {
@@ -26,17 +26,34 @@ import { Driver } from './driver.entity';
     },
   },
 })
-export class Kyc1 extends Model<Kyc1> {
+export class kyc1PersonalInfo extends Model<kyc1PersonalInfo> {
   @PrimaryKey
   @Default(DataType.UUIDV4)
   @Column(DataType.UUID)
   declare public id: string;
 
+  @AllowNull
+  @ForeignKey(() => Driver)
+  @Column({
+    type: DataType.UUID,
+    allowNull: true,
+  })
+  public driverId: string;
+
+  @BelongsTo(() => Driver)
+  public driver: Driver;
+
   @Column(DataType.STRING(255))
   public fullName: string;
 
   @Unique
-  @Column(DataType.STRING(15))
+  @Column({
+    type: DataType.STRING(15),
+    allowNull: false,
+    validate: {
+      isPhoneNumber: true
+    },
+  })
   public phoneNo: string;
 
   @Unique
@@ -78,18 +95,20 @@ export class Kyc1 extends Model<Kyc1> {
     type: DataType.BOOLEAN,
     defaultValue: false,
   })
-  verified: boolean;
+  isVerified: boolean;
 
-  @AllowNull
-  @ForeignKey(() => Driver)
   @Column({
-    type: DataType.UUID,
+    type: DataType.STRING,
     allowNull: true,
   })
-  public driverId: string;
+  public schoolCertificateImageUrl: string;
 
-  @BelongsTo(() => Driver)
-  public driver: Driver;
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+  })
+  public utilityBillImageUrl: string;
+
 
   @CreatedAt
   @Column({

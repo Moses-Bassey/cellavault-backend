@@ -88,6 +88,13 @@ export class User extends Model<User> {
   })
   public isActive: boolean;
 
+  @Default(false)
+  @Column({
+    type: DataType.BOOLEAN,
+    allowNull: false,
+  })
+  public isDisabled: boolean;
+
   @AllowNull
   @ForeignKey(() => Country)
   @Column({

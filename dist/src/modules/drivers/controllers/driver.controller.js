@@ -16,8 +16,6 @@ exports.DriverController = void 0;
 const common_1 = require("@nestjs/common");
 const swagger_1 = require("@nestjs/swagger");
 const driver_service_1 = require("../services/driver.service");
-const auth_guard_1 = require("../../auth/guards/auth.guard");
-const roles_guard_1 = require("../../auth/guards/roles.guard");
 const roles_decorator_1 = require("../../auth/decorators/roles.decorator");
 const user_type_enum_1 = require("../../../enums/user-type.enum");
 let DriverController = class DriverController {
@@ -33,17 +31,9 @@ let DriverController = class DriverController {
     }
     async dashboard(driverData) {
     }
-    async findAvailableDrivers() {
-        return await this.driverService.findAvailableDrivers();
-    }
-    async findNearby(latitude, longitude) {
-        return await this.driverService.findNearbyDrivers(latitude, longitude);
-    }
 };
 exports.DriverController = DriverController;
 __decorate([
-    (0, common_1.Get)(':id'),
-    (0, roles_decorator_1.Roles)(user_type_enum_1.UserType.PEPP_ADMIN, user_type_enum_1.UserType.SUPER_ADMIN, user_type_enum_1.UserType.DRIVER),
     (0, swagger_1.ApiOperation)({ summary: 'Get driver by ID' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Driver retrieved successfully' }),
     (0, swagger_1.ApiResponse)({ status: 404, description: 'Driver not found' }),
@@ -73,29 +63,9 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], DriverController.prototype, "dashboard", null);
-__decorate([
-    (0, common_1.Get)('available/list'),
-    (0, roles_decorator_1.Roles)(user_type_enum_1.UserType.PEPP_ADMIN, user_type_enum_1.UserType.SUPER_ADMIN),
-    (0, swagger_1.ApiOperation)({ summary: 'Get all available drivers' }),
-    (0, swagger_1.ApiResponse)({ status: 200, description: 'Available drivers retrieved successfully' }),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
-    __metadata("design:returntype", Promise)
-], DriverController.prototype, "findAvailableDrivers", null);
-__decorate([
-    (0, common_1.Get)('nearby'),
-    (0, swagger_1.ApiOperation)({ summary: 'Get nearby drivers' }),
-    (0, swagger_1.ApiResponse)({ status: 200, description: 'Nearby drivers retrieved successfully' }),
-    __param(0, (0, common_1.Param)('latitude')),
-    __param(1, (0, common_1.Param)('longitude')),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, Number]),
-    __metadata("design:returntype", Promise)
-], DriverController.prototype, "findNearby", null);
 exports.DriverController = DriverController = __decorate([
     (0, swagger_1.ApiTags)('Drivers'),
     (0, swagger_1.ApiBearerAuth)(),
-    (0, common_1.UseGuards)(auth_guard_1.AuthGuard, roles_guard_1.RolesGuard),
     (0, common_1.Controller)('drivers'),
     __metadata("design:paramtypes", [driver_service_1.DriverService])
 ], DriverController);

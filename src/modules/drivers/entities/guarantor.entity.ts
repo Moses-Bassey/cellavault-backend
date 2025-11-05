@@ -56,58 +56,23 @@ export class Guarantor extends Model<Guarantor> {
   })
   public email: string;
 
-  @Column(DataType.STRING)
-  public relationship: string;
-
-  @Column(DataType.STRING)
-  public address: string;
-
-  @Column(DataType.STRING)
-  public occupation: string;
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+  })
+  public identificationImageUrl: string;
 
   @Column({
     type: DataType.STRING,
     allowNull: true,
   })
-  public homeAddress: string;
+  public utilityBillImageUrl: string;
 
   @Column({
     type: DataType.STRING,
     allowNull: true,
   })
-  public workAddress: string;
-
-  @Column({
-    type: DataType.STRING,
-    allowNull: true,
-  })
-  public identificationType: string; // NIN, Drivers License, etc.
-
-  @Column({
-    type: DataType.STRING,
-    allowNull: true,
-  })
-  public identificationNumber: string;
-
-  @Column({
-    type: DataType.TEXT,
-    allowNull: true,
-  })
-  public additionalInfo: string;
-
-  @Default(false)
-  @Column({
-    type: DataType.BOOLEAN,
-    allowNull: false,
-  })
-  public isVerified: boolean;
-
-  @AllowNull
-  @Column({
-    type: DataType.TEXT,
-    allowNull: true,
-  })
-  public verificationStatus: string;
+  public policeClearanceImageUrl: string;
 
   @CreatedAt
   @Column({

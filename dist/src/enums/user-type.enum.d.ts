@@ -5,3 +5,7 @@ export declare enum UserType {
     USER = "USER",
     DRIVER = "DRIVER"
 }
+export declare enum UserLoginIdentityType {
+    PHONE_NO = "PHONE_NO",
+    EMAIL = "EMAIL"
+}

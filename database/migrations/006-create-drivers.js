@@ -1,137 +1,150 @@
-'use strict';
+const { QueryInterface, DataTypes } = require('sequelize');
 
-/** @type {import('sequelize-cli').Migration} */
 module.exports = {
-  async up(queryInterface, Sequelize) {
+  up: async (queryInterface) => {
     await queryInterface.createTable('drivers', {
       id: {
-        type: Sequelize.UUID,
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
         primaryKey: true,
-        defaultValue: Sequelize.UUIDV4,
       },
       fullName: {
-        type: Sequelize.STRING(150),
+        type: DataTypes.STRING(150),
         allowNull: false,
       },
       phoneNo: {
-        type: Sequelize.STRING(15),
+        type: DataTypes.STRING(15),
         allowNull: false,
         unique: true,
       },
       email: {
-        type: Sequelize.STRING,
+        type: DataTypes.STRING,
         allowNull: false,
         unique: true,
         validate: {
           isEmail: true,
         },
       },
-      userType: {
-        type: Sequelize.ENUM('USER', 'DRIVER', 'PEPP_ADMIN', 'SUPER_ADMIN'),
+      gender: {
+        type: DataTypes.ENUM('MALE', 'FEMALE', 'OTHER'),
         allowNull: false,
       },
+      kycCompleted: {
+        type: DataTypes.ENUM('PERSONAL_INFORMATION', 'IDENTITY_INFORMATION', 'RESIDENTIAL_INFORMATION', 'ALL_COMPLETED', 'NOT_COMPLETED'),
+        allowNull: false,
+        defaultValue: 'NOT_COMPLETED',
+      },
+      userType: {
+        type: DataTypes.ENUM('USER', 'DRIVER', 'PEPP_ADMIN', 'SUPER_ADMIN'),
+        allowNull: false,
+        defaultValue: 'DRIVER',
+      },
       password: {
-        type: Sequelize.STRING(1000),
+        type: DataTypes.STRING(2000),
+        allowNull: false,
+      },
+      profileImageUrl: {
+        type: DataTypes.STRING(1000),
         allowNull: true,
       },
+      driverShift: {
+        type: DataTypes.ENUM('DAY', 'NIGHT', 'NO_SHIFT'),
+        allowNull: false,
+        defaultValue: 'NO_SHIFT',
+      },
       loginType: {
-        type: Sequelize.ENUM('NORMAL', 'GOOGLE', 'APPLE'),
+        type: DataTypes.ENUM('NORMAL', 'GOOGLE', 'APPLE'),
         allowNull: false,
       },
       isEmailVerified: {
-        type: Sequelize.BOOLEAN,
+        type: DataTypes.BOOLEAN,
         allowNull: false,
         defaultValue: false,
       },
       isPhoneVerified: {
-        type: Sequelize.BOOLEAN,
+        type: DataTypes.BOOLEAN,
         allowNull: false,
         defaultValue: false,
       },
       isActive: {
-        type: Sequelize.BOOLEAN,
+        type: DataTypes.BOOLEAN,
         allowNull: false,
         defaultValue: true,
       },
-      isVerified: {
-        type: Sequelize.BOOLEAN,
-        allowNull: false,
-        defaultValue: false,
-      },
       verificationStatus: {
-        type: Sequelize.TEXT,
-        allowNull: true,
-      },
-      licenseNumber: {
-        type: Sequelize.STRING,
-        allowNull: true,
-      },
-      vehicleModel: {
-        type: Sequelize.STRING,
-        allowNull: true,
-      },
-      vehicleColor: {
-        type: Sequelize.STRING,
-        allowNull: true,
-      },
-      vehiclePlateNumber: {
-        type: Sequelize.STRING,
-        allowNull: true,
-      },
-      vehicleYear: {
-        type: Sequelize.STRING,
-        allowNull: true,
-      },
-      vehicleType: {
-        type: Sequelize.STRING,
-        allowNull: true,
+        type: DataTypes.ENUM('PENDING', 'IN_PROGRESS', 'VERIFIED', 'REJECTED'),
+        allowNull: false,
+        defaultValue: 'PENDING',
       },
       latitude: {
-        type: Sequelize.DECIMAL(10, 8),
+        type: DataTypes.DECIMAL(10, 8),
         allowNull: true,
       },
       longitude: {
-        type: Sequelize.DECIMAL(11, 8),
+        type: DataTypes.DECIMAL(11, 8),
         allowNull: true,
       },
       isAvailable: {
-        type: Sequelize.BOOLEAN,
+        type: DataTypes.BOOLEAN,
         allowNull: false,
         defaultValue: false,
       },
-      rating: {
-        type: Sequelize.DECIMAL(3, 2),
-        allowNull: true,
-      },
-      totalTrips: {
-        type: Sequelize.INTEGER,
-        allowNull: true,
+      isPeppcruiseDriver: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
       },
       countryId: {
-        type: Sequelize.UUID,
+        type: DataTypes.UUID,
         allowNull: true,
         references: {
           model: 'countries',
           key: 'id',
         },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL',
+      },
+      accountNo: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      bankName: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      accountName: {
+        type: DataTypes.STRING,
+        allowNull: true,
       },
       createdAt: {
-        type: Sequelize.DATE,
+        type: DataTypes.DATE,
         allowNull: false,
       },
       updatedAt: {
-        type: Sequelize.DATE,
-        allowNull: false,
+        type: DataTypes.DATE,
+        allowNull: true,
       },
       deletedAt: {
-        type: Sequelize.DATE,
+        type: DataTypes.DATE,
         allowNull: true,
       },
     });
+
+    // Add indexes for better query performance
+    await queryInterface.addIndex('drivers', ['countryId']);
+    await queryInterface.addIndex('drivers', ['verificationStatus']);
+    await queryInterface.addIndex('drivers', ['isAvailable']);
+    await queryInterface.addIndex('drivers', ['isActive']);
+    await queryInterface.addIndex('drivers', ['driverShift']);
+    await queryInterface.addIndex('drivers', ['isPeppcruiseDriver']);
+    await queryInterface.addIndex('drivers', ['userType']);
+    // Composite index for common queries
+    await queryInterface.addIndex('drivers', ['isAvailable', 'isActive', 'verificationStatus']);
+    await queryInterface.addIndex('drivers', ['driverShift', 'isAvailable']);
+    await queryInterface.addIndex('drivers', ['countryId', 'isAvailable']);
   },
 
-  async down(queryInterface, Sequelize) {
+  down: async (queryInterface) => {
     await queryInterface.dropTable('drivers');
   },
 };
-

@@ -69,7 +69,6 @@ export class AuthController {
   async resetPassword(@Body() input: ResetPasswordDto) {
     return await this.authService.resetPassword(input);
   }
-  
 
   @Auth()
   @ApiBearerAuth()

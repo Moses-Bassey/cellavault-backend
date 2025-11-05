@@ -47,9 +47,6 @@ export class GuarantorService {
     return await this.guarantorRepository.deleteByDriverId(driverId);
   }
 
-  async verify(id: string): Promise<[number, Guarantor[]]> {
-    return await this.guarantorRepository.verify(id);
-  }
 
   canAddMoreGuarantors(driverId: string): Promise<boolean> {
     return this.guarantorRepository.countByDriverId(driverId)

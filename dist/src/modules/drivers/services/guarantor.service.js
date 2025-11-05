@@ -46,9 +46,6 @@ let GuarantorService = class GuarantorService {
     async deleteByDriverId(driverId) {
         return await this.guarantorRepository.deleteByDriverId(driverId);
     }
-    async verify(id) {
-        return await this.guarantorRepository.verify(id);
-    }
     canAddMoreGuarantors(driverId) {
         return this.guarantorRepository.countByDriverId(driverId)
             .then(count => count < this.MAX_GUARANTORS);

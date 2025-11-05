@@ -13,6 +13,7 @@ export declare class User extends Model<User> {
     isEmailVerified: boolean;
     isPhoneVerified: boolean;
     isActive: boolean;
+    isDisabled: boolean;
     countryId: string;
     country: Country;
     createdAt: Date;

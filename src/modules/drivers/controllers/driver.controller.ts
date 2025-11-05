@@ -9,13 +9,10 @@ import { UserType } from '../../../enums/user-type.enum';
 
 @ApiTags('Drivers')
 @ApiBearerAuth()
-@UseGuards(AuthGuard, RolesGuard)
 @Controller('drivers')
 export class DriverController {
   constructor(private readonly driverService: DriverService) {}
 
-  @Get(':id')
-  @Roles(UserType.PEPP_ADMIN, UserType.SUPER_ADMIN, UserType.DRIVER)
   @ApiOperation({ summary: 'Get driver by ID' })
   @ApiResponse({ status: 200, description: 'Driver retrieved successfully' })
   @ApiResponse({ status: 404, description: 'Driver not found' })
@@ -42,24 +39,6 @@ export class DriverController {
     @Body() driverData: Partial<Driver>,
   ){
     // return await this.driverService.dashboard();
-  }
-
-  @Get('available/list')
-  @Roles(UserType.PEPP_ADMIN, UserType.SUPER_ADMIN)
-  @ApiOperation({ summary: 'Get all available drivers' })
-  @ApiResponse({ status: 200, description: 'Available drivers retrieved successfully' })
-  async findAvailableDrivers(): Promise<Driver[]> {
-    return await this.driverService.findAvailableDrivers();
-  }
-
-  @Get('nearby')
-  @ApiOperation({ summary: 'Get nearby drivers' })
-  @ApiResponse({ status: 200, description: 'Nearby drivers retrieved successfully' })
-  async findNearby(
-    @Param('latitude') latitude: number,
-    @Param('longitude') longitude: number,
-  ): Promise<Driver[]> {
-    return await this.driverService.findNearbyDrivers(latitude, longitude);
   }
 }
 

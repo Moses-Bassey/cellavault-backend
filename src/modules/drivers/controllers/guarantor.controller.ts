@@ -64,12 +64,5 @@ export class GuarantorController {
     return await this.guarantorService.delete(id);
   }
 
-  @Put(':id/verify')
-  @Roles(UserType.PEPP_ADMIN, UserType.SUPER_ADMIN)
-  @ApiOperation({ summary: 'Verify guarantor' })
-  @ApiResponse({ status: 200, description: 'Guarantor verified successfully' })
-  async verify(@Param('id') id: string): Promise<[number, Guarantor[]]> {
-    return await this.guarantorService.verify(id);
-  }
 }
 
