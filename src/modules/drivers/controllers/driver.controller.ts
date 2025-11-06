@@ -20,18 +20,6 @@ export class DriverController {
     return await this.driverService.findById(id);
   }
 
-  @Put(':id')
-  @Roles(UserType.PEPP_ADMIN, UserType.SUPER_ADMIN, UserType.DRIVER)
-  @ApiOperation({ summary: 'Update driver' })
-  @ApiResponse({ status: 200, description: 'Driver updated successfully' })
-  @ApiResponse({ status: 404, description: 'Driver not found' })
-  async update(
-    @Param('id') id: string,
-    @Body() driverData: Partial<Driver>,
-  ): Promise<[number, Driver[]]> {
-    return await this.driverService.update(id, driverData);
-  }
-
   @Put('dashboard')
   @ApiOperation({ summary: 'Driver dashboard' })
   @ApiResponse({ status: 200, description: 'Driver dashboard data' })

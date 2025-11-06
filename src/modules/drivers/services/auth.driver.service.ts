@@ -33,7 +33,7 @@ import {
   import { DriverRepository } from '../repositories/driver.repository';
   import { ClientDeviceService } from '../../client-devices/services/client-device.service';
   import { Driver } from '../entities/driver.entity';
-import { IDriverLoginData } from '../../../shared/interfaces/auth.interfaces';
+import { IDriverLoginData } from '../../../shared/interfaces/auth.interface';
 import { Validators } from 'src/utils/validators.utils';
 import { Utils } from 'src/utils/utils';
 import { KYC_COMPLETED } from 'src/enums/kyc.enums';
@@ -279,7 +279,7 @@ import { KYC_COMPLETED } from 'src/enums/kyc.enums';
           }
         }
   
-        const payload = {
+        const payload : JwtAuthPayload = {
           sub: driver.id,
           userType: driver.userType,
           userId: driver.id,
@@ -502,11 +502,13 @@ import { KYC_COMPLETED } from 'src/enums/kyc.enums';
         return ResponseUtil.errorFromException(error);
       }
     }
+
     ////////////////
     //            //
     //   HELPERS  //
     //            //
     ////////////////
+    
     async checkEmailExist(email: string): Promise<Driver | null> {
       return await this.driverRepository.findByEmail(email);
     }

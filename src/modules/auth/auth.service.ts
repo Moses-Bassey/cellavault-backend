@@ -38,7 +38,7 @@ import { UserService } from '../users/services/user.service';
 import { ClientDeviceService } from '../client-devices/services/client-device.service';
 import { Validators } from 'src/utils/validators.utils';
 import { Utils } from 'src/utils/utils';
-import { IUserLoginData } from 'src/shared/interfaces/auth.interfaces';
+import { IUserLoginData } from 'src/shared/interfaces/auth.interface';
 
 @Injectable()
 export class AuthService {
@@ -274,11 +274,11 @@ export class AuthService {
         }
       }
 
-      const payload = {
+      const payload : JwtAuthPayload = {
         sub: user.id,
         userType: user.userType,
         userId: user.id,
-        email: user.email
+        email: user.email,
       };
 
       const token: string = await this.tokenService.generateJWTtoken(payload);

@@ -34,15 +34,6 @@ export class GuarantorController {
     return await this.guarantorService.findByDriverId(driverId);
   }
 
-  @Get(':id')
-  @Roles(UserType.DRIVER, UserType.PEPP_ADMIN, UserType.SUPER_ADMIN)
-  @ApiOperation({ summary: 'Get guarantor by ID' })
-  @ApiResponse({ status: 200, description: 'Guarantor retrieved successfully' })
-  @ApiResponse({ status: 404, description: 'Guarantor not found' })
-  async findById(@Param('id') id: string): Promise<Guarantor | null> {
-    return await this.guarantorService.findById(id);
-  }
-
   @Put(':id')
   @Roles(UserType.DRIVER, UserType.PEPP_ADMIN, UserType.SUPER_ADMIN)
   @ApiOperation({ summary: 'Update guarantor' })
@@ -55,14 +46,6 @@ export class GuarantorController {
     return await this.guarantorService.update(id, guarantorData);
   }
 
-  @Delete(':id')
-  @Roles(UserType.DRIVER, UserType.PEPP_ADMIN, UserType.SUPER_ADMIN)
-  @ApiOperation({ summary: 'Delete guarantor' })
-  @ApiResponse({ status: 200, description: 'Guarantor deleted successfully' })
-  @ApiResponse({ status: 404, description: 'Guarantor not found' })
-  async delete(@Param('id') id: string): Promise<number> {
-    return await this.guarantorService.delete(id);
-  }
 
 }
 

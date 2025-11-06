@@ -15,6 +15,7 @@ import {
 } from 'sequelize-typescript';
 import { GENDER } from 'src/enums/gender.enum';
 import { Driver } from './driver.entity';
+import { Country } from '../../countries/entities/country.entity';
 
 @Table({
   tableName: 'driver_kyc_1_personal_information',
@@ -42,6 +43,17 @@ export class kyc1PersonalInfo extends Model<kyc1PersonalInfo> {
 
   @BelongsTo(() => Driver)
   public driver: Driver;
+
+  @AllowNull
+  @ForeignKey(() => Country)
+  @Column({
+    type: DataType.UUID,
+    allowNull: true,
+  })
+  public countryId: string;
+
+  @BelongsTo(() => Country)
+  public country: Country;
 
   @Column(DataType.STRING(255))
   public fullName: string;

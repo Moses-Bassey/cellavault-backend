@@ -9,13 +9,19 @@ import { Vehicle } from './entities/vehicle.entity';
 import { PeppDriverVehicles } from './entities/pepp-driver-vehicles.entity';
 import { DriverController } from './controllers/driver.controller';
 import { GuarantorController } from './controllers/guarantor.controller';
+import { KycController } from './controllers/kyc.controller';
 import { DriverService } from './services/driver.service';
 import { GuarantorService } from './services/guarantor.service';
+import { KycService } from './services/kyc.service';
 import { DriverRepository } from './repositories/driver.repository';
 import { GuarantorRepository } from './repositories/guarantor.repository';
+import { Kyc1Repository } from './repositories/kyc1.repository';
+import { Kyc2Repository } from './repositories/kyc2.repository';
+import { Kyc3Repository } from './repositories/kyc3.repository';
 import { AuthDriverController } from './controllers/auth.driver.controller';
 import { AuthDriverService } from './services/auth.driver.service';
 import { CountriesModule } from '../countries/countries.module';
+import { Country } from '../countries/entities/country.entity';
 import { ClientDevicesModule } from '../client-devices/client-devices.module';
 import { MailModule } from 'src/services/mail/mail.module';
 import { TokenModule } from 'src/services/token/token.module';
@@ -31,6 +37,7 @@ import { SmsModule } from 'src/services/sms/sms.module';
       kyc3ResidentialInformation,
       Vehicle,
       PeppDriverVehicles,
+      Country,
     ]),
     CountriesModule,
     ClientDevicesModule,
@@ -38,9 +45,33 @@ import { SmsModule } from 'src/services/sms/sms.module';
     MailModule,
     SmsModule,
   ],
-  controllers: [DriverController, GuarantorController, AuthDriverController],
-  providers: [DriverService, AuthDriverService, GuarantorService, DriverRepository, GuarantorRepository],
-  exports: [DriverService, GuarantorService, DriverRepository, GuarantorRepository],
+  controllers: [
+    DriverController,
+    GuarantorController,
+    KycController,
+    AuthDriverController,
+  ],
+  providers: [
+    DriverService,
+    AuthDriverService,
+    GuarantorService,
+    KycService,
+    DriverRepository,
+    GuarantorRepository,
+    Kyc1Repository,
+    Kyc2Repository,
+    Kyc3Repository,
+  ],
+  exports: [
+    DriverService,
+    GuarantorService,
+    KycService,
+    DriverRepository,
+    GuarantorRepository,
+    Kyc1Repository,
+    Kyc2Repository,
+    Kyc3Repository,
+  ],
 })
 export class DriversModule {}
 

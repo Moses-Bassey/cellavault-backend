@@ -5,7 +5,7 @@ import { GuarantorRepository } from '../repositories/guarantor.repository';
 @Injectable()
 export class GuarantorService {
   
-  private readonly MAX_GUARANTORS = 3;
+  private readonly MAX_GUARANTORS = 2;
 
   constructor(private readonly guarantorRepository: GuarantorRepository) {}
 
@@ -22,7 +22,6 @@ export class GuarantorService {
   }
 
   async create(driverId: string, guarantorData: Partial<Guarantor>): Promise<Guarantor> {
-    // Check if driver already has maximum guarantors
     const count = await this.guarantorRepository.countByDriverId(driverId);
     
     if (count >= this.MAX_GUARANTORS) {
