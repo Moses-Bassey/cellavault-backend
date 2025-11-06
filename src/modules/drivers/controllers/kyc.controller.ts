@@ -15,6 +15,7 @@ import {
   ApiOperation,
   ApiResponse,
   ApiBearerAuth,
+  ApiBody,
 } from '@nestjs/swagger';
 import { KycService } from '../services/kyc.service';
 import { AuthGuard } from '../../auth/guards/auth.guard';
@@ -55,6 +56,7 @@ export class KycController {
     status: 201,
     description: 'KYC1 personal information created/updated successfully',
   })
+  
   async createKyc1(
     @Body() kycData: CreateKyc1Dto,
     @Req() req: ExpressRequest & { user: JwtAuthPayload }
