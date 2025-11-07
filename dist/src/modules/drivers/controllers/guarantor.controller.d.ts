@@ -5,7 +5,4 @@ export declare class GuarantorController {
     constructor(guarantorService: GuarantorService);
     create(driverId: string, guarantorData: Partial<Guarantor>): Promise<Guarantor>;
     findByDriverId(driverId: string): Promise<Guarantor[]>;
-    findById(id: string): Promise<Guarantor | null>;
-    update(id: string, guarantorData: Partial<Guarantor>): Promise<[number, Guarantor[]]>;
-    delete(id: string): Promise<number>;
 }

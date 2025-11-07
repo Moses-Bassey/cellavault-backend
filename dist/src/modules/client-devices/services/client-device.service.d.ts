@@ -1,14 +1,13 @@
 import { ClientDevice } from '../entities/client-device.entity';
 import { ClientDeviceRepository } from '../repositories/client-device.repository';
-import { ApiResponse } from 'src/utils/response.utils';
 export declare class ClientDeviceService {
     private readonly clientDeviceRepository;
     constructor(clientDeviceRepository: ClientDeviceRepository);
     findById(id: string): Promise<ClientDevice | null>;
-    findByUserId(userId: string): Promise<ApiResponse<ClientDevice[]> | ApiResponse<null>>;
-    findByIpAddress(ipAddress: string): Promise<ApiResponse<ClientDevice[]> | ApiResponse<null>>;
+    findByUserId(userId: string): Promise<ClientDevice[]>;
+    findByIpAddress(ipAddress: string): Promise<ClientDevice[]>;
     findByUserIdAndDeviceToken(userId: string, deviceFCMToken: string): Promise<ClientDevice | null>;
-    findAll(options?: any): Promise<ApiResponse<ClientDevice[]> | ApiResponse<null>>;
+    findAll(options?: any): Promise<ClientDevice[]>;
     create(clientDeviceData: Partial<ClientDevice>): Promise<ClientDevice>;
     update(id: string, clientDeviceData: Partial<ClientDevice>): Promise<[number, ClientDevice[]]>;
     delete(id: string): Promise<number>;
@@ -19,6 +18,6 @@ export declare class ClientDeviceService {
         name?: string;
         userId?: string;
         userType?: 'SUPER_ADMIN' | 'PEPP_ADMIN' | 'USER';
-    }): Promise<ApiResponse<null> | ApiResponse<ClientDevice>>;
-    updateDeviceToken(deviceId: string, deviceFCMToken: string): Promise<ApiResponse<null> | ApiResponse<ClientDevice>>;
+    }): Promise<ClientDevice>;
+    updateDeviceToken(deviceId: string, deviceFCMToken: string): Promise<ClientDevice>;
 }

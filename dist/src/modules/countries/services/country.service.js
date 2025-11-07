@@ -12,7 +12,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CountryService = void 0;
 const common_1 = require("@nestjs/common");
 const country_repository_1 = require("../repositories/country.repository");
-const response_utils_1 = require("../../../utils/response.utils");
 let CountryService = class CountryService {
     countryRepository;
     constructor(countryRepository) {
@@ -25,13 +24,8 @@ let CountryService = class CountryService {
         return await this.countryRepository.findByName(name);
     }
     async findAll(options) {
-        try {
-            const countries = await this.countryRepository.findAll(options);
-            return response_utils_1.ResponseUtil.success(countries, 'Countries retrieved successfully', common_1.HttpStatus.OK);
-        }
-        catch (error) {
-            return response_utils_1.ResponseUtil.errorFromException(error, 'An error occurred during find all countries', common_1.HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        const countries = await this.countryRepository.findAll(options);
+        return countries;
     }
     async create(countryData) {
         return await this.countryRepository.create(countryData);

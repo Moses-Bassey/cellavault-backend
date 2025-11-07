@@ -1,3 +1,5 @@
+import { HttpException, HttpStatus } from '@nestjs/common';
+
 export interface ApiResponse<T> {
   status: 'success' | 'error'; // success or error
   message: string;
@@ -51,6 +53,19 @@ export class ResponseUtil {
       status: 'error',
       message,
       statusCode,
+    };
+  }
+
+  static handleResponse<T>(
+    data: T | null,
+    message: string,
+    statusCode: number = HttpStatus.OK,
+  ): ApiResponse<T> {
+    return {
+      status: 'success',
+      statusCode,
+      message,
+      data,
     };
   }
 }

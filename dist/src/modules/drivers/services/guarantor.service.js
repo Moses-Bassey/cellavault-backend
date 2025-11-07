@@ -14,7 +14,7 @@ const common_1 = require("@nestjs/common");
 const guarantor_repository_1 = require("../repositories/guarantor.repository");
 let GuarantorService = class GuarantorService {
     guarantorRepository;
-    MAX_GUARANTORS = 3;
+    MAX_GUARANTORS = 2;
     constructor(guarantorRepository) {
         this.guarantorRepository = guarantorRepository;
     }

@@ -10,6 +10,7 @@ import { ChangePasswordDto, ForgotPasswordDto, LoginOtpDto, LoginUserDto, ResetP
 import { CountryService } from '../countries/services/country.service';
 import { UserService } from '../users/services/user.service';
 import { ClientDeviceService } from '../client-devices/services/client-device.service';
+import { IUserLoginData } from 'src/shared/interfaces/auth.interface';
 export declare class AuthService {
     private readonly userRepository;
     private mailService;
@@ -20,34 +21,29 @@ export declare class AuthService {
     private userService;
     private clientDeviceService;
     constructor(userRepository: UserRepository, mailService: MailService, tokenService: TokenService, emailEventService: EmailEventService, smsEventService: SmsEventService, countryService: CountryService, userService: UserService, clientDeviceService: ClientDeviceService);
-    signUpPhoneNo(input: SignupPhone): Promise<import("src/utils/response.utils").ApiResponse<{
+    signUpPhoneNo(input: SignupPhone): Promise<{
         otpToken: string;
-    }> | import("src/utils/response.utils").ApiResponse<null>>;
-    signUpEmail(input: SignupEmail): Promise<import("src/utils/response.utils").ApiResponse<null> | import("src/utils/response.utils").ApiResponse<{}>>;
-    verifyOtp(input: VerifyOtpDto): Promise<import("src/utils/response.utils").ApiResponse<null> | import("src/utils/response.utils").ApiResponse<{
+    }>;
+    signUpEmail(input: SignupEmail): Promise<null>;
+    verifyOtp(input: VerifyOtpDto): Promise<{
         token: string;
-    }>>;
-    signUp(input: SignUpUserDto): Promise<import("src/utils/response.utils").ApiResponse<null> | import("src/utils/response.utils").ApiResponse<{
+    }>;
+    signUp(input: SignUpUserDto): Promise<{
         email: string;
         userType: UserType;
         id: string;
         token: string;
-    }>>;
-    login(input: LoginUserDto): Promise<import("src/utils/response.utils").ApiResponse<null> | import("src/utils/response.utils").ApiResponse<{
-        token: string;
-        userType: any;
-        userId: any;
-        email: any;
-    }>>;
-    loginOtp(input: LoginOtpDto): Promise<import("src/utils/response.utils").ApiResponse<null> | import("src/utils/response.utils").ApiResponse<{
+    }>;
+    login(input: LoginUserDto): Promise<IUserLoginData>;
+    loginOtp(input: LoginOtpDto): Promise<{
         email: string;
         userType: UserType;
         id: string;
         token: string;
-    }>>;
-    forgotPassword(input: ForgotPasswordDto): Promise<import("src/utils/response.utils").ApiResponse<null> | import("src/utils/response.utils").ApiResponse<{}>>;
-    resetPassword(input: ResetPasswordDto): Promise<import("src/utils/response.utils").ApiResponse<{}>>;
-    changePassword(input: ChangePasswordDto, authUser: JwtAuthPayload): Promise<import("src/utils/response.utils").ApiResponse<null> | import("src/utils/response.utils").ApiResponse<{}>>;
+    }>;
+    forgotPassword(input: ForgotPasswordDto): Promise<null>;
+    resetPassword(input: ResetPasswordDto): Promise<null>;
+    changePassword(input: ChangePasswordDto, authUser: JwtAuthPayload): Promise<null>;
     checkEmailExist(email: string): Promise<User | null>;
     private getBaseUrlFromRequest;
 }

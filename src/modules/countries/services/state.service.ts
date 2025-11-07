@@ -1,7 +1,6 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { State } from '../entities/state.entity';
 import { StateRepository } from '../repositories/state.repository';
-import { ApiResponse, ResponseUtil } from 'src/utils/response.utils';
 
 @Injectable()
 export class StateService {
@@ -12,25 +11,13 @@ export class StateService {
   }
 
   async findByCountryId(countryId: string) {
-    try {
-      const states = await this.stateRepository.findByCountryId(countryId);
-      return ResponseUtil.success(states, 'States retrieved successfully', HttpStatus.OK);
-    } catch (error: unknown) {
-      return ResponseUtil.errorFromException(
-        error,
-        'An error occurred during find states by country', HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+    const states = await this.stateRepository.findByCountryId(countryId);
+    return states;
   }
 
   async findAll(options?: any) {
-    try {
-      const states = await this.stateRepository.findAll(options);
-      return ResponseUtil.success(states, 'States retrieved successfully', HttpStatus.OK);
-    } catch (error: unknown) {
-      return ResponseUtil.errorFromException(
-        error,
-        'An error occurred during find all states', HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+    const states = await this.stateRepository.findAll(options);
+    return states;
   }
 
   async create(stateData: Partial<State>): Promise<State> {

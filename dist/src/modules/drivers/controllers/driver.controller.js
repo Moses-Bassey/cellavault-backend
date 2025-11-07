@@ -16,8 +16,6 @@ exports.DriverController = void 0;
 const common_1 = require("@nestjs/common");
 const swagger_1 = require("@nestjs/swagger");
 const driver_service_1 = require("../services/driver.service");
-const roles_decorator_1 = require("../../auth/decorators/roles.decorator");
-const user_type_enum_1 = require("../../../enums/user-type.enum");
 let DriverController = class DriverController {
     driverService;
     constructor(driverService) {
@@ -25,9 +23,6 @@ let DriverController = class DriverController {
     }
     async findById(id) {
         return await this.driverService.findById(id);
-    }
-    async update(id, driverData) {
-        return await this.driverService.update(id, driverData);
     }
     async dashboard(driverData) {
     }
@@ -42,18 +37,6 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], DriverController.prototype, "findById", null);
-__decorate([
-    (0, common_1.Put)(':id'),
-    (0, roles_decorator_1.Roles)(user_type_enum_1.UserType.PEPP_ADMIN, user_type_enum_1.UserType.SUPER_ADMIN, user_type_enum_1.UserType.DRIVER),
-    (0, swagger_1.ApiOperation)({ summary: 'Update driver' }),
-    (0, swagger_1.ApiResponse)({ status: 200, description: 'Driver updated successfully' }),
-    (0, swagger_1.ApiResponse)({ status: 404, description: 'Driver not found' }),
-    __param(0, (0, common_1.Param)('id')),
-    __param(1, (0, common_1.Body)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object]),
-    __metadata("design:returntype", Promise)
-], DriverController.prototype, "update", null);
 __decorate([
     (0, common_1.Put)('dashboard'),
     (0, swagger_1.ApiOperation)({ summary: 'Driver dashboard' }),

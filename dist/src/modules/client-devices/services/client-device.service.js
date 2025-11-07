@@ -12,7 +12,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ClientDeviceService = void 0;
 const common_1 = require("@nestjs/common");
 const client_device_repository_1 = require("../repositories/client-device.repository");
-const response_utils_1 = require("../../../utils/response.utils");
 let ClientDeviceService = class ClientDeviceService {
     clientDeviceRepository;
     constructor(clientDeviceRepository) {
@@ -22,34 +21,19 @@ let ClientDeviceService = class ClientDeviceService {
         return await this.clientDeviceRepository.findById(id);
     }
     async findByUserId(userId) {
-        try {
-            const devices = await this.clientDeviceRepository.findByUserId(userId);
-            return response_utils_1.ResponseUtil.success(devices, 'User devices retrieved successfully', common_1.HttpStatus.OK);
-        }
-        catch (error) {
-            return response_utils_1.ResponseUtil.errorFromException(error, 'An error occurred while retrieving user devices', common_1.HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        const devices = await this.clientDeviceRepository.findByUserId(userId);
+        return devices;
     }
     async findByIpAddress(ipAddress) {
-        try {
-            const devices = await this.clientDeviceRepository.findByIpAddress(ipAddress);
-            return response_utils_1.ResponseUtil.success(devices, 'Devices by IP retrieved successfully', common_1.HttpStatus.OK);
-        }
-        catch (error) {
-            return response_utils_1.ResponseUtil.errorFromException(error, 'An error occurred while retrieving devices by IP', common_1.HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        const devices = await this.clientDeviceRepository.findByIpAddress(ipAddress);
+        return devices;
     }
     async findByUserIdAndDeviceToken(userId, deviceFCMToken) {
         return await this.clientDeviceRepository.findByUserIdAndDeviceToken(userId, deviceFCMToken);
     }
     async findAll(options) {
-        try {
-            const devices = await this.clientDeviceRepository.findAll(options);
-            return response_utils_1.ResponseUtil.success(devices, 'Client devices retrieved successfully', common_1.HttpStatus.OK);
-        }
-        catch (error) {
-            return response_utils_1.ResponseUtil.errorFromException(error, 'An error occurred during find all client devices', common_1.HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        const devices = await this.clientDeviceRepository.findAll(options);
+        return devices;
     }
     async create(clientDeviceData) {
         return await this.clientDeviceRepository.create(clientDeviceData);
@@ -64,27 +48,17 @@ let ClientDeviceService = class ClientDeviceService {
         await this.clientDeviceRepository.restore(id);
     }
     async registerDevice(deviceData) {
-        try {
-            const device = await this.clientDeviceRepository.updateOrCreateDevice(deviceData);
-            return response_utils_1.ResponseUtil.success(device, 'Device registered successfully', common_1.HttpStatus.CREATED);
-        }
-        catch (error) {
-            return response_utils_1.ResponseUtil.errorFromException(error, 'An error occurred while registering device', common_1.HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        const device = await this.clientDeviceRepository.updateOrCreateDevice(deviceData);
+        return device;
     }
     async updateDeviceToken(deviceId, deviceFCMToken) {
-        try {
-            const [affectedCount, updatedDevices] = await this.clientDeviceRepository.update(deviceId, {
-                deviceFCMToken,
-            });
-            if (affectedCount === 0) {
-                throw new common_1.NotFoundException('Device not found!');
-            }
-            return response_utils_1.ResponseUtil.success(updatedDevices[0], 'Device token updated successfully', common_1.HttpStatus.OK);
+        const [affectedCount, updatedDevices] = await this.clientDeviceRepository.update(deviceId, {
+            deviceFCMToken,
+        });
+        if (affectedCount === 0) {
+            throw new common_1.NotFoundException('Device not found!');
         }
-        catch (error) {
-            return response_utils_1.ResponseUtil.errorFromException(error, 'An error occurred while updating device token', common_1.HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        return updatedDevices[0];
     }
 };
 exports.ClientDeviceService = ClientDeviceService;

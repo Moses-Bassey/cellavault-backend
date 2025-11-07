@@ -20,6 +20,7 @@ const state_service_1 = require("../services/state.service");
 const auth_guard_1 = require("../../auth/guards/auth.guard");
 const roles_decorator_1 = require("../../auth/decorators/roles.decorator");
 const user_type_enum_1 = require("../../../enums/user-type.enum");
+const response_utils_1 = require("../../../utils/response.utils");
 let CountryController = class CountryController {
     countryService;
     stateService;
@@ -29,10 +30,11 @@ let CountryController = class CountryController {
     }
     async findAll() {
         const data = await this.countryService.findAll();
-        return data;
+        return response_utils_1.ResponseUtil.handleResponse(data, 'Countries retrieved successfully', common_1.HttpStatus.OK);
     }
     async getStatesByCountry(countryId) {
-        return await this.stateService.findByCountryId(countryId);
+        const data = await this.stateService.findByCountryId(countryId);
+        return response_utils_1.ResponseUtil.handleResponse(data, 'States retrieved successfully', common_1.HttpStatus.OK);
     }
     async findById(id) {
         return await this.countryService.findById(id);

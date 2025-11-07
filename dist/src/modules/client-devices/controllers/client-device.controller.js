@@ -20,20 +20,23 @@ const auth_guard_1 = require("../../auth/guards/auth.guard");
 const roles_guard_1 = require("../../auth/guards/roles.guard");
 const roles_decorator_1 = require("../../auth/decorators/roles.decorator");
 const user_type_enum_1 = require("../../../enums/user-type.enum");
+const response_utils_1 = require("../../../utils/response.utils");
 let ClientDeviceController = class ClientDeviceController {
     clientDeviceService;
     constructor(clientDeviceService) {
         this.clientDeviceService = clientDeviceService;
     }
     async findAll() {
-        return await this.clientDeviceService.findAll();
+        const data = await this.clientDeviceService.findAll();
+        return response_utils_1.ResponseUtil.handleResponse(data, 'Client devices retrieved successfully', common_1.HttpStatus.OK);
     }
     async getMyDevices(req) {
         const userId = req.user?.id;
         if (!userId) {
             return { message: 'User not authenticated', statusCode: 401 };
         }
-        return await this.clientDeviceService.findByUserId(userId);
+        const data = await this.clientDeviceService.findByUserId(userId);
+        return response_utils_1.ResponseUtil.handleResponse(data, 'User devices retrieved successfully', common_1.HttpStatus.OK);
     }
 };
 exports.ClientDeviceController = ClientDeviceController;

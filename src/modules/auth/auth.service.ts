@@ -16,7 +16,6 @@ import { SmsEventService } from 'src/services/sms/sms-event.service';
 import { TOKEN_SUBJECT } from 'src/services/token/token.constants';
 import { TokenService } from 'src/services/token/token.service';
 import { PasswordUtil } from 'src/utils/password.util';
-import { ResponseUtil } from 'src/utils/response.utils';
 import { UserRepository } from '../users/repositories/user.repository';
 import { JwtAuthPayload } from './auth.interface';
 import {
@@ -54,370 +53,292 @@ export class AuthService {
   ) {} 
 
   async signUpPhoneNo(input: SignupPhone){
-    try{
-      
-      const existingUser= await this.userRepository.findByPhone(input.phoneNo);
+    const existingUser= await this.userRepository.findByPhone(input.phoneNo);
 
-      if(existingUser){
-        throw new ConflictException('User with this phoneNo already exist');
-      }
-      
-      const otpToken = await this.tokenService.generateOTPtoken({
-        phoneNo: input.phoneNo,
-        expiry: moment().add(10, 'minutes').toDate(),
-        subject: TokenSubject.SIGN_UP_PHONE,
-      })
+    if(existingUser){
+      throw new ConflictException('User with this phoneNo already exist');
+    }
+    
+    const otpToken = await this.tokenService.generateOTPtoken({
+      phoneNo: input.phoneNo,
+      expiry: moment().add(10, 'minutes').toDate(),
+      subject: TokenSubject.SIGN_UP_PHONE,
+    })
 
-      // Send SMS with OTP
-      await this.smsEventService.emitSignUpOtpSms(input.phoneNo, otpToken.token);
-      
-      return ResponseUtil.success(
-        {otpToken: otpToken.token},
-        'Sign up OTP has been sent to your phoneNo',
-        HttpStatus.OK,
-      );
-      } catch (error) {
-        return ResponseUtil.errorFromException(
-          error,
-          'An error occurred during sign up phoneNo',
-        );
-      }
+    // Send SMS with OTP
+    await this.smsEventService.emitSignUpOtpSms(input.phoneNo, otpToken.token);
+    
+    return {otpToken: otpToken.token};
   }
 
   async signUpEmail(input: SignupEmail){
-    try {
+    input.email = Validators.validateEmail(input.email);
+    const existingUser= await this.userRepository.findByEmail(input.email);
 
-      input.email = Validators.validateEmail(input.email);
-      const existingUser= await this.userRepository.findByEmail(input.email);
-
-      if(existingUser){
-        throw new ConflictException('User with this email already exist');
-      }
-      const expiryDate = moment().add(10, 'minutes').toDate();
-      const otpToken = await this.tokenService.generateOTPtoken({
-        email: input.email,
-        expiry: expiryDate,
-        subject: TokenSubject.SIGN_UP_EMAIL,
-      })
-
-      // Send forget password email
-      await this.emailEventService.emitSignUpOtpEmail(input.email, otpToken.token, expiryDate.toISOString());    
-
-      //send otp here
-      return ResponseUtil.success(
-        {},
-        'Sign up OTP has been sent to your email',
-        HttpStatus.OK,
-      );
-    } catch (error) {
-      console.error(error);
-      return ResponseUtil.errorFromException(
-        error,
-        'An error occurred during sign up email',
-      );
+    if(existingUser){
+      throw new ConflictException('User with this email already exist');
     }
+    const expiryDate = moment().add(10, 'minutes').toDate();
+    const otpToken = await this.tokenService.generateOTPtoken({
+      email: input.email,
+      expiry: expiryDate,
+      subject: TokenSubject.SIGN_UP_EMAIL,
+    })
+
+    // Send forget password email
+    await this.emailEventService.emitSignUpOtpEmail(input.email, otpToken.token, expiryDate.toISOString());    
+
+    return null;
   }
 
   async verifyOtp(input: VerifyOtpDto) {
-    try { 
-      
-      const data = await this.tokenService.validateOtp(input);
-      
-      if(!data){
-        throw new BadRequestException('Invalid OTP');
-      }
-      
-      return ResponseUtil.success(data, 'OTP Validated successfully', HttpStatus.OK);
-
-    } catch (error) {
-      return ResponseUtil.errorFromException(
-        error,
-        'An error occurred during verify OTP',
-      );
+    const data = await this.tokenService.validateOtp(input);
+    
+    if(!data){
+      throw new BadRequestException('Invalid OTP');
     }
+    
+    return data;
   }
 
   async signUp(input: SignUpUserDto){
-    try{
-
-      const country = await this.countryService.findById(input.country);
-      if (!country) {
-        throw new NotFoundException('Country not found');
-      }
-
-      input.email = Validators.validateEmail(input.email);
-
-      const emailUser = await this.checkEmailExist(input.email);
-      if(emailUser) {
-        throw new ConflictException("User with email already exist")
-      }
-
-      const userPhone = await this.userRepository.findByPhone(input.phoneNo);
-      if(userPhone) {
-        throw new ConflictException("User with phone number already exist")
-      }
-
-      const verifyPhoneOtp = await this.tokenService.verifySignUpOTP({
-        phoneNo: input.phoneNo,
-        token: input.otpPhone,
-        subject: TokenSubject.SIGN_UP_PHONE,
-      });
-
-      if (!verifyPhoneOtp) {
-        throw new BadRequestException('Invalid OTP');
-      }
-
-      const verifyEmailOtp = await this.tokenService.verifySignUpOTP({
-        email: input.email,
-        token: input.otpEmail,
-        subject: TokenSubject.SIGN_UP_EMAIL,
-      });
-
-      if (!verifyEmailOtp) {
-        throw new BadRequestException('Invalid OTP');
-      }
-      
-      const password = await PasswordUtil.hashPassword(input.password)
-
-      const user = await this.userRepository.create({
-        email: input.email,
-        phoneNo: input.phoneNo,
-        fullName: input.fullName,
-        password: password,
-        countryId: country.id,
-        userType: UserType.USER,
-        loginType: LoginType.NORMAL,
-        isEmailVerified: true,
-        isPhoneVerified: true,
-        isActive: true,
-      });
-
-      const payload = {
-        sub: user.id,
-        userType: UserType.USER,
-        userId: user!.id,
-        email: input.email
-      };
-
-      const token: string = await this.tokenService.generateJWTtoken(payload);
-
-      // Send welcome email
-      await this.emailEventService.emitWelcomeEmail(user.email, user.fullName);
-
-      return ResponseUtil.success({
-        email: input.email, 
-        userType: UserType.USER, 
-        id: user.id, 
-        token: token
-      }, 'User created successfully', HttpStatus.CREATED);
-    }
-    catch (error: unknown) {
-      console.log(error);
-      return ResponseUtil.errorFromException(
-        error,
-        'An error occurred during sign up',
-      );
+    const country = await this.countryService.findById(input.country);
+    if (!country) {
+      throw new NotFoundException('Country not found');
     }
 
+    input.email = Validators.validateEmail(input.email);
+
+    const emailUser = await this.checkEmailExist(input.email);
+    if(emailUser) {
+      throw new ConflictException("User with email already exist")
+    }
+
+    const userPhone = await this.userRepository.findByPhone(input.phoneNo);
+    if(userPhone) {
+      throw new ConflictException("User with phone number already exist")
+    }
+
+    const verifyPhoneOtp = await this.tokenService.verifySignUpOTP({
+      phoneNo: input.phoneNo,
+      token: input.otpPhone,
+      subject: TokenSubject.SIGN_UP_PHONE,
+    });
+
+    if (!verifyPhoneOtp) {
+      throw new BadRequestException('Invalid OTP');
+    }
+
+    const verifyEmailOtp = await this.tokenService.verifySignUpOTP({
+      email: input.email,
+      token: input.otpEmail,
+      subject: TokenSubject.SIGN_UP_EMAIL,
+    });
+
+    if (!verifyEmailOtp) {
+      throw new BadRequestException('Invalid OTP');
+    }
+    
+    const password = await PasswordUtil.hashPassword(input.password)
+
+    const user = await this.userRepository.create({
+      email: input.email,
+      phoneNo: input.phoneNo,
+      fullName: input.fullName,
+      password: password,
+      countryId: country.id,
+      userType: UserType.USER,
+      loginType: LoginType.NORMAL,
+      isEmailVerified: true,
+      isPhoneVerified: true,
+      isActive: true,
+    });
+
+    const payload = {
+      sub: user.id,
+      userType: UserType.USER,
+      userId: user!.id,
+      email: input.email
+    };
+
+    const token: string = await this.tokenService.generateJWTtoken(payload);
+
+    // Send welcome email
+    await this.emailEventService.emitWelcomeEmail(user.email, user.fullName);
+
+    return {
+      email: input.email, 
+      userType: UserType.USER, 
+      id: user.id, 
+      token: token
+    };
   }
 
   async login(input: LoginUserDto) {
-    try {
-      const { identity } = input;
-      const identityType = Utils.getLoginIdentityType(identity);
+    const { identity } = input;
+    const identityType = Utils.getLoginIdentityType(identity);
 
-      let user;
-      if (identityType == UserLoginIdentityType.EMAIL){
-        user = await this.checkEmailExist(identity);
-      } else {
-        user = await this.userRepository.findByPhone(identity);
-      }
-
-      if (!user) {
-        throw new UnauthorizedException('Invalid Credentials');
-      }
-
-      if(user.loginType !== LoginType.NORMAL){
-        throw new BadRequestException('login with email and password');
-      }
-      
-      if (user.isDisabled) {
-        throw new NotFoundException('Your account is disabled, contact Admin');
-      }
-
-      if (!user.isEmailVerified || !user.isPhoneVerified){
-        throw new UnauthorizedException('Your account is not verified');
-      }
-
-      const verifyPassword = await PasswordUtil.verifyPassword(
-        input.password,
-        user.password,
-      );
-
-      if (!verifyPassword) {
-        throw new UnauthorizedException('Invalid Credentials');
-      }
-
-      //Detect if the user login with a new device using the x-client-device-toke provided in the request header
-      const clientDeviceToken = request.headers['x-client-device-token'] as string;
-      if (clientDeviceToken) {
-        const clientDevice = await this.clientDeviceService.findByUserIdAndDeviceToken(user.id, clientDeviceToken);
-        if (!clientDevice) {
-          //send new device email with otp here 
-          const otpToken = await this.tokenService.generateOTPtoken({
-            email: user.email,
-            expiry: moment().add(10, 'minutes').toDate(),
-            subject: TokenSubject.NEW_DEVICE_LOGIN_OTP,
-          });
-          await this.emailEventService.emitNewDeviceLoginOtpEmail(user.email, otpToken.token);
-          throw new UnauthorizedException('Detected new device login');
-        }
-      }
-
-      const payload : JwtAuthPayload = {
-        sub: user.id,
-        userType: user.userType,
-        userId: user.id,
-        email: user.email,
-      };
-
-      const token: string = await this.tokenService.generateJWTtoken(payload);
-
-      const { password, ...rest } = user;
-
-      const data: IUserLoginData = { 
-        id: user.id,
-        token, 
-        userType: user.userType,
-        userId: user.id,
-        email: user.email,
-      };
-
-      return ResponseUtil.success(data, 'Login Successful', HttpStatus.OK);
-    } catch (error: unknown) {
-      console.error(error);
-      return ResponseUtil.errorFromException(
-        error,
-        'An error occurred during login',
-      );
+    let user;
+    if (identityType == UserLoginIdentityType.EMAIL){
+      user = await this.checkEmailExist(identity);
+    } else {
+      user = await this.userRepository.findByPhone(identity);
     }
+
+    if (!user) {
+      throw new UnauthorizedException('Invalid Credentials');
+    }
+
+    if(user.loginType !== LoginType.NORMAL){
+      throw new BadRequestException('login with email and password');
+    }
+    
+    if (user.isDisabled) {
+      throw new NotFoundException('Your account is disabled, contact Admin');
+    }
+
+    if (!user.isEmailVerified || !user.isPhoneVerified){
+      throw new UnauthorizedException('Your account is not verified');
+    }
+
+    const verifyPassword = await PasswordUtil.verifyPassword(
+      input.password,
+      user.password,
+    );
+
+    if (!verifyPassword) {
+      throw new UnauthorizedException('Invalid Credentials');
+    }
+
+    //Detect if the user login with a new device using the x-client-device-toke provided in the request header
+    const clientDeviceToken = request.headers['x-client-device-token'] as string;
+    if (clientDeviceToken) {
+      const clientDevice = await this.clientDeviceService.findByUserIdAndDeviceToken(user.id, clientDeviceToken);
+      if (!clientDevice) {
+        //send new device email with otp here 
+        const otpToken = await this.tokenService.generateOTPtoken({
+          email: user.email,
+          expiry: moment().add(10, 'minutes').toDate(),
+          subject: TokenSubject.NEW_DEVICE_LOGIN_OTP,
+        });
+        await this.emailEventService.emitNewDeviceLoginOtpEmail(user.email, otpToken.token);
+        throw new UnauthorizedException('Detected new device login');
+      }
+    }
+
+    const payload : JwtAuthPayload = {
+      sub: user.id,
+      userType: user.userType,
+      userId: user.id,
+      email: user.email,
+    };
+
+    const token: string = await this.tokenService.generateJWTtoken(payload);
+
+    const { password, ...rest } = user;
+
+    const data: IUserLoginData = { 
+      id: user.id,
+      token, 
+      userType: user.userType,
+      userId: user.id,
+      email: user.email,
+    };
+
+    return data;
   }
 
   async loginOtp(input: LoginOtpDto) {
-    try {
-      const { identity, otp, password, deviceInfo } = input;
+    const { identity, otp, password, deviceInfo } = input;
 
-      const user = await this.userService.findByIdentity(identity);
-      if (!user) {
-        throw new NotFoundException('User not found');
-      }
-
-      if(user.loginType !== LoginType.NORMAL){
-        throw new BadRequestException('Only normal login type is allowed to login with OTP');
-      }
-
-      if (!user.isActive) {
-        throw new NotFoundException('Your account is disabled, contact Admin');
-      }
-
-      if (!user.isEmailVerified){
-        throw new UnauthorizedException('Your email account is not verified');
-      }
-
-      if (!user.isPhoneVerified){
-        throw new UnauthorizedException('Your phone no. is not verified');
-      }
-
-      const verifyOtp = await this.tokenService.verifyOTP({
-        email: user.email,
-        token: otp,
-        subject: TokenSubject.NEW_DEVICE_LOGIN_OTP,
-      });
-
-      if (!verifyOtp) {
-        throw new BadRequestException('Invalid OTP');
-      }
-
-      const verifyPassword = await PasswordUtil.verifyPassword(
-        password,
-        user.password,
-      );
-
-      if (!verifyPassword) {
-        throw new UnauthorizedException('Invalid Credentials');
-      }
-
-      const payload = {
-        sub: user.id,
-        userType: UserType.USER,
-        userId: user.id,
-        email: user.email
-      };
-
-      const token: string = await this.tokenService.generateJWTtoken(payload);
-
-       const loginTime = moment().format('MMMM Do YYYY, h:mm A');
-       await this.emailEventService.emitNewLoginEmail(
-         user.email,
-         user.fullName,
-         deviceInfo,
-         loginTime,
-       );
-
-      return ResponseUtil.success({
-        email: user.email, 
-        userType: UserType.USER, 
-        id: user.id, 
-        token: token
-      }, 'User created successfully', HttpStatus.CREATED);
-      
-    } catch (error: unknown) {
-      return ResponseUtil.errorFromException(
-        error,
-        'An error occurred during login with OTP',
-      );
+    const user = await this.userService.findByIdentity(identity);
+    if (!user) {
+      throw new NotFoundException('User not found');
     }
+
+    if(user.loginType !== LoginType.NORMAL){
+      throw new BadRequestException('Only normal login type is allowed to login with OTP');
+    }
+
+    if (!user.isActive) {
+      throw new NotFoundException('Your account is disabled, contact Admin');
+    }
+
+    if (!user.isEmailVerified){
+      throw new UnauthorizedException('Your email account is not verified');
+    }
+
+    if (!user.isPhoneVerified){
+      throw new UnauthorizedException('Your phone no. is not verified');
+    }
+
+    const verifyOtp = await this.tokenService.verifyOTP({
+      email: user.email,
+      token: otp,
+      subject: TokenSubject.NEW_DEVICE_LOGIN_OTP,
+    });
+
+    if (!verifyOtp) {
+      throw new BadRequestException('Invalid OTP');
+    }
+
+    const verifyPassword = await PasswordUtil.verifyPassword(
+      password,
+      user.password,
+    );
+
+    if (!verifyPassword) {
+      throw new UnauthorizedException('Invalid Credentials');
+    }
+
+    const payload = {
+      sub: user.id,
+      userType: UserType.USER,
+      userId: user.id,
+      email: user.email
+    };
+
+    const token: string = await this.tokenService.generateJWTtoken(payload);
+
+     const loginTime = moment().format('MMMM Do YYYY, h:mm A');
+     await this.emailEventService.emitNewLoginEmail(
+       user.email,
+       user.fullName,
+       deviceInfo,
+       loginTime,
+     );
+
+    return {
+      email: user.email, 
+      userType: UserType.USER, 
+      id: user.id, 
+      token: token
+    };
   }
 
   async forgotPassword(input: ForgotPasswordDto) {
-    try {
+    input.email = Validators.validateEmail(input.email);
+    const user = await this.checkEmailExist(input.email);
 
-      input.email = Validators.validateEmail(input.email);
-      const user = await this.checkEmailExist(input.email);
-
-      if (!user) {
-        return ResponseUtil.success(
-          {},
-          'Reset OTP has been sent to your email',
-          200,
-        );
-      }
-
-      if (user.loginType !== LoginType.NORMAL) {
-        throw new BadRequestException('Only normal login type is allowed to reset password');
-      }
-
-      const expiry: Date = moment().add(10, 'minutes').toDate();
-
-      const otpToken = await this.tokenService.generateOTPtoken({
-        email: input.email,
-        expiry: expiry,
-        subject: TokenSubject.FORGOT_PASSWORD,
-      })
-
-      await this.emailEventService.emitForgetPasswordEmail(user.email, otpToken.token);
-
-      return ResponseUtil.success(
-        {},
-        'Reset OTP has been sent to your email',
-        200,
-      );
-    } catch (error: unknown) {
-      return ResponseUtil.errorFromException(
-        error,
-        'An error occurred during password reset',
-      );
+    if (!user) {
+      return null;
     }
+
+    if (user.loginType !== LoginType.NORMAL) {
+      throw new BadRequestException('Only normal login type is allowed to reset password');
+    }
+
+    const expiry: Date = moment().add(10, 'minutes').toDate();
+
+    const otpToken = await this.tokenService.generateOTPtoken({
+      email: input.email,
+      expiry: expiry,
+      subject: TokenSubject.FORGOT_PASSWORD,
+    })
+
+    await this.emailEventService.emitForgetPasswordEmail(user.email, otpToken.token);
+
+    return null;
   }
 
   async resetPassword(input: ResetPasswordDto) {
@@ -448,52 +369,48 @@ export class AuthService {
       throw new BadRequestException('Only normal login type is allowed to reset password');
     }
 
-    const data = await this.userService.update(
+    await this.userService.update(
       user.id,
       {password: await PasswordUtil.hashPassword(password) },
     );
 
-    return ResponseUtil.success({}, 'Password reset successful', 200);
+    return null;
   }
 
   async changePassword(input: ChangePasswordDto, authUser: JwtAuthPayload) {
-    try {
-      const user = await this.checkEmailExist(authUser.email);
+    const user = await this.checkEmailExist(authUser.email);
 
-      if (!user) {
-        throw new NotFoundException('User not found');
-      }
-
-      const { confirmPassword, newPassword, oldPassword } = input;
-
-      const verifyOldPass = await PasswordUtil.verifyPassword(
-        oldPassword,
-        user.password,
-      );
-
-      if (!verifyOldPass) {
-        throw new BadRequestException('Incorrect Old Password');
-      }
-
-      if (confirmPassword !== newPassword) {
-        throw new BadRequestException('Password do not match');
-      }
-
-      const hashedPassword = await PasswordUtil.hashPassword(newPassword);
-
-      await this.userRepository.update(user.id, { password: hashedPassword });
-
-      const changedAt = moment().format('MMMM Do YYYY, h:mm A');
-      await this.emailEventService.emitPasswordChangedEmail(
-        user.email,
-        user.fullName,
-        changedAt,
-      );
-
-      return ResponseUtil.success({}, 'Password Changed', 200);
-    } catch (error: unknown) {
-      return ResponseUtil.errorFromException(error);
+    if (!user) {
+      throw new NotFoundException('User not found');
     }
+
+    const { confirmPassword, newPassword, oldPassword } = input;
+
+    const verifyOldPass = await PasswordUtil.verifyPassword(
+      oldPassword,
+      user.password,
+    );
+
+    if (!verifyOldPass) {
+      throw new BadRequestException('Incorrect Old Password');
+    }
+
+    if (confirmPassword !== newPassword) {
+      throw new BadRequestException('Password do not match');
+    }
+
+    const hashedPassword = await PasswordUtil.hashPassword(newPassword);
+
+    await this.userRepository.update(user.id, { password: hashedPassword });
+
+    const changedAt = moment().format('MMMM Do YYYY, h:mm A');
+    await this.emailEventService.emitPasswordChangedEmail(
+      user.email,
+      user.fullName,
+      changedAt,
+    );
+
+    return null;
   }
   ////////////////
   //            //

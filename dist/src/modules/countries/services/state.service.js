@@ -12,7 +12,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.StateService = void 0;
 const common_1 = require("@nestjs/common");
 const state_repository_1 = require("../repositories/state.repository");
-const response_utils_1 = require("../../../utils/response.utils");
 let StateService = class StateService {
     stateRepository;
     constructor(stateRepository) {
@@ -22,22 +21,12 @@ let StateService = class StateService {
         return await this.stateRepository.findById(id);
     }
     async findByCountryId(countryId) {
-        try {
-            const states = await this.stateRepository.findByCountryId(countryId);
-            return response_utils_1.ResponseUtil.success(states, 'States retrieved successfully', common_1.HttpStatus.OK);
-        }
-        catch (error) {
-            return response_utils_1.ResponseUtil.errorFromException(error, 'An error occurred during find states by country', common_1.HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        const states = await this.stateRepository.findByCountryId(countryId);
+        return states;
     }
     async findAll(options) {
-        try {
-            const states = await this.stateRepository.findAll(options);
-            return response_utils_1.ResponseUtil.success(states, 'States retrieved successfully', common_1.HttpStatus.OK);
-        }
-        catch (error) {
-            return response_utils_1.ResponseUtil.errorFromException(error, 'An error occurred during find all states', common_1.HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        const states = await this.stateRepository.findAll(options);
+        return states;
     }
     async create(stateData) {
         return await this.stateRepository.create(stateData);

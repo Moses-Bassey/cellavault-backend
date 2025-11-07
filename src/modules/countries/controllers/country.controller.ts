@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards, HttpStatus } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { Country } from '../entities/country.entity';
 import { CountryService } from '../services/country.service';
@@ -7,6 +7,7 @@ import { AuthGuard } from '../../auth/guards/auth.guard';
 import { RolesGuard } from '../../auth/guards/roles.guard';
 import { Roles } from '../../auth/decorators/roles.decorator';
 import { UserType } from '../../../enums/user-type.enum';
+import { ResponseUtil } from 'src/utils/response.utils';
 
 
 @ApiTags('Countries')
@@ -22,7 +23,7 @@ export class CountryController {
   @ApiResponse({ status: 200, description: 'Countries retrieved successfully' })
   async findAll() {
     const data = await this.countryService.findAll();
-    return data;
+    return ResponseUtil.handleResponse(data, 'Countries retrieved successfully', HttpStatus.OK);
   }
 
   @Get(':id/states')
@@ -30,7 +31,8 @@ export class CountryController {
   @ApiResponse({ status: 200, description: 'States retrieved successfully' })
   @ApiResponse({ status: 404, description: 'Country not found' })
   async getStatesByCountry(@Param('id') countryId: string) {
-    return await this.stateService.findByCountryId(countryId);
+    const data = await this.stateService.findByCountryId(countryId);
+    return ResponseUtil.handleResponse(data, 'States retrieved successfully', HttpStatus.OK);
   }
 
   @Get(':id')

@@ -9,4 +9,5 @@ export declare class ResponseUtil {
     static success<T>(data: T | null, message: string | undefined, statusCode: number): ApiResponse<T>;
     static error(message: string, error?: string | string[], statusCode?: number): ApiResponse<null>;
     static errorFromException(error: unknown, defaultMessage?: string, defaultStatusCode?: number): ApiResponse<null>;
+    static handleResponse<T>(data: T | null, message: string, statusCode?: number): ApiResponse<T>;
 }

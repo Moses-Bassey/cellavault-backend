@@ -20,42 +20,53 @@ const auth_guard_1 = require("../../auth/guards/auth.guard");
 const swagger_1 = require("@nestjs/swagger");
 const auth_driver_service_1 = require("../services/auth.driver.service");
 const auth_driver_dto_2 = require("../dto/auth.driver.dto");
+const response_utils_1 = require("../../../utils/response.utils");
 let AuthDriverController = class AuthDriverController {
     authService;
     constructor(authService) {
         this.authService = authService;
     }
     async signUpPhoneNo(input) {
-        return await this.authService.signUpPhoneNo(input);
+        const data = await this.authService.signUpPhoneNo(input);
+        return response_utils_1.ResponseUtil.handleResponse(data, 'Sign up OTP has been sent to your phoneNo', common_1.HttpStatus.OK);
     }
     async signUpEmail(input) {
-        return await this.authService.signUpEmail(input);
+        const data = await this.authService.signUpEmail(input);
+        return response_utils_1.ResponseUtil.handleResponse(data, 'Sign up OTP has been sent to your email', common_1.HttpStatus.OK);
     }
     async verifyOtp(input) {
-        return await this.authService.verifyOtp(input);
+        const data = await this.authService.verifyOtp(input);
+        return response_utils_1.ResponseUtil.handleResponse(data, 'OTP Validated successfully', common_1.HttpStatus.OK);
     }
     async signUp(input) {
-        return await this.authService.createAccount(input);
+        const data = await this.authService.createAccount(input);
+        return response_utils_1.ResponseUtil.handleResponse(data, 'Account created successfully', common_1.HttpStatus.CREATED);
     }
     async login(input) {
-        return await this.authService.login(input);
+        const data = await this.authService.login(input);
+        return response_utils_1.ResponseUtil.handleResponse(data, 'Login successful', common_1.HttpStatus.OK);
     }
     async loginOtp(input) {
-        return await this.authService.loginOtp(input);
+        const data = await this.authService.loginOtp(input);
+        return response_utils_1.ResponseUtil.handleResponse(data, 'Login successful', common_1.HttpStatus.OK);
     }
     async forgotPassword(input, req) {
-        return await this.authService.forgotPassword(input);
+        const data = await this.authService.forgotPassword(input);
+        return response_utils_1.ResponseUtil.handleResponse(data, 'Forgot password request successful', common_1.HttpStatus.OK);
     }
     async resetPassword(input) {
-        return await this.authService.resetPassword(input);
+        const data = await this.authService.resetPassword(input);
+        return response_utils_1.ResponseUtil.handleResponse(data, 'Password reset successful', common_1.HttpStatus.OK);
     }
     async changePassword(input, req) {
-        return await this.authService.changePassword(input, req.user);
+        const data = await this.authService.changePassword(input, req.user);
+        return response_utils_1.ResponseUtil.handleResponse(data, 'Password changed successfully', common_1.HttpStatus.OK);
     }
 };
 exports.AuthDriverController = AuthDriverController;
 __decorate([
     (0, common_1.Post)('signup-phone'),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [auth_driver_dto_1.SignupPhone]),
@@ -63,6 +74,7 @@ __decorate([
 ], AuthDriverController.prototype, "signUpPhoneNo", null);
 __decorate([
     (0, common_1.Post)('signup-email'),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [auth_driver_dto_1.SignupEmail]),
@@ -70,6 +82,7 @@ __decorate([
 ], AuthDriverController.prototype, "signUpEmail", null);
 __decorate([
     (0, common_1.Post)('verify-otp'),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [auth_driver_dto_1.VerifyOtpDto]),
@@ -77,6 +90,7 @@ __decorate([
 ], AuthDriverController.prototype, "verifyOtp", null);
 __decorate([
     (0, common_1.Post)('create-account'),
+    (0, common_1.HttpCode)(common_1.HttpStatus.CREATED),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [auth_driver_dto_2.CreateAccountDto]),
@@ -84,6 +98,7 @@ __decorate([
 ], AuthDriverController.prototype, "signUp", null);
 __decorate([
     (0, common_1.Post)('login'),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [auth_driver_dto_1.LoginUserDto]),
@@ -91,6 +106,7 @@ __decorate([
 ], AuthDriverController.prototype, "login", null);
 __decorate([
     (0, common_1.Post)('login-with-otp'),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [auth_driver_dto_1.LoginOtpDto]),
@@ -98,6 +114,7 @@ __decorate([
 ], AuthDriverController.prototype, "loginOtp", null);
 __decorate([
     (0, common_1.Post)('forgot-password'),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     __param(0, (0, common_1.Body)()),
     __param(1, (0, common_1.Request)()),
     __metadata("design:type", Function),
@@ -106,6 +123,7 @@ __decorate([
 ], AuthDriverController.prototype, "forgotPassword", null);
 __decorate([
     (0, common_1.Patch)('reset-password'),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [auth_driver_dto_1.ResetPasswordDto]),
@@ -116,6 +134,7 @@ __decorate([
     (0, swagger_1.ApiBearerAuth)(),
     (0, common_1.UseGuards)(auth_guard_1.AuthGuard),
     (0, common_1.Patch)('change-password'),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     __param(0, (0, common_1.Body)()),
     __param(1, (0, common_1.Request)()),
     __metadata("design:type", Function),

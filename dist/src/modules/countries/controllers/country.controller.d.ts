@@ -5,8 +5,8 @@ export declare class CountryController {
     private readonly countryService;
     private readonly stateService;
     constructor(countryService: CountryService, stateService: StateService);
-    findAll(): Promise<import("../../../utils/response.utils").ApiResponse<null> | import("../../../utils/response.utils").ApiResponse<Country[]>>;
-    getStatesByCountry(countryId: string): Promise<import("../../../utils/response.utils").ApiResponse<null> | import("../../../utils/response.utils").ApiResponse<import("../entities").State[]>>;
+    findAll(): Promise<import("src/utils/response.utils").ApiResponse<Country[]>>;
+    getStatesByCountry(countryId: string): Promise<import("src/utils/response.utils").ApiResponse<import("../entities").State[]>>;
     findById(id: string): Promise<Country | null>;
     create(countryData: Partial<Country>): Promise<Country>;
     update(id: string, countryData: Partial<Country>): Promise<[number, Country[]]>;

@@ -2,12 +2,10 @@ import {
   Controller,
   Get,
   Post,
-  Put,
-  Delete,
   Body,
-  Param,
   UseGuards,
   Req,
+  HttpCode,
   HttpStatus,
 } from '@nestjs/common';
 import {
@@ -15,7 +13,6 @@ import {
   ApiOperation,
   ApiResponse,
   ApiBearerAuth,
-  ApiBody,
 } from '@nestjs/swagger';
 import { KycService } from '../services/kyc.service';
 import { AuthGuard } from '../../auth/guards/auth.guard';
@@ -51,6 +48,7 @@ export class KycController {
 
   @Post('personal-info')
   @Roles(UserType.DRIVER)
+  @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create or update KYC1 personal information' })
   @ApiResponse({
     status: 201,
@@ -62,7 +60,7 @@ export class KycController {
     @Req() req: ExpressRequest & { user: JwtAuthPayload }
   ) {
     const data = await this.kycService.createKyc1(req.user.userId, kycData);
-    return ResponseUtil.success(data, 'KYC1 personal information created successfully', HttpStatus.CREATED);
+    return ResponseUtil.handleResponse(data, 'KYC1 personal information created successfully', HttpStatus.CREATED);
   }
 
   @Get('personal-info')
@@ -79,6 +77,7 @@ export class KycController {
 
   @Post('id-information')
   @Roles(UserType.DRIVER)
+  @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create or update KYC2 id information' })
   @ApiResponse({
     status: 201,
@@ -89,7 +88,7 @@ export class KycController {
     @Req() req: ExpressRequest & { user: JwtAuthPayload }
   ) {
     const data = await this.kycService.createKyc2(req.user.userId, kycData);
-    return ResponseUtil.success(data, 'KYC2 information created successfully', HttpStatus.CREATED);
+    return ResponseUtil.handleResponse(data, 'KYC2 information created successfully', HttpStatus.CREATED);
   }
 
   @Get('id-information')
@@ -108,6 +107,7 @@ export class KycController {
 
   @Post('id-information')
   @Roles(UserType.DRIVER)
+  @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create or update KYC1 personal information' })
   @ApiResponse({
     status: 201,
@@ -118,7 +118,7 @@ export class KycController {
     @Req() req: ExpressRequest & { user: JwtAuthPayload }
   ) {
     const data = await this.kycService.createKyc3(req.user.userId, kycData);
-    return ResponseUtil.success(data, 'KYC2 information created successfully', HttpStatus.CREATED);
+    return ResponseUtil.handleResponse(data, 'KYC3 information created successfully', HttpStatus.CREATED);
   }
 
   @Get('address-information')

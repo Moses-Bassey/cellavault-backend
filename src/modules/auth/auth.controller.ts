@@ -1,6 +1,8 @@
 import {
   Body,
   Controller,
+  HttpCode,
+  HttpStatus,
   Patch,
   Post,
   Request,
@@ -22,62 +24,81 @@ import {
 import { Auth } from './decorators/auth.decorator';
 import { AuthGuard } from './guards/auth.guard';
 import { ApiBearerAuth } from '@nestjs/swagger';
+import { ResponseUtil } from 'src/utils/response.utils';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('signup-phone')
+  @HttpCode(HttpStatus.OK)
   async signUpPhoneNo(@Body() input: SignupPhone) {
-    return await this.authService.signUpPhoneNo(input);
+    const data = await this.authService.signUpPhoneNo(input);
+    return ResponseUtil.handleResponse(data, 'Sign up OTP has been sent to your phoneNo', HttpStatus.OK);
   }
 
   @Post('signup-email')
+  @HttpCode(HttpStatus.OK)
   async signUpEmail(@Body() input: SignupEmail) {
-    return await this.authService.signUpEmail(input);
+    const data = await this.authService.signUpEmail(input);
+    return ResponseUtil.handleResponse(data, 'Sign up OTP has been sent to your email', HttpStatus.OK);
   }
 
   @Post('verify-otp')
+  @HttpCode(HttpStatus.OK)
   async verifyOtp(@Body() input: VerifyOtpDto) {
-    return await this.authService.verifyOtp(input);
+    const data = await this.authService.verifyOtp(input);
+    return ResponseUtil.handleResponse(data, 'OTP Validated successfully', HttpStatus.OK);
   }
 
   @Post('sign-up')
+  @HttpCode(HttpStatus.CREATED)
   async signUp(@Body() input: SignUpUserDto) {
-    return await this.authService.signUp(input);
+    const data = await this.authService.signUp(input);
+    return ResponseUtil.handleResponse(data, 'User created successfully', HttpStatus.CREATED);
   }
 
   @Post('login')
+  @HttpCode(HttpStatus.OK)
   async login(@Body() input: LoginUserDto) {
-    return await this.authService.login(input);
+    const data = await this.authService.login(input);
+    return ResponseUtil.handleResponse(data, 'Login Successful', HttpStatus.OK);
   }
 
   @Post('login-with-otp')
+  @HttpCode(HttpStatus.OK)
   async loginOtp(@Body() input: LoginOtpDto) {
-    return await this.authService.loginOtp(input);
+    const data = await this.authService.loginOtp(input);
+    return ResponseUtil.handleResponse(data, 'Login successful', HttpStatus.OK);
   }
 
   @Post('forgot-password')
+  @HttpCode(HttpStatus.OK)
   async forgotPassword(
     @Body() input: ForgotPasswordDto,
     @Request() req: ExpressRequest,
   ) {
-    return await this.authService.forgotPassword(input);
+    const data = await this.authService.forgotPassword(input);
+    return ResponseUtil.handleResponse(data, 'Reset OTP has been sent to your email', HttpStatus.OK);
   }
 
   @Patch('reset-password')
+  @HttpCode(HttpStatus.OK)
   async resetPassword(@Body() input: ResetPasswordDto) {
-    return await this.authService.resetPassword(input);
+    const data = await this.authService.resetPassword(input);
+    return ResponseUtil.handleResponse(data, 'Password reset successful', HttpStatus.OK);
   }
 
   @Auth()
   @ApiBearerAuth()
   @UseGuards(AuthGuard)
   @Patch('change-password')
+  @HttpCode(HttpStatus.OK)
   async changePassword(
     @Body() input: ChangePasswordDto,
     @Request() req: ExpressRequest & { user: any },
   ) {
-    return await this.authService.changePassword(input, req.user);
+    const data = await this.authService.changePassword(input, req.user);
+    return ResponseUtil.handleResponse(data, 'Password changed successfully', HttpStatus.OK);
   }
 }

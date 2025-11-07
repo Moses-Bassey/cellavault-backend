@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ResponseUtil = void 0;
+const common_1 = require("@nestjs/common");
 class ResponseUtil {
     static success(data, message = 'Request successful', statusCode) {
         return {
@@ -30,6 +31,14 @@ class ResponseUtil {
             status: 'error',
             message,
             statusCode,
+        };
+    }
+    static handleResponse(data, message, statusCode = common_1.HttpStatus.OK) {
+        return {
+            status: 'success',
+            statusCode,
+            message,
+            data,
         };
     }
 }

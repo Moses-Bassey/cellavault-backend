@@ -1,10 +1,13 @@
 import { Model } from 'sequelize-typescript';
 import { GENDER } from 'src/enums/gender.enum';
 import { Driver } from './driver.entity';
+import { Country } from '../../countries/entities/country.entity';
 export declare class kyc1PersonalInfo extends Model<kyc1PersonalInfo> {
     id: string;
     driverId: string;
     driver: Driver;
+    countryId: string;
+    country: Country;
     fullName: string;
     phoneNo: string;
     email: string;

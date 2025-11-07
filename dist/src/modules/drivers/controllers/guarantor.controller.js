@@ -31,15 +31,6 @@ let GuarantorController = class GuarantorController {
     async findByDriverId(driverId) {
         return await this.guarantorService.findByDriverId(driverId);
     }
-    async findById(id) {
-        return await this.guarantorService.findById(id);
-    }
-    async update(id, guarantorData) {
-        return await this.guarantorService.update(id, guarantorData);
-    }
-    async delete(id) {
-        return await this.guarantorService.delete(id);
-    }
 };
 exports.GuarantorController = GuarantorController;
 __decorate([
@@ -55,7 +46,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], GuarantorController.prototype, "create", null);
 __decorate([
-    (0, common_1.Get)('driver/:driverId'),
+    (0, common_1.Get)(''),
     (0, roles_decorator_1.Roles)(user_type_enum_1.UserType.DRIVER, user_type_enum_1.UserType.PEPP_ADMIN, user_type_enum_1.UserType.SUPER_ADMIN),
     (0, swagger_1.ApiOperation)({ summary: 'Get all guarantors for a driver' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Guarantors retrieved successfully' }),
@@ -64,40 +55,6 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], GuarantorController.prototype, "findByDriverId", null);
-__decorate([
-    (0, common_1.Get)(':id'),
-    (0, roles_decorator_1.Roles)(user_type_enum_1.UserType.DRIVER, user_type_enum_1.UserType.PEPP_ADMIN, user_type_enum_1.UserType.SUPER_ADMIN),
-    (0, swagger_1.ApiOperation)({ summary: 'Get guarantor by ID' }),
-    (0, swagger_1.ApiResponse)({ status: 200, description: 'Guarantor retrieved successfully' }),
-    (0, swagger_1.ApiResponse)({ status: 404, description: 'Guarantor not found' }),
-    __param(0, (0, common_1.Param)('id')),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", Promise)
-], GuarantorController.prototype, "findById", null);
-__decorate([
-    (0, common_1.Put)(':id'),
-    (0, roles_decorator_1.Roles)(user_type_enum_1.UserType.DRIVER, user_type_enum_1.UserType.PEPP_ADMIN, user_type_enum_1.UserType.SUPER_ADMIN),
-    (0, swagger_1.ApiOperation)({ summary: 'Update guarantor' }),
-    (0, swagger_1.ApiResponse)({ status: 200, description: 'Guarantor updated successfully' }),
-    (0, swagger_1.ApiResponse)({ status: 404, description: 'Guarantor not found' }),
-    __param(0, (0, common_1.Param)('id')),
-    __param(1, (0, common_1.Body)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object]),
-    __metadata("design:returntype", Promise)
-], GuarantorController.prototype, "update", null);
-__decorate([
-    (0, common_1.Delete)(':id'),
-    (0, roles_decorator_1.Roles)(user_type_enum_1.UserType.DRIVER, user_type_enum_1.UserType.PEPP_ADMIN, user_type_enum_1.UserType.SUPER_ADMIN),
-    (0, swagger_1.ApiOperation)({ summary: 'Delete guarantor' }),
-    (0, swagger_1.ApiResponse)({ status: 200, description: 'Guarantor deleted successfully' }),
-    (0, swagger_1.ApiResponse)({ status: 404, description: 'Guarantor not found' }),
-    __param(0, (0, common_1.Param)('id')),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", Promise)
-], GuarantorController.prototype, "delete", null);
 exports.GuarantorController = GuarantorController = __decorate([
     (0, swagger_1.ApiTags)('Guarantors'),
     (0, swagger_1.ApiBearerAuth)(),

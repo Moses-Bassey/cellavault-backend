@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Put, Body, Param, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { Guarantor } from '../entities/guarantor.entity';
 import { GuarantorService } from '../services/guarantor.service';
@@ -26,7 +26,7 @@ export class GuarantorController {
     return await this.guarantorService.create(driverId, guarantorData);
   }
 
-  @Get('driver/:driverId')
+  @Get('')
   @Roles(UserType.DRIVER, UserType.PEPP_ADMIN, UserType.SUPER_ADMIN)
   @ApiOperation({ summary: 'Get all guarantors for a driver' })
   @ApiResponse({ status: 200, description: 'Guarantors retrieved successfully' })
@@ -34,18 +34,7 @@ export class GuarantorController {
     return await this.guarantorService.findByDriverId(driverId);
   }
 
-  @Put(':id')
-  @Roles(UserType.DRIVER, UserType.PEPP_ADMIN, UserType.SUPER_ADMIN)
-  @ApiOperation({ summary: 'Update guarantor' })
-  @ApiResponse({ status: 200, description: 'Guarantor updated successfully' })
-  @ApiResponse({ status: 404, description: 'Guarantor not found' })
-  async update(
-    @Param('id') id: string,
-    @Body() guarantorData: Partial<Guarantor>,
-  ): Promise<[number, Guarantor[]]> {
-    return await this.guarantorService.update(id, guarantorData);
-  }
-
+  
 
 }
 

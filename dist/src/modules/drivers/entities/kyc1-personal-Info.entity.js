@@ -13,9 +13,12 @@ exports.kyc1PersonalInfo = void 0;
 const sequelize_typescript_1 = require("sequelize-typescript");
 const gender_enum_1 = require("../../../enums/gender.enum");
 const driver_entity_1 = require("./driver.entity");
+const country_entity_1 = require("../../countries/entities/country.entity");
 let kyc1PersonalInfo = class kyc1PersonalInfo extends sequelize_typescript_1.Model {
     driverId;
     driver;
+    countryId;
+    country;
     fullName;
     phoneNo;
     email;
@@ -47,6 +50,19 @@ __decorate([
     (0, sequelize_typescript_1.BelongsTo)(() => driver_entity_1.Driver),
     __metadata("design:type", driver_entity_1.Driver)
 ], kyc1PersonalInfo.prototype, "driver", void 0);
+__decorate([
+    sequelize_typescript_1.AllowNull,
+    (0, sequelize_typescript_1.ForeignKey)(() => country_entity_1.Country),
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.UUID,
+        allowNull: true,
+    }),
+    __metadata("design:type", String)
+], kyc1PersonalInfo.prototype, "countryId", void 0);
+__decorate([
+    (0, sequelize_typescript_1.BelongsTo)(() => country_entity_1.Country),
+    __metadata("design:type", country_entity_1.Country)
+], kyc1PersonalInfo.prototype, "country", void 0);
 __decorate([
     (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.STRING(255)),
     __metadata("design:type", String)
