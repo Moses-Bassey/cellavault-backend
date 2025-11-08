@@ -28,7 +28,11 @@ __decorate([
     __metadata("design:type", String)
 ], Token.prototype, "id", void 0);
 __decorate([
-    (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.STRING(100)),
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.ENUM,
+        values: Object.values(token_enum_1.TokenSubject),
+        allowNull: false,
+    }),
     __metadata("design:type", String)
 ], Token.prototype, "subject", void 0);
 __decorate([
@@ -56,7 +60,9 @@ __decorate([
 ], Token.prototype, "phoneNo", void 0);
 __decorate([
     (0, sequelize_typescript_1.Column)({
-        type: sequelize_typescript_1.DataType.ENUM(Object.values(token_enum_1.TokenType).toString()),
+        type: sequelize_typescript_1.DataType.ENUM,
+        values: Object.values(token_enum_1.TokenType),
+        allowNull: false,
     }),
     __metadata("design:type", String)
 ], Token.prototype, "tokenType", void 0);

@@ -71,10 +71,7 @@ __decorate([
     sequelize_typescript_1.Unique,
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.STRING(15),
-        allowNull: false,
-        validate: {
-            isPhoneNumber: true
-        },
+        allowNull: false
     }),
     __metadata("design:type", String)
 ], kyc1PersonalInfo.prototype, "phoneNo", void 0);

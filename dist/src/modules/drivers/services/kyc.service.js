@@ -16,18 +16,22 @@ const kyc2_repository_1 = require("../repositories/kyc2.repository");
 const kyc3_repository_1 = require("../repositories/kyc3.repository");
 const repositories_1 = require("../repositories");
 const repositories_2 = require("../../countries/repositories");
+const kyc_enums_1 = require("../../../enums/kyc.enums");
+const state_service_1 = require("../../countries/services/state.service");
 let KycService = class KycService {
     kyc1Repository;
     kyc2Repository;
     kyc3Repository;
     driverRepository;
     countryRepository;
-    constructor(kyc1Repository, kyc2Repository, kyc3Repository, driverRepository, countryRepository) {
+    stateService;
+    constructor(kyc1Repository, kyc2Repository, kyc3Repository, driverRepository, countryRepository, stateService) {
         this.kyc1Repository = kyc1Repository;
         this.kyc2Repository = kyc2Repository;
         this.kyc3Repository = kyc3Repository;
         this.driverRepository = driverRepository;
         this.countryRepository = countryRepository;
+        this.stateService = stateService;
     }
     async createKyc1(driverId, kycData) {
         const driver = await this.driverRepository.findById(driverId);
@@ -40,7 +44,7 @@ let KycService = class KycService {
         }
         const existingKyc1 = await this.fetchKyc1ByDriverId(driverId);
         if (existingKyc1) {
-            throw new common_1.ConflictException('KYC1 (Personal Information) already exists for this driver');
+            return existingKyc1;
         }
         const kyc1 = await this.kyc1Repository.create({
             ...kycData,
@@ -48,6 +52,11 @@ let KycService = class KycService {
             countryId: kycData.countryId,
             dateOfBirth: new Date(kycData.dateOfBirth),
         });
+        if (kyc1.id) {
+            await this.driverRepository.update(driverId, {
+                kycCompleted: kyc_enums_1.KYC_COMPLETED.PERSONAL_INFORMATION
+            });
+        }
         return kyc1;
     }
     async fetchKyc1ByDriverId(driverId) {
@@ -66,12 +75,17 @@ let KycService = class KycService {
         }
         const existingKyc2 = await this.fetchKyc2ByDriverId(driverId);
         if (existingKyc2) {
-            throw new common_1.ConflictException('KYC2 (ID Information) already exists for this driver');
+            return existingKyc2;
         }
         const kyc2 = await this.kyc2Repository.create({
             ...kycData,
             driverId,
         });
+        if (kyc2.id) {
+            await this.driverRepository.update(driverId, {
+                kycCompleted: kyc_enums_1.KYC_COMPLETED.IDENTITY_INFORMATION
+            });
+        }
         return kyc2;
     }
     async createKyc3(driverId, kycData) {
@@ -79,14 +93,23 @@ let KycService = class KycService {
         if (!driver) {
             throw new common_1.NotFoundException('Driver not found');
         }
+        const state = await this.stateService.findById(kycData.stateId);
+        if (!state) {
+            throw new common_1.NotFoundException('State not found');
+        }
         const existingKyc3 = await this.kyc3Repository.findByDriverId(driverId);
         if (existingKyc3) {
-            throw new common_1.ConflictException('KYC3 (Residential Information) already exists for this driver');
+            return existingKyc3;
         }
         const kyc3 = await this.kyc3Repository.create({
             ...kycData,
             driverId,
         });
+        if (kyc3.id) {
+            await this.driverRepository.update(driverId, {
+                kycCompleted: kyc_enums_1.KYC_COMPLETED.RESIDENTIAL_INFORMATION
+            });
+        }
         return kyc3;
     }
     async getAllKycByDriverId(driverId) {
@@ -109,6 +132,7 @@ exports.KycService = KycService = __decorate([
         kyc2_repository_1.Kyc2Repository,
         kyc3_repository_1.Kyc3Repository,
         repositories_1.DriverRepository,
-        repositories_2.CountryRepository])
+        repositories_2.CountryRepository,
+        state_service_1.StateService])
 ], KycService);
 //# sourceMappingURL=kyc.service.js.map

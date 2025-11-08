@@ -35,6 +35,7 @@ const client_devices_module_1 = require("../client-devices/client-devices.module
 const mail_module_1 = require("../../services/mail/mail.module");
 const token_module_1 = require("../../services/token/token.module");
 const sms_module_1 = require("../../services/sms/sms.module");
+const auth_module_1 = require("../auth/auth.module");
 let DriversModule = class DriversModule {
 };
 exports.DriversModule = DriversModule;
@@ -56,6 +57,7 @@ exports.DriversModule = DriversModule = __decorate([
             token_module_1.TokenModule,
             mail_module_1.MailModule,
             sms_module_1.SmsModule,
+            auth_module_1.AuthModule,
         ],
         controllers: [
             driver_controller_1.DriverController,

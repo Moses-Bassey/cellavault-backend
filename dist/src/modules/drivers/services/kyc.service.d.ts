@@ -7,13 +7,15 @@ import { Kyc3Repository } from '../repositories/kyc3.repository';
 import { CreateKyc1Dto, CreateKyc2Dto, CreateKyc3Dto } from '../dto/kyc.dto';
 import { DriverRepository } from '../repositories';
 import { CountryRepository } from 'src/modules/countries/repositories';
+import { StateService } from 'src/modules/countries/services/state.service';
 export declare class KycService {
     private readonly kyc1Repository;
     private readonly kyc2Repository;
     private readonly kyc3Repository;
     private readonly driverRepository;
     private readonly countryRepository;
-    constructor(kyc1Repository: Kyc1Repository, kyc2Repository: Kyc2Repository, kyc3Repository: Kyc3Repository, driverRepository: DriverRepository, countryRepository: CountryRepository);
+    private readonly stateService;
+    constructor(kyc1Repository: Kyc1Repository, kyc2Repository: Kyc2Repository, kyc3Repository: Kyc3Repository, driverRepository: DriverRepository, countryRepository: CountryRepository, stateService: StateService);
     createKyc1(driverId: string, kycData: CreateKyc1Dto): Promise<kyc1PersonalInfo | null>;
     fetchKyc1ByDriverId(driverId: string): Promise<kyc1PersonalInfo | null>;
     fetchKyc2ByDriverId(driverId: string): Promise<kyc2IdInformation | null>;

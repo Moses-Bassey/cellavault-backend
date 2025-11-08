@@ -28,6 +28,12 @@ export class UserRepository {
     return await this.userModel.findByPk(id, {raw: true});
   }
 
+  async fetchUser(id: string): Promise<User | null> {
+    return await this.userModel.findByPk(id, {raw: true, attributes: {
+      exclude: ['password', 'deletedAt']
+    }});
+  }
+
   async findByEmail(email: string): Promise<User | null> {
     return await this.userModel.findOne({
       where: { email },

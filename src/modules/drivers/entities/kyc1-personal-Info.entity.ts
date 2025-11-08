@@ -61,10 +61,7 @@ export class kyc1PersonalInfo extends Model<kyc1PersonalInfo> {
   @Unique
   @Column({
     type: DataType.STRING(15),
-    allowNull: false,
-    validate: {
-      isPhoneNumber: true
-    },
+    allowNull: false
   })
   public phoneNo: string;
 

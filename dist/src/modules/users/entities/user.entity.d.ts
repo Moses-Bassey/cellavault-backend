@@ -14,6 +14,7 @@ export declare class User extends Model<User> {
     isPhoneVerified: boolean;
     isActive: boolean;
     isDisabled: boolean;
+    hasPasscode: boolean;
     countryId: string;
     country: Country;
     createdAt: Date;

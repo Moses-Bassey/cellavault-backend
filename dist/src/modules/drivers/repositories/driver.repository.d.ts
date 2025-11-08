@@ -5,6 +5,7 @@ export declare class DriverRepository {
     constructor(driverModel: typeof Driver);
     findByIdentity(identity: string): Promise<Driver | null>;
     findById(id: string): Promise<Driver | null>;
+    fetchDriver(id: string): Promise<Driver | null>;
     findByEmail(email: string): Promise<Driver | null>;
     findByPhone(phoneNo: string): Promise<Driver | null>;
     findByEmailAndRole(email: string, userType: UserType): Promise<Driver | null>;

@@ -17,8 +17,12 @@ let DriverService = class DriverService {
     constructor(driverRepository) {
         this.driverRepository = driverRepository;
     }
-    async findById(id) {
-        return await this.driverRepository.findById(id);
+    async fetchDriver(id) {
+        const driver = await this.driverRepository.fetchDriver(id);
+        if (!driver) {
+            throw new common_1.NotFoundException('Driver not found!');
+        }
+        return driver;
     }
     async findByIdentity(identity) {
         return await this.driverRepository.findByIdentity(identity);

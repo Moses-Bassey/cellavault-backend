@@ -4,7 +4,7 @@ export declare class UserService {
     private readonly userRepository;
     constructor(userRepository: UserRepository);
     dashboard(): Promise<void>;
-    findById(id: string): Promise<User | null>;
+    fetchUser(id: string): Promise<User | null>;
     findByIdentity(identity: string): Promise<User | null>;
     findByEmail(email: string): Promise<User | null>;
     findAll(options?: any): Promise<User[]>;

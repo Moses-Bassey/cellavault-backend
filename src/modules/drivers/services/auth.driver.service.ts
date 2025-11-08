@@ -18,7 +18,7 @@ import {
     ChangePasswordDto,
     ForgotPasswordDto,
     LoginOtpDto,
-    LoginUserDto,
+    LoginDriverDto,
     ResetPasswordDto,
     SignupEmail,
     SignupPhone,
@@ -143,7 +143,7 @@ import { KYC_COMPLETED } from 'src/enums/kyc.enums';
         fullName: input.fullName,
         password: password,
         countryId: country.id,
-        userType: UserType.USER,
+        userType: UserType.DRIVER,
         loginType: LoginType.NORMAL,
         isEmailVerified: true,
         isPhoneVerified: true,
@@ -179,7 +179,7 @@ import { KYC_COMPLETED } from 'src/enums/kyc.enums';
       return data;
     }
   
-    async login(input: LoginUserDto){
+    async login(input: LoginDriverDto){
       const { identity } = input;
 
       const identityType = Utils.getLoginIdentityType(identity);

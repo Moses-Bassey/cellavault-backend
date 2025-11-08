@@ -116,7 +116,7 @@ let AuthDriverService = class AuthDriverService {
             fullName: input.fullName,
             password: password,
             countryId: country.id,
-            userType: user_type_enum_1.UserType.USER,
+            userType: user_type_enum_1.UserType.DRIVER,
             loginType: login_type_enum_1.LoginType.NORMAL,
             isEmailVerified: true,
             isPhoneVerified: true,

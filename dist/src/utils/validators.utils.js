@@ -27,6 +27,13 @@ class Validators {
         }
         return enums_1.UserLoginIdentityType.PHONE_NO;
     }
+    static validateUuid(value) {
+        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+        if (!uuidRegex.test(value)) {
+            throw new common_1.BadRequestException('Invalid UUID format');
+        }
+        return value;
+    }
 }
 exports.Validators = Validators;
 //# sourceMappingURL=validators.utils.js.map

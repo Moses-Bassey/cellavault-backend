@@ -156,7 +156,6 @@ __decorate([
 class CreateKyc3Dto {
     stateId;
     city;
-    verified;
 }
 exports.CreateKyc3Dto = CreateKyc3Dto;
 __decorate([
@@ -177,14 +176,4 @@ __decorate([
     (0, class_validator_1.MaxLength)(255),
     __metadata("design:type", String)
 ], CreateKyc3Dto.prototype, "city", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)({
-        description: 'Verification status',
-        example: false,
-        required: false,
-    }),
-    (0, class_validator_1.IsBoolean)(),
-    (0, class_validator_1.IsOptional)(),
-    __metadata("design:type", Boolean)
-], CreateKyc3Dto.prototype, "verified", void 0);
 //# sourceMappingURL=kyc.dto.js.map

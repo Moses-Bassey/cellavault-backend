@@ -9,7 +9,7 @@ module.exports = {
         primaryKey: true,
       },
       subject: {
-        type: DataTypes.STRING(100),
+        type: DataTypes.ENUM('PASSWORD_RESET', 'SIGN_UP_PHONE', 'SIGN_UP_EMAIL', 'NEW_DEVICE_LOGIN_OTP', 'RESET_PASSCODE'),
         allowNull: false,
       },
       token: {
@@ -28,7 +28,7 @@ module.exports = {
         allowNull: true,
       },
       tokenType: {
-        type: DataTypes.STRING(225),
+        type: DataTypes.ENUM('OTP', 'JWT', 'REFRESH'),
         allowNull: false,
       },
       expiry: {

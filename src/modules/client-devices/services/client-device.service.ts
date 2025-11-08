@@ -50,7 +50,7 @@ export class ClientDeviceService {
     deviceFCMToken?: string;
     name?: string;
     userId?: string;
-    userType?: 'SUPER_ADMIN' | 'PEPP_ADMIN' | 'USER';
+    userType?: 'DRIVER' | 'USER';
   }) {
     const device = await this.clientDeviceRepository.updateOrCreateDevice(deviceData);
     return device;

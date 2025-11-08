@@ -73,7 +73,7 @@ export class CreateAccountDto {
   readonly referalCode: string;
 }
 
-export class LoginUserDto {
+export class LoginDriverDto {
   @ApiProperty({
     description: 'User email address or phone number',
     example: 'user@example.com or 08100000000',

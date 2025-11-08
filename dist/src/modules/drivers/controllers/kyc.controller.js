@@ -49,11 +49,11 @@ let KycController = class KycController {
     }
     async createKyc3AddressInformation(kycData, req) {
         const data = await this.kycService.createKyc3(req.user.userId, kycData);
-        return response_utils_1.ResponseUtil.handleResponse(data, 'KYC3 information created successfully', common_1.HttpStatus.CREATED);
+        return response_utils_1.ResponseUtil.handleResponse(data, 'KYC3 residential information created successfully', common_1.HttpStatus.CREATED);
     }
     async getKyc3AddressInformation(req) {
         const data = await this.kycService.fetchKyc3ByDriverId(req.user.userId);
-        return response_utils_1.ResponseUtil.success(data, 'KYC3 address information retrieved successfully', common_1.HttpStatus.OK);
+        return response_utils_1.ResponseUtil.success(data, 'KYC3 residential information retrieved successfully', common_1.HttpStatus.OK);
     }
 };
 exports.KycController = KycController;
@@ -75,10 +75,7 @@ __decorate([
     (0, roles_decorator_1.Roles)(user_type_enum_1.UserType.DRIVER),
     (0, common_1.HttpCode)(common_1.HttpStatus.CREATED),
     (0, swagger_1.ApiOperation)({ summary: 'Create or update KYC1 personal information' }),
-    (0, swagger_1.ApiResponse)({
-        status: 201,
-        description: 'KYC1 personal information created/updated successfully',
-    }),
+    (0, swagger_1.ApiResponse)({ status: 201, description: 'KYC1 personal information created/updated successfully' }),
     __param(0, (0, common_1.Body)()),
     __param(1, (0, common_1.Req)()),
     __metadata("design:type", Function),
@@ -127,10 +124,10 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], KycController.prototype, "getKyc2IdInformation", null);
 __decorate([
-    (0, common_1.Post)('id-information'),
+    (0, common_1.Post)('Residential-information'),
     (0, roles_decorator_1.Roles)(user_type_enum_1.UserType.DRIVER),
     (0, common_1.HttpCode)(common_1.HttpStatus.CREATED),
-    (0, swagger_1.ApiOperation)({ summary: 'Create or update KYC1 personal information' }),
+    (0, swagger_1.ApiOperation)({ summary: 'Create or update KYC1 residential information' }),
     (0, swagger_1.ApiResponse)({
         status: 201,
         description: 'KYC2 information created successfully',
@@ -142,12 +139,12 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], KycController.prototype, "createKyc3AddressInformation", null);
 __decorate([
-    (0, common_1.Get)('address-information'),
-    (0, roles_decorator_1.Roles)(user_type_enum_1.UserType.DRIVER, user_type_enum_1.UserType.PEPP_ADMIN, user_type_enum_1.UserType.SUPER_ADMIN),
-    (0, swagger_1.ApiOperation)({ summary: 'Get KYC3 address information by driver' }),
+    (0, common_1.Get)('residential-information'),
+    (0, roles_decorator_1.Roles)(user_type_enum_1.UserType.DRIVER),
+    (0, swagger_1.ApiOperation)({ summary: 'Get KYC3 residential information by driver' }),
     (0, swagger_1.ApiResponse)({
         status: 200,
-        description: 'KYC3 address information retrieved successfully',
+        description: 'KYC3 residential information retrieved successfully',
     }),
     __param(0, (0, common_1.Req)()),
     __metadata("design:type", Function),

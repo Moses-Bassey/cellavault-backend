@@ -12,6 +12,7 @@ import {
   BelongsTo,
 } from 'sequelize-typescript';
 import { User } from '../../users/entities/user.entity';
+import { Driver } from '../../drivers/entities/driver.entity';
 
 @Table({
   tableName: 'client_devices',
@@ -54,14 +55,24 @@ export class ClientDevice extends Model<ClientDevice> {
   })
   public declare userId: string | null;
 
+  @ForeignKey(() => Driver)
   @Column({
-    type: DataType.ENUM('SUPER_ADMIN', 'PEPP_ADMIN', 'USER'),
+    type: DataType.UUID,
     allowNull: true,
   })
-  public declare userType: 'SUPER_ADMIN' | 'PEPP_ADMIN' | 'USER' | null;
+  public declare driverId: string | null;
+
+  @Column({
+    type: DataType.ENUM('DRIVER', 'USER'),
+    allowNull: true,
+  })
+  public declare userType: 'DRIVER' | 'USER' | null;
 
   @BelongsTo(() => User)
   public declare user: User;
+
+  @BelongsTo(() => Driver)
+  public declare driver: Driver;
 
   @CreatedAt
   public declare createdAt: Date;

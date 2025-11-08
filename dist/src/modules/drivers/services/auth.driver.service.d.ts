@@ -3,7 +3,7 @@ import { EmailEventService } from 'src/services/mail/email-event.service';
 import { SmsEventService } from 'src/services/sms/sms-event.service';
 import { TokenService } from 'src/services/token/token.service';
 import { JwtAuthPayload } from '../../auth/auth.interface';
-import { ChangePasswordDto, ForgotPasswordDto, LoginOtpDto, LoginUserDto, ResetPasswordDto, SignupEmail, SignupPhone, CreateAccountDto, VerifyOtpDto } from '../dto/auth.driver.dto';
+import { ChangePasswordDto, ForgotPasswordDto, LoginOtpDto, LoginDriverDto, ResetPasswordDto, SignupEmail, SignupPhone, CreateAccountDto, VerifyOtpDto } from '../dto/auth.driver.dto';
 import { CountryService } from '../../countries/services/country.service';
 import { DriverRepository } from '../repositories/driver.repository';
 import { ClientDeviceService } from '../../client-devices/services/client-device.service';
@@ -25,7 +25,7 @@ export declare class AuthDriverService {
         token: string;
     }>;
     createAccount(input: CreateAccountDto): Promise<IDriverLoginData>;
-    login(input: LoginUserDto): Promise<IDriverLoginData>;
+    login(input: LoginDriverDto): Promise<IDriverLoginData>;
     loginOtp(input: LoginOtpDto): Promise<{
         email: string;
         userType: UserType;

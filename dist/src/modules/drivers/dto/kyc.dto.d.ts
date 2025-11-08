@@ -20,5 +20,4 @@ export declare class CreateKyc2Dto {
 export declare class CreateKyc3Dto {
     stateId: string;
     city: string;
-    verified?: boolean;
 }

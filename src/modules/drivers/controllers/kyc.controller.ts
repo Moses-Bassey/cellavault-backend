@@ -50,11 +50,7 @@ export class KycController {
   @Roles(UserType.DRIVER)
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create or update KYC1 personal information' })
-  @ApiResponse({
-    status: 201,
-    description: 'KYC1 personal information created/updated successfully',
-  })
-  
+  @ApiResponse({status: 201, description: 'KYC1 personal information created/updated successfully'})
   async createKyc1(
     @Body() kycData: CreateKyc1Dto,
     @Req() req: ExpressRequest & { user: JwtAuthPayload }
@@ -105,10 +101,10 @@ export class KycController {
     return ResponseUtil.success(data, 'KYC2 information retrieved successfully', HttpStatus.OK);
   }
 
-  @Post('id-information')
+  @Post('Residential-information')
   @Roles(UserType.DRIVER)
   @HttpCode(HttpStatus.CREATED)
-  @ApiOperation({ summary: 'Create or update KYC1 personal information' })
+  @ApiOperation({ summary: 'Create or update KYC1 residential information' })
   @ApiResponse({
     status: 201,
     description: 'KYC2 information created successfully',
@@ -118,21 +114,21 @@ export class KycController {
     @Req() req: ExpressRequest & { user: JwtAuthPayload }
   ) {
     const data = await this.kycService.createKyc3(req.user.userId, kycData);
-    return ResponseUtil.handleResponse(data, 'KYC3 information created successfully', HttpStatus.CREATED);
+    return ResponseUtil.handleResponse(data, 'KYC3 residential information created successfully', HttpStatus.CREATED);
   }
 
-  @Get('address-information')
-  @Roles(UserType.DRIVER, UserType.PEPP_ADMIN, UserType.SUPER_ADMIN)
-  @ApiOperation({ summary: 'Get KYC3 address information by driver' })
+  @Get('residential-information')
+  @Roles(UserType.DRIVER)
+  @ApiOperation({ summary: 'Get KYC3 residential information by driver' })
   @ApiResponse({
     status: 200,
-    description: 'KYC3 address information retrieved successfully',
+    description: 'KYC3 residential information retrieved successfully',
   })
   async getKyc3AddressInformation(
     @Req() req: ExpressRequest & { user: JwtAuthPayload }
   ){
     const data = await this.kycService.fetchKyc3ByDriverId(req.user.userId);
-    return ResponseUtil.success(data, 'KYC3 address information retrieved successfully', HttpStatus.OK);
+    return ResponseUtil.success(data, 'KYC3 residential information retrieved successfully', HttpStatus.OK);
   }
  
 }

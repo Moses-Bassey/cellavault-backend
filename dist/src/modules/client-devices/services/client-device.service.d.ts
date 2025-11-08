@@ -17,7 +17,7 @@ export declare class ClientDeviceService {
         deviceFCMToken?: string;
         name?: string;
         userId?: string;
-        userType?: 'SUPER_ADMIN' | 'PEPP_ADMIN' | 'USER';
+        userType?: 'DRIVER' | 'USER';
     }): Promise<ClientDevice>;
     updateDeviceToken(deviceId: string, deviceFCMToken: string): Promise<ClientDevice>;
 }

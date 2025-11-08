@@ -46,7 +46,7 @@ export class Driver extends Model<Driver> {
   @Column(DataType.STRING(150))
   public fullName: string;
 
-  @Unique
+  // @Unique
   @Column({
     type: DataType.STRING(15),
     unique: true,
@@ -148,6 +148,13 @@ export class Driver extends Model<Driver> {
     defaultValue: false,
   })
   public isDisabled: boolean;
+
+  @Default(false)
+  @Column({
+    type: DataType.BOOLEAN,
+    allowNull: false,
+  })
+  public hasPasscode: boolean;
 
   @Column({
     type: DataType.ENUM,

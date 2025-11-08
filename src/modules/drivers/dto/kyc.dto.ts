@@ -143,14 +143,5 @@ export class CreateKyc3Dto {
   @MinLength(2)
   @MaxLength(255)
   city: string;
-
-  @ApiProperty({
-    description: 'Verification status',
-    example: false,
-    required: false,
-  })
-  @IsBoolean()
-  @IsOptional()
-  verified?: boolean;
 }
 

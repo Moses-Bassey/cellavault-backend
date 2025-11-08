@@ -38,6 +38,7 @@ let Driver = class Driver extends sequelize_typescript_1.Model {
     isPhoneVerified;
     isActive;
     isDisabled;
+    hasPasscode;
     verificationStatus;
     latitude;
     longitude;
@@ -65,7 +66,6 @@ __decorate([
     __metadata("design:type", String)
 ], Driver.prototype, "fullName", void 0);
 __decorate([
-    sequelize_typescript_1.Unique,
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.STRING(15),
         unique: true,
@@ -179,6 +179,14 @@ __decorate([
     }),
     __metadata("design:type", Boolean)
 ], Driver.prototype, "isDisabled", void 0);
+__decorate([
+    (0, sequelize_typescript_1.Default)(false),
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.BOOLEAN,
+        allowNull: false,
+    }),
+    __metadata("design:type", Boolean)
+], Driver.prototype, "hasPasscode", void 0);
 __decorate([
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.ENUM,

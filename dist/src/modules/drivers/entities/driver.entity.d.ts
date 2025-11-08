@@ -27,6 +27,7 @@ export declare class Driver extends Model<Driver> {
     isPhoneVerified: boolean;
     isActive: boolean;
     isDisabled: boolean;
+    hasPasscode: boolean;
     verificationStatus: DRIVER_VERIFICATION_STATUS;
     latitude: number;
     longitude: number;

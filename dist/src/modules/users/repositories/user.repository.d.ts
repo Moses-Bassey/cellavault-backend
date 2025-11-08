@@ -5,6 +5,7 @@ export declare class UserRepository {
     constructor(userModel: typeof User);
     findByIdentity(identity: string): Promise<User | null>;
     findById(id: string): Promise<User | null>;
+    fetchUser(id: string): Promise<User | null>;
     findByEmail(email: string): Promise<User | null>;
     findByPhone(phoneNo: string): Promise<User | null>;
     findByEmailAndRole(email: string, userType: UserType): Promise<User | null>;

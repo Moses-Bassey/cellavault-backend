@@ -19,8 +19,12 @@ let UserService = class UserService {
     }
     async dashboard() {
     }
-    async findById(id) {
-        return await this.userRepository.findById(id);
+    async fetchUser(id) {
+        const user = await this.userRepository.fetchUser(id);
+        if (!user) {
+            throw new common_1.NotFoundException('User not found!');
+        }
+        return user;
     }
     async findByIdentity(identity) {
         return await this.userRepository.findByIdentity(identity);

@@ -36,6 +36,11 @@ let DriverRepository = class DriverRepository {
     async findById(id) {
         return await this.driverModel.findByPk(id, { raw: true });
     }
+    async fetchDriver(id) {
+        return await this.driverModel.findByPk(id, { raw: true, attributes: {
+                exclude: ['password']
+            } });
+    }
     async findByEmail(email) {
         return await this.driverModel.findOne({
             where: { email },

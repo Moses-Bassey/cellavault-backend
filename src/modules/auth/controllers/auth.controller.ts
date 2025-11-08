@@ -9,7 +9,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import type { Request as ExpressRequest } from 'express';
-import { AuthService } from './auth.service';
+import { AuthService } from '../auth.service';
 import {
   ChangePasswordDto,
   ForgotPasswordDto,
@@ -20,9 +20,9 @@ import {
   SignupPhone,
   SignUpUserDto,
   VerifyOtpDto,
-} from './dto/auth.dto';
-import { Auth } from './decorators/auth.decorator';
-import { AuthGuard } from './guards/auth.guard';
+} from '../dto/auth.dto';
+import { Auth } from '../decorators/auth.decorator';
+import { AuthGuard } from '../guards/auth.guard';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { ResponseUtil } from 'src/utils/response.utils';
 

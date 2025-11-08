@@ -26,6 +26,7 @@ import { ClientDevicesModule } from '../client-devices/client-devices.module';
 import { MailModule } from 'src/services/mail/mail.module';
 import { TokenModule } from 'src/services/token/token.module';
 import { SmsModule } from 'src/services/sms/sms.module';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
   imports: [
@@ -44,6 +45,7 @@ import { SmsModule } from 'src/services/sms/sms.module';
     TokenModule,
     MailModule,
     SmsModule,
+    AuthModule,
   ],
   controllers: [
     DriverController,

@@ -11,7 +11,7 @@ export declare class CreateAccountDto {
     readonly fullName: string;
     readonly referalCode: string;
 }
-export declare class LoginUserDto {
+export declare class LoginDriverDto {
     readonly identity: string;
     readonly password: string;
     readonly deviceInfo: string;

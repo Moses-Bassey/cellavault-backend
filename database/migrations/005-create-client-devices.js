@@ -30,8 +30,18 @@ module.exports = {
         onUpdate: 'CASCADE',
         onDelete: 'SET NULL',
       },
+      driverId: {
+        type: DataTypes.UUID,
+        allowNull: true,
+        references: {
+          model: 'drivers',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL',
+      },
       userType: {
-        type: DataTypes.ENUM('SUPER_ADMIN', 'PEPP_ADMIN', 'USER', 'DRIVER'),
+        type: DataTypes.ENUM('DRIVER', 'USER'),
         allowNull: true,
       },
       createdAt: {
@@ -50,6 +60,7 @@ module.exports = {
 
     // Add indexes for better performance
     await queryInterface.addIndex('client_devices', ['userId']);
+    await queryInterface.addIndex('client_devices', ['driverId']);
   },
 
   down: async (queryInterface) => {

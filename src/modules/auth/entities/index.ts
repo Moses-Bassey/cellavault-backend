@@ -1,1 +1,1 @@
-// No entities in auth module
+export * from './passcode.entity';

@@ -95,6 +95,13 @@ export class User extends Model<User> {
   })
   public isDisabled: boolean;
 
+  @Default(false)
+  @Column({
+    type: DataType.BOOLEAN,
+    allowNull: false,
+  })
+  public hasPasscode: boolean;
+
   @AllowNull
   @ForeignKey(() => Country)
   @Column({

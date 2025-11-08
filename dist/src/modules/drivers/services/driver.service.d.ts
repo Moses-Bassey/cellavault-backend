@@ -3,7 +3,7 @@ import { DriverRepository } from '../repositories/driver.repository';
 export declare class DriverService {
     private readonly driverRepository;
     constructor(driverRepository: DriverRepository);
-    findById(id: string): Promise<Driver | null>;
+    fetchDriver(id: string): Promise<Driver | null>;
     findByIdentity(identity: string): Promise<Driver | null>;
     findByEmail(email: string): Promise<Driver | null>;
     findAll(options?: any): Promise<Driver[]>;

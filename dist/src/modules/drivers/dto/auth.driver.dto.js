@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SignUserDto = exports.VerifyOtpDto = exports.SignupPhone = exports.SignupEmail = exports.ResendOtpDto = exports.ChangePasswordDto = exports.ResetPasswordDto = exports.ForgotPasswordDto = exports.LoginOtpDto = exports.LoginUserDto = exports.CreateAccountDto = void 0;
+exports.SignUserDto = exports.VerifyOtpDto = exports.SignupPhone = exports.SignupEmail = exports.ResendOtpDto = exports.ChangePasswordDto = exports.ResetPasswordDto = exports.ForgotPasswordDto = exports.LoginOtpDto = exports.LoginDriverDto = exports.CreateAccountDto = void 0;
 const swagger_1 = require("@nestjs/swagger");
 const class_validator_1 = require("class-validator");
 const gender_enum_1 = require("../../../enums/gender.enum");
@@ -99,12 +99,12 @@ __decorate([
     (0, class_validator_1.MaxLength)(10),
     __metadata("design:type", String)
 ], CreateAccountDto.prototype, "referalCode", void 0);
-class LoginUserDto {
+class LoginDriverDto {
     identity;
     password;
     deviceInfo;
 }
-exports.LoginUserDto = LoginUserDto;
+exports.LoginDriverDto = LoginDriverDto;
 __decorate([
     (0, swagger_1.ApiProperty)({
         description: 'User email address or phone number',
@@ -114,7 +114,7 @@ __decorate([
     (0, class_validator_1.MinLength)(4),
     (0, class_validator_1.MaxLength)(100),
     __metadata("design:type", String)
-], LoginUserDto.prototype, "identity", void 0);
+], LoginDriverDto.prototype, "identity", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({
         description: 'User password',
@@ -122,7 +122,7 @@ __decorate([
     }),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
-], LoginUserDto.prototype, "password", void 0);
+], LoginDriverDto.prototype, "password", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({
         description: 'Device information',
@@ -130,7 +130,7 @@ __decorate([
     }),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
-], LoginUserDto.prototype, "deviceInfo", void 0);
+], LoginDriverDto.prototype, "deviceInfo", void 0);
 class LoginOtpDto {
     identity;
     password;

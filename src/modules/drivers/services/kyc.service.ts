@@ -8,6 +8,8 @@ import { Kyc3Repository } from '../repositories/kyc3.repository';
 import { CreateKyc1Dto, CreateKyc2Dto, CreateKyc3Dto } from '../dto/kyc.dto';
 import { DriverRepository } from '../repositories';
 import { CountryRepository } from 'src/modules/countries/repositories';
+import { KYC_COMPLETED } from 'src/enums/kyc.enums';
+import { StateService } from 'src/modules/countries/services/state.service';
 
 @Injectable()
 export class KycService {
@@ -17,6 +19,7 @@ export class KycService {
     private readonly kyc3Repository: Kyc3Repository,
     private readonly driverRepository: DriverRepository,
     private readonly countryRepository: CountryRepository,
+    private readonly stateService: StateService,
   ) {}
 
   async createKyc1(
@@ -34,7 +37,7 @@ export class KycService {
 
     const existingKyc1 = await this.fetchKyc1ByDriverId(driverId);
     if (existingKyc1) {
-      throw new ConflictException('KYC1 (Personal Information) already exists for this driver');
+      return existingKyc1;
     }
     
     const kyc1 = await this.kyc1Repository.create({
@@ -43,6 +46,13 @@ export class KycService {
       countryId: kycData.countryId,
       dateOfBirth: new Date(kycData.dateOfBirth),
     });
+
+    if (kyc1.id) {
+      await this.driverRepository.update(driverId, {
+        kycCompleted: KYC_COMPLETED.PERSONAL_INFORMATION
+      });
+    }
+    
     return kyc1;
   }
 
@@ -71,13 +81,19 @@ export class KycService {
     const existingKyc2 = await this.fetchKyc2ByDriverId(driverId);
 
     if (existingKyc2) {
-      throw new ConflictException('KYC2 (ID Information) already exists for this driver');
+      return existingKyc2;
     }
 
     const kyc2 = await this.kyc2Repository.create({
       ...kycData,
       driverId,
     });
+
+    if (kyc2.id) {
+      await this.driverRepository.update(driverId, {
+        kycCompleted: KYC_COMPLETED.IDENTITY_INFORMATION
+      });
+    }
 
     return kyc2;
   }
@@ -92,15 +108,26 @@ export class KycService {
       throw new NotFoundException('Driver not found');
     }
 
+    const state = await this.stateService.findById(kycData.stateId);
+    if (!state) {
+      throw new NotFoundException('State not found');
+    }
+
     const existingKyc3 = await this.kyc3Repository.findByDriverId(driverId);
     if (existingKyc3) {
-      throw new ConflictException('KYC3 (Residential Information) already exists for this driver');
+      return existingKyc3;
     }
 
     const kyc3 = await this.kyc3Repository.create({
       ...kycData,
       driverId,
     });
+
+    if (kyc3.id) {
+      await this.driverRepository.update(driverId, {
+        kycCompleted: KYC_COMPLETED.RESIDENTIAL_INFORMATION
+      });
+    }
 
     return kyc3;
   }

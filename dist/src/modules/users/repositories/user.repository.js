@@ -36,6 +36,11 @@ let UserRepository = class UserRepository {
     async findById(id) {
         return await this.userModel.findByPk(id, { raw: true });
     }
+    async fetchUser(id) {
+        return await this.userModel.findByPk(id, { raw: true, attributes: {
+                exclude: ['password', 'deletedAt']
+            } });
+    }
     async findByEmail(email) {
         return await this.userModel.findOne({
             where: { email },

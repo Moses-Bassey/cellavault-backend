@@ -28,6 +28,12 @@ export class DriverRepository {
     return await this.driverModel.findByPk(id, {raw: true});
   }
 
+  async fetchDriver(id: string): Promise<Driver | null> {
+    return await this.driverModel.findByPk(id, {raw: true, attributes: {
+      exclude: ['password']
+    }});
+  }
+
   async findByEmail(email: string): Promise<Driver | null> {
     return await this.driverModel.findOne({
       where: { email },

@@ -13,7 +13,7 @@ import {
     ChangePasswordDto,
     ForgotPasswordDto,
     LoginOtpDto,
-    LoginUserDto,
+    LoginDriverDto,
     ResetPasswordDto,
     SignupEmail,
     SignupPhone,
@@ -60,7 +60,7 @@ import {
   
     @Post('login')
     @HttpCode(HttpStatus.OK)
-    async login(@Body() input: LoginUserDto) {
+    async login(@Body() input: LoginDriverDto) {
       const data = await this.authService.login(input);
       return ResponseUtil.handleResponse(data, 'Login successful', HttpStatus.OK);
     }

@@ -22,7 +22,11 @@ export class Token extends Model<Token> {
   @Column(DataType.UUID)
   declare id: string;
 
-  @Column(DataType.STRING(100))
+  @Column({
+    type: DataType.ENUM,
+    values: Object.values(TokenSubject),
+    allowNull: false,
+  })
   subject: TokenSubject;
 
   @Column({
@@ -46,7 +50,9 @@ export class Token extends Model<Token> {
   phoneNo: string;
 
   @Column({
-    type: DataType.ENUM(Object.values(TokenType).toString()),
+    type: DataType.ENUM,
+    values: Object.values(TokenType),
+    allowNull: false,
   })
   tokenType: TokenType;
 
