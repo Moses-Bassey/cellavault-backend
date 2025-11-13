@@ -92,6 +92,7 @@ __decorate([
 class LoginUserDto {
     identity;
     password;
+    country;
 }
 exports.LoginUserDto = LoginUserDto;
 __decorate([
@@ -112,11 +113,15 @@ __decorate([
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], LoginUserDto.prototype, "password", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], LoginUserDto.prototype, "country", void 0);
 class LoginOtpDto {
     identity;
-    password;
     otp;
     deviceInfo;
+    country;
 }
 exports.LoginOtpDto = LoginOtpDto;
 __decorate([
@@ -129,14 +134,6 @@ __decorate([
     (0, class_validator_1.MaxLength)(100),
     __metadata("design:type", String)
 ], LoginOtpDto.prototype, "identity", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)({
-        description: 'User password',
-        example: 'password123',
-    }),
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
-], LoginOtpDto.prototype, "password", void 0);
 __decorate([
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.MinLength)(6),
@@ -152,6 +149,10 @@ __decorate([
     (0, class_validator_1.MaxLength)(50),
     __metadata("design:type", String)
 ], LoginOtpDto.prototype, "deviceInfo", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], LoginOtpDto.prototype, "country", void 0);
 class ForgotPasswordDto {
     email;
 }
@@ -259,6 +260,7 @@ __decorate([
 ], SignupEmail.prototype, "email", void 0);
 class SignupPhone {
     phoneNo;
+    country;
 }
 exports.SignupPhone = SignupPhone;
 __decorate([
@@ -269,10 +271,15 @@ __decorate([
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], SignupPhone.prototype, "phoneNo", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], SignupPhone.prototype, "country", void 0);
 class VerifyOtpDto {
     token;
     email;
     phoneNo;
+    country;
     subject;
 }
 exports.VerifyOtpDto = VerifyOtpDto;
@@ -302,6 +309,10 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], VerifyOtpDto.prototype, "phoneNo", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], VerifyOtpDto.prototype, "country", void 0);
 __decorate([
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),

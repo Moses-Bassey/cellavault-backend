@@ -216,6 +216,11 @@ export class Driver extends Model<Driver> {
   })
   public accountName: string;
 
+  @Column({
+    type: DataType.STRING(11),
+    allowNull: true,
+  })
+  public bvn: string | null;
 
   @BelongsTo(() => Country)
   public country: Country;

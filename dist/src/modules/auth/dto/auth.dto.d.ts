@@ -12,12 +12,13 @@ export declare class SignUpUserDto {
 export declare class LoginUserDto {
     readonly identity: string;
     readonly password: string;
+    country?: string;
 }
 export declare class LoginOtpDto {
     readonly identity: string;
-    readonly password: string;
     otp: string;
     deviceInfo: string;
+    readonly country: string;
 }
 export declare class ForgotPasswordDto {
     email: string;
@@ -41,11 +42,13 @@ export declare class SignupEmail {
 }
 export declare class SignupPhone {
     readonly phoneNo: string;
+    readonly country: string;
 }
 export declare class VerifyOtpDto {
     token: string;
     email: string;
     phoneNo: string;
+    country?: string;
     readonly subject: TokenSubject;
 }
 export declare class SignUserDto {

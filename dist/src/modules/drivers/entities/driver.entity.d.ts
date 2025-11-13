@@ -37,6 +37,7 @@ export declare class Driver extends Model<Driver> {
     accountNo: string;
     bankName: string;
     accountName: string;
+    bvn: string | null;
     country: Country;
     guarantors: Guarantor[];
     driverPersonalInfoKyc: kyc1PersonalInfo;

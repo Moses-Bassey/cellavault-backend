@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEmail, IsEnum, IsOptional, IsPhoneNumber, IsString, IsUUID, MaxLength, MinLength } from 'class-validator';
 import { min } from 'date-fns';
+import { NotNull } from 'sequelize-typescript';
 import { GENDER } from 'src/enums/gender.enum';
 import { LoginType } from 'src/enums/login-type.enum';
 import { TokenSubject } from 'src/enums/token.enum';
@@ -89,6 +90,9 @@ export class LoginUserDto {
   @IsString()
   readonly password: string;
 
+  @IsOptional()
+  country?: string;
+
   // @ApiProperty({
   //   description: 'Login type',
   //   example: 'NORMAL',
@@ -107,12 +111,12 @@ export class LoginOtpDto {
   @MaxLength(100)
   readonly identity: string;
 
-  @ApiProperty({
-    description: 'User password',
-    example: 'password123',
-  })
-  @IsString()
-  readonly password: string;
+  // @ApiProperty({
+  //   description: 'User password',
+  //   example: 'password123',
+  // })
+  // @IsString()
+  // readonly password: string;
 
   @IsString()
   @MinLength(6)
@@ -126,6 +130,9 @@ export class LoginOtpDto {
   @IsString()
   @MaxLength(50)
   deviceInfo: string;
+
+  @IsOptional()
+  readonly country: string;
 
 }
 
@@ -216,6 +223,9 @@ export class SignupPhone {
   })
   @IsString()
   readonly phoneNo: string;
+
+  @IsString()
+  readonly country: string;
 }
 
 export class VerifyOtpDto {
@@ -241,6 +251,9 @@ export class VerifyOtpDto {
   @IsString()
   @IsOptional()
   phoneNo: string;
+
+  @IsOptional()
+  country?: string;
 
   @IsString()
   @IsOptional()

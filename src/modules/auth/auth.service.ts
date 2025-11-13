@@ -53,22 +53,31 @@ export class AuthService {
   ) {} 
 
   async signUpPhoneNo(input: SignupPhone){
-    const existingUser= await this.userRepository.findByPhone(input.phoneNo);
 
+    const { country, phoneNo } = input;
+
+    const existingCountry = await this.countryService.findById(country)
+    if (!existingCountry){
+      throw new ConflictException('Country code not found!') 
+    }
+
+    const phone = Utils.normalizeCountryPhone(existingCountry.phoneCode, phoneNo, existingCountry.phoneLength)
+
+    const existingUser = await this.userRepository.findByPhone(phone);
     if(existingUser){
       throw new ConflictException('User with this phoneNo already exist');
     }
     
     const otpToken = await this.tokenService.generateOTPtoken({
-      phoneNo: input.phoneNo,
+      phoneNo: phone,
       expiry: moment().add(10, 'minutes').toDate(),
       subject: TokenSubject.SIGN_UP_PHONE,
     })
 
     // Send SMS with OTP
-    await this.smsEventService.emitSignUpOtpSms(input.phoneNo, otpToken.token);
+    await this.smsEventService.emitSignUpOtpSms(Utils.phoneSMSFormat(phone), otpToken.token);
     
-    return {otpToken: otpToken.token};
+    return {};
   }
 
   async signUpEmail(input: SignupEmail){
@@ -92,13 +101,45 @@ export class AuthService {
   }
 
   async verifyOtp(input: VerifyOtpDto) {
-    const data = await this.tokenService.validateOtp(input);
+
+    const { token, subject, email, phoneNo, country } = input;
+
+    let data;
+
+    if (subject === TokenSubject.SIGN_UP_EMAIL){
+
+      input.email = Validators.validateEmail(input.email);
+      data = await this.tokenService.validateOtp({token, subject, email, phoneNo});
+
+    } else {
+      
+      if (!country){
+        throw new BadRequestException('Must provide a valid country!')
+      }
+
+      const existingCountry = await this.countryService.findById(country)
+      if (!existingCountry){
+        throw new ConflictException('Country code not found!') 
+      }
+
+      const phone = Utils.normalizeCountryPhone(existingCountry.phoneCode, phoneNo, existingCountry.phoneLength)
+
+      const existingUser = await this.userRepository.findByPhone(phone);
+      if(existingUser){
+        throw new ConflictException('User with this phoneNo already exist');
+      } 
+
+      data = await this.tokenService.validateOtp({
+        token, subject, phoneNo: phone
+      });
+
+    } 
     
     if(!data){
       throw new BadRequestException('Invalid OTP');
     }
     
-    return data;
+    return input;
   }
 
   async signUp(input: SignUpUserDto){
@@ -114,13 +155,19 @@ export class AuthService {
       throw new ConflictException("User with email already exist")
     }
 
-    const userPhone = await this.userRepository.findByPhone(input.phoneNo);
-    if(userPhone) {
-      throw new ConflictException("User with phone number already exist")
+    if (!input.country){
+      throw new BadRequestException('Must provide a valid country!')
     }
 
+    const existingCountry = await this.countryService.findById(input.country)
+    if (!existingCountry){
+      throw new ConflictException('Country code not found!') 
+    }
+
+    const phone = Utils.normalizeCountryPhone(existingCountry.phoneCode, input.phoneNo, existingCountry.phoneLength)
+
     const verifyPhoneOtp = await this.tokenService.verifySignUpOTP({
-      phoneNo: input.phoneNo,
+      phoneNo: phone,
       token: input.otpPhone,
       subject: TokenSubject.SIGN_UP_PHONE,
     });
@@ -143,7 +190,7 @@ export class AuthService {
 
     const user = await this.userRepository.create({
       email: input.email,
-      phoneNo: input.phoneNo,
+      phoneNo: phone,
       fullName: input.fullName,
       password: password,
       countryId: country.id,
@@ -175,14 +222,26 @@ export class AuthService {
   }
 
   async login(input: LoginUserDto) {
-    const { identity } = input;
+    const { identity, country } = input;
     const identityType = Utils.getLoginIdentityType(identity);
 
     let user;
+
     if (identityType == UserLoginIdentityType.EMAIL){
-      user = await this.checkEmailExist(identity);
+      user = await this.checkEmailExist(Validators.validateEmail(identity));
     } else {
-      user = await this.userRepository.findByPhone(identity);
+      if(!country){
+        throw new BadRequestException('Must select a valid phone county')
+      }
+
+      const existingCountry = await this.countryService.findById(country)
+      if (!existingCountry){
+        throw new NotFoundException('Country phone not found!')
+      }
+
+      const phoneNo = Utils.normalizeCountryPhone(existingCountry?.phoneCode, identity, existingCountry.phoneLength)
+
+      user = await this.userRepository.findByPhone(phoneNo);
     }
 
     if (!user) {
@@ -249,9 +308,29 @@ export class AuthService {
   }
 
   async loginOtp(input: LoginOtpDto) {
-    const { identity, otp, password, deviceInfo } = input;
+    const { identity, otp, deviceInfo, country } = input;
 
-    const user = await this.userService.findByIdentity(identity);
+    let user: User | null = null;
+
+    const identityType = Utils.getLoginIdentityType(identity);
+    if (identityType == UserLoginIdentityType.EMAIL){
+      // user = await this.checkEmailExist(identity);
+      user = await this.userService.findByIdentity(Validators.validateEmail(identity));
+    } else {
+      if(!country){
+        throw new BadRequestException('Must select a valid phone county')
+      }
+
+      const existingCountry = await this.countryService.findById(country)
+      if (!existingCountry){
+        throw new NotFoundException('Country phone not found!')
+      }
+
+      const phoneNo = Utils.normalizeCountryPhone(existingCountry?.phoneCode, identity, existingCountry.phoneLength)
+
+      user = await this.userRepository.findByPhone(phoneNo);
+    }
+
     if (!user) {
       throw new NotFoundException('User not found');
     }
@@ -282,14 +361,14 @@ export class AuthService {
       throw new BadRequestException('Invalid OTP');
     }
 
-    const verifyPassword = await PasswordUtil.verifyPassword(
-      password,
-      user.password,
-    );
+    // const verifyPassword = await PasswordUtil.verifyPassword(
+    //   password,
+    //   user.password,
+    // );
 
-    if (!verifyPassword) {
-      throw new UnauthorizedException('Invalid Credentials');
-    }
+    // if (!verifyPassword) {
+    //   throw new UnauthorizedException('Invalid Credentials');
+    // }
 
     const payload = {
       sub: user.id,
