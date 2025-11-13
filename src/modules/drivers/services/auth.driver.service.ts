@@ -303,10 +303,11 @@ import { KYC_COMPLETED } from 'src/enums/kyc.enums';
         userId: driver.id,
         email: driver.email,
         kycCompleted: driver.kycCompleted,
-        isGuarantorCompleted: driver.isGuarantorCompleted
+        isGuarantorCompleted: driver.isGuarantorCompleted ? true : false
       };
 
       return data;
+      
     }
   
     async loginOtp(input: LoginOtpDto) {

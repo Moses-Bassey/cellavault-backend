@@ -228,7 +228,7 @@ let AuthDriverService = class AuthDriverService {
             userId: driver.id,
             email: driver.email,
             kycCompleted: driver.kycCompleted,
-            isGuarantorCompleted: driver.isGuarantorCompleted
+            isGuarantorCompleted: driver.isGuarantorCompleted ? true : false
         };
         return data;
     }
