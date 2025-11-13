@@ -103,6 +103,7 @@ class LoginDriverDto {
     identity;
     password;
     deviceInfo;
+    country;
 }
 exports.LoginDriverDto = LoginDriverDto;
 __decorate([
@@ -131,11 +132,20 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], LoginDriverDto.prototype, "deviceInfo", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        description: 'Country',
+        example: 'Country',
+    }),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], LoginDriverDto.prototype, "country", void 0);
 class LoginOtpDto {
     identity;
     password;
     otp;
     deviceInfo;
+    country;
 }
 exports.LoginOtpDto = LoginOtpDto;
 __decorate([
@@ -171,6 +181,14 @@ __decorate([
     (0, class_validator_1.MaxLength)(50),
     __metadata("design:type", String)
 ], LoginOtpDto.prototype, "deviceInfo", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        description: 'Country',
+        example: 'Country',
+    }),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], LoginOtpDto.prototype, "country", void 0);
 class ForgotPasswordDto {
     email;
 }
@@ -278,6 +296,7 @@ __decorate([
 ], SignupEmail.prototype, "email", void 0);
 class SignupPhone {
     phoneNo;
+    country;
 }
 exports.SignupPhone = SignupPhone;
 __decorate([
@@ -288,11 +307,20 @@ __decorate([
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], SignupPhone.prototype, "phoneNo", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        description: 'Country',
+        example: 'Country',
+    }),
+    (0, class_validator_1.IsUUID)(),
+    __metadata("design:type", String)
+], SignupPhone.prototype, "country", void 0);
 class VerifyOtpDto {
     token;
     email;
     phoneNo;
     subject;
+    country;
 }
 exports.VerifyOtpDto = VerifyOtpDto;
 __decorate([
@@ -326,6 +354,15 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], VerifyOtpDto.prototype, "subject", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        description: 'Country',
+        example: 'Country',
+    }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], VerifyOtpDto.prototype, "country", void 0);
 class SignUserDto {
     fullName;
     email;

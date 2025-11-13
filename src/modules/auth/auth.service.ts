@@ -124,11 +124,6 @@ export class AuthService {
 
       const phone = Utils.normalizeCountryPhone(existingCountry.phoneCode, phoneNo, existingCountry.phoneLength)
 
-      const existingUser = await this.userRepository.findByPhone(phone);
-      if(existingUser){
-        throw new ConflictException('User with this phoneNo already exist');
-      } 
-
       data = await this.tokenService.validateOtp({
         token, subject, phoneNo: phone
       });

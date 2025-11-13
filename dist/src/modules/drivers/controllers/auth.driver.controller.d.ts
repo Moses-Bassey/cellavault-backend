@@ -9,9 +9,7 @@ export declare class AuthDriverController {
         otpToken: string;
     }>>;
     signUpEmail(input: SignupEmail): Promise<import("src/utils/response.utils").ApiResponse<null>>;
-    verifyOtp(input: VerifyOtpDto): Promise<import("src/utils/response.utils").ApiResponse<{
-        token: string;
-    }>>;
+    verifyOtp(input: VerifyOtpDto): Promise<import("src/utils/response.utils").ApiResponse<VerifyOtpDto>>;
     signUp(input: CreateAccountDto): Promise<import("src/utils/response.utils").ApiResponse<import("../../../shared/interfaces/auth.interface").IDriverLoginData>>;
     login(input: LoginDriverDto): Promise<import("src/utils/response.utils").ApiResponse<import("../../../shared/interfaces/auth.interface").IDriverLoginData>>;
     loginOtp(input: LoginOtpDto): Promise<import("src/utils/response.utils").ApiResponse<{

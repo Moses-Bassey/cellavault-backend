@@ -21,9 +21,7 @@ export declare class AuthDriverService {
         otpToken: string;
     }>;
     signUpEmail(input: SignupEmail): Promise<null>;
-    verifyOtp(input: VerifyOtpDto): Promise<{
-        token: string;
-    }>;
+    verifyOtp(input: VerifyOtpDto): Promise<VerifyOtpDto>;
     createAccount(input: CreateAccountDto): Promise<IDriverLoginData>;
     login(input: LoginDriverDto): Promise<IDriverLoginData>;
     loginOtp(input: LoginOtpDto): Promise<{

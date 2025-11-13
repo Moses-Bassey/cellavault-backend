@@ -15,12 +15,14 @@ export declare class LoginDriverDto {
     readonly identity: string;
     readonly password: string;
     readonly deviceInfo: string;
+    readonly country: string;
 }
 export declare class LoginOtpDto {
     readonly identity: string;
     readonly password: string;
     otp: string;
     deviceInfo: string;
+    readonly country?: string;
 }
 export declare class ForgotPasswordDto {
     email: string;
@@ -44,12 +46,14 @@ export declare class SignupEmail {
 }
 export declare class SignupPhone {
     readonly phoneNo: string;
+    country: string;
 }
 export declare class VerifyOtpDto {
     token: string;
     email: string;
     phoneNo: string;
     readonly subject: TokenSubject;
+    country?: string;
 }
 export declare class SignUserDto {
     readonly fullName: string;

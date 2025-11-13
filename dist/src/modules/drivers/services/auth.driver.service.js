@@ -45,16 +45,22 @@ let AuthDriverService = class AuthDriverService {
         this.clientDeviceService = clientDeviceService;
     }
     async signUpPhoneNo(input) {
-        const existingUser = await this.driverRepository.findByPhone(input.phoneNo);
+        const { country, phoneNo } = input;
+        const existingCountry = await this.countryService.findById(country);
+        if (!existingCountry) {
+            throw new common_1.ConflictException('Country code not found!');
+        }
+        const phone = utils_1.Utils.normalizeCountryPhone(existingCountry.phoneCode, phoneNo, existingCountry.phoneLength);
+        const existingUser = await this.driverRepository.findByPhone(phone);
         if (existingUser) {
             throw new common_1.ConflictException('Driver with this phoneNo already exist');
         }
         const otpToken = await this.tokenService.generateOTPtoken({
-            phoneNo: input.phoneNo,
+            phoneNo: phone,
             expiry: (0, moment_1.default)().add(10, 'minutes').toDate(),
             subject: token_enum_1.TokenSubject.SIGN_UP_PHONE,
         });
-        await this.smsEventService.emitSignUpOtpSms(input.phoneNo, otpToken.token);
+        await this.smsEventService.emitSignUpOtpSms(utils_1.Utils.phoneSMSFormat(phone), otpToken.token);
         return { otpToken: otpToken.token };
     }
     async signUpEmail(input) {
@@ -73,11 +79,29 @@ let AuthDriverService = class AuthDriverService {
         return null;
     }
     async verifyOtp(input) {
-        const data = await this.tokenService.validateOtp(input);
+        const { token, subject, email, phoneNo, country } = input;
+        let data;
+        if (subject === token_enum_1.TokenSubject.SIGN_UP_EMAIL) {
+            input.email = validators_utils_1.Validators.validateEmail(input.email);
+            data = await this.tokenService.validateOtp({ token, subject, email, phoneNo });
+        }
+        else {
+            if (!country) {
+                throw new common_1.BadRequestException('Must provide a valid country!');
+            }
+            const existingCountry = await this.countryService.findById(country);
+            if (!existingCountry) {
+                throw new common_1.ConflictException('Country code not found!');
+            }
+            const phone = utils_1.Utils.normalizeCountryPhone(existingCountry.phoneCode, phoneNo, existingCountry.phoneLength);
+            data = await this.tokenService.validateOtp({
+                token, subject, phoneNo: phone
+            });
+        }
         if (!data) {
             throw new common_1.BadRequestException('Invalid OTP');
         }
-        return data;
+        return input;
     }
     async createAccount(input) {
         input.email = validators_utils_1.Validators.validateEmail(input.email);
@@ -89,12 +113,9 @@ let AuthDriverService = class AuthDriverService {
         if (emailUser) {
             throw new common_1.ConflictException("User with email already exist");
         }
-        const userPhone = await this.driverRepository.findByPhone(input.phoneNo);
-        if (userPhone) {
-            throw new common_1.ConflictException("User with phone number already exist");
-        }
+        const phone = utils_1.Utils.normalizeCountryPhone(country.phoneCode, input.phoneNo, country.phoneLength);
         const verifyPhoneOtp = await this.tokenService.verifySignUpOTP({
-            phoneNo: input.phoneNo,
+            phoneNo: phone,
             token: input.otpPhone,
             subject: token_enum_1.TokenSubject.SIGN_UP_PHONE,
         });
@@ -112,7 +133,7 @@ let AuthDriverService = class AuthDriverService {
         const password = await password_util_1.PasswordUtil.hashPassword(input.password);
         const user = await this.driverRepository.create({
             email: input.email,
-            phoneNo: input.phoneNo,
+            phoneNo: phone,
             fullName: input.fullName,
             password: password,
             countryId: country.id,
@@ -146,14 +167,22 @@ let AuthDriverService = class AuthDriverService {
         return data;
     }
     async login(input) {
-        const { identity } = input;
+        const { identity, country } = input;
         const identityType = utils_1.Utils.getLoginIdentityType(identity);
         let driver;
         if (identityType == user_type_enum_1.UserLoginIdentityType.EMAIL) {
             driver = await this.checkEmailExist(identity);
         }
         else {
-            driver = await this.driverRepository.findByPhone(identity);
+            if (!country) {
+                throw new common_1.BadRequestException('Must select a valid phone county');
+            }
+            const existingCountry = await this.countryService.findById(country);
+            if (!existingCountry) {
+                throw new common_1.NotFoundException('Country phone not found!');
+            }
+            const phone = utils_1.Utils.normalizeCountryPhone(existingCountry?.phoneCode, identity, existingCountry.phoneLength);
+            driver = await this.driverRepository.findByPhone(phone);
         }
         if (!driver) {
             throw new common_1.UnauthorizedException('Invalid Credentials');
@@ -204,8 +233,23 @@ let AuthDriverService = class AuthDriverService {
         return data;
     }
     async loginOtp(input) {
-        const { identity, otp, password, deviceInfo } = input;
-        const user = await this.driverRepository.findByIdentity(identity);
+        const { identity, otp, password, deviceInfo, country } = input;
+        let user = null;
+        const identityType = utils_1.Utils.getLoginIdentityType(identity);
+        if (identityType == user_type_enum_1.UserLoginIdentityType.EMAIL) {
+            user = await this.driverRepository.findByEmail(validators_utils_1.Validators.validateEmail(identity));
+        }
+        else {
+            if (!country) {
+                throw new common_1.BadRequestException('Must select a valid phone county');
+            }
+            const existingCountry = await this.countryService.findById(country);
+            if (!existingCountry) {
+                throw new common_1.NotFoundException('Country phone not found!');
+            }
+            const phone = utils_1.Utils.normalizeCountryPhone(existingCountry?.phoneCode, identity, existingCountry.phoneLength);
+            user = await this.driverRepository.findByPhone(phone);
+        }
         if (!user) {
             throw new common_1.NotFoundException('User not found');
         }

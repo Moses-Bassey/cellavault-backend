@@ -49,20 +49,28 @@ import { KYC_COMPLETED } from 'src/enums/kyc.enums';
     ) {} 
   
     async signUpPhoneNo(input: SignupPhone){
-      const existingUser= await this.driverRepository.findByPhone(input.phoneNo);
+      const { country, phoneNo } = input;
+
+      const existingCountry = await this.countryService.findById(country)
+      if (!existingCountry){
+        throw new ConflictException('Country code not found!') 
+      }
+
+      const phone = Utils.normalizeCountryPhone(existingCountry.phoneCode, phoneNo, existingCountry.phoneLength)
+      const existingUser= await this.driverRepository.findByPhone(phone);
   
       if(existingUser){
         throw new ConflictException('Driver with this phoneNo already exist');
       }
       
       const otpToken = await this.tokenService.generateOTPtoken({
-        phoneNo: input.phoneNo,
+        phoneNo: phone,
         expiry: moment().add(10, 'minutes').toDate(),
         subject: TokenSubject.SIGN_UP_PHONE,
       })
   
       // Send SMS with OTP
-      await this.smsEventService.emitSignUpOtpSms(input.phoneNo, otpToken.token);
+      await this.smsEventService.emitSignUpOtpSms(Utils.phoneSMSFormat(phone), otpToken.token);
       
       return {otpToken: otpToken.token};
     }
@@ -86,16 +94,52 @@ import { KYC_COMPLETED } from 'src/enums/kyc.enums';
   
       return null;
     }
-  
+
     async verifyOtp(input: VerifyOtpDto) {
-      const data = await this.tokenService.validateOtp(input);
+
+      const { token, subject, email, phoneNo, country } = input;
+
+      let data;
+
+      if (subject === TokenSubject.SIGN_UP_EMAIL){
+  
+        input.email = Validators.validateEmail(input.email);
+        data = await this.tokenService.validateOtp({token, subject, email, phoneNo});
+  
+      } else {
+        
+        if (!country){
+          throw new BadRequestException('Must provide a valid country!')
+        }
+  
+        const existingCountry = await this.countryService.findById(country)
+        if (!existingCountry){
+          throw new ConflictException('Country code not found!') 
+        }
+  
+        const phone = Utils.normalizeCountryPhone(existingCountry.phoneCode, phoneNo, existingCountry.phoneLength)
+  
+        data = await this.tokenService.validateOtp({
+          token, subject, phoneNo: phone
+        });
+      } 
       
       if(!data){
         throw new BadRequestException('Invalid OTP');
       }
       
-      return data;
+      return input;
     }
+  
+    // async verifyOtp(input: VerifyOtpDto) {
+    //   const data = await this.tokenService.validateOtp(input);
+      
+    //   if(!data){
+    //     throw new BadRequestException('Invalid OTP');
+    //   }
+      
+    //   return data;
+    // }
   
     async createAccount(input: CreateAccountDto){
       input.email = Validators.validateEmail(input.email)
@@ -110,13 +154,10 @@ import { KYC_COMPLETED } from 'src/enums/kyc.enums';
         throw new ConflictException("User with email already exist")
       }
 
-      const userPhone = await this.driverRepository.findByPhone(input.phoneNo);
-      if(userPhone) {
-        throw new ConflictException("User with phone number already exist")
-      }
+      const phone = Utils.normalizeCountryPhone(country.phoneCode, input.phoneNo, country.phoneLength)
 
       const verifyPhoneOtp = await this.tokenService.verifySignUpOTP({
-        phoneNo: input.phoneNo,
+        phoneNo: phone,
         token: input.otpPhone,
         subject: TokenSubject.SIGN_UP_PHONE,
       });
@@ -139,7 +180,7 @@ import { KYC_COMPLETED } from 'src/enums/kyc.enums';
 
       const user = await this.driverRepository.create({
         email: input.email,
-        phoneNo: input.phoneNo,
+        phoneNo: phone,
         fullName: input.fullName,
         password: password,
         countryId: country.id,
@@ -180,7 +221,7 @@ import { KYC_COMPLETED } from 'src/enums/kyc.enums';
     }
   
     async login(input: LoginDriverDto){
-      const { identity } = input;
+      const { identity, country } = input;
 
       const identityType = Utils.getLoginIdentityType(identity);
       let driver;
@@ -188,7 +229,19 @@ import { KYC_COMPLETED } from 'src/enums/kyc.enums';
       if (identityType == UserLoginIdentityType.EMAIL){
         driver = await this.checkEmailExist(identity);
       } else {
-        driver = await this.driverRepository.findByPhone(identity);
+
+        if(!country){
+          throw new BadRequestException('Must select a valid phone county')
+        }
+
+        const existingCountry = await this.countryService.findById(country)
+        if (!existingCountry){
+          throw new NotFoundException('Country phone not found!')
+        }
+
+        const phone = Utils.normalizeCountryPhone(existingCountry?.phoneCode, identity, existingCountry.phoneLength)
+
+        driver = await this.driverRepository.findByPhone(phone);
       }
 
       if (!driver) {
@@ -257,9 +310,28 @@ import { KYC_COMPLETED } from 'src/enums/kyc.enums';
     }
   
     async loginOtp(input: LoginOtpDto) {
-      const { identity, otp, password, deviceInfo } = input;
+      const { identity, otp, password, deviceInfo, country } = input;
 
-      const user = await this.driverRepository.findByIdentity(identity);
+      let user: Driver | null = null;
+
+      const identityType = Utils.getLoginIdentityType(identity);
+      if (identityType == UserLoginIdentityType.EMAIL){
+        user = await this.driverRepository.findByEmail(Validators.validateEmail(identity));
+      } else {
+        if(!country){
+          throw new BadRequestException('Must select a valid phone county')
+        }
+
+        const existingCountry = await this.countryService.findById(country)
+        if (!existingCountry){
+          throw new NotFoundException('Country phone not found!')
+        }
+
+        const phone = Utils.normalizeCountryPhone(existingCountry?.phoneCode, identity, existingCountry.phoneLength)
+
+        user = await this.driverRepository.findByPhone(phone);
+      }
+
       if (!user) {
         throw new NotFoundException('User not found');
       }

@@ -99,6 +99,13 @@ export class LoginDriverDto {
   @IsOptional()
   readonly deviceInfo: string;
 
+  @ApiProperty({
+    description: 'Country',
+    example: 'Country',
+  })
+  @IsOptional()
+  readonly country: string;
+
 }
 
 export class LoginOtpDto {
@@ -130,6 +137,13 @@ export class LoginOtpDto {
   @IsString()
   @MaxLength(50)
   deviceInfo: string;
+
+  @ApiProperty({
+    description: 'Country',
+    example: 'Country',
+  })
+  @IsOptional()
+  readonly country?: string;
 
 }
 
@@ -220,6 +234,13 @@ export class SignupPhone {
   })
   @IsString()
   readonly phoneNo: string;
+
+  @ApiProperty({
+    description: 'Country',
+    example: 'Country',
+  })
+  @IsUUID()
+  country: string;
 }
 
 export class VerifyOtpDto {
@@ -249,6 +270,15 @@ export class VerifyOtpDto {
   @IsString()
   @IsOptional()
   readonly subject: TokenSubject;
+
+
+  @ApiProperty({
+    description: 'Country',
+    example: 'Country',
+  })
+  @IsString()
+  @IsOptional()
+  country?: string;
 }
 
 export class SignUserDto {
