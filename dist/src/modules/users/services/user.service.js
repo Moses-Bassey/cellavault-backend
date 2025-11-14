@@ -12,22 +12,37 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserService = void 0;
 const common_1 = require("@nestjs/common");
 const user_repository_1 = require("../repositories/user.repository");
+const client_device_service_1 = require("../../client-devices/services/client-device.service");
 let UserService = class UserService {
     userRepository;
-    constructor(userRepository) {
+    clientDeviceService;
+    constructor(userRepository, clientDeviceService) {
         this.userRepository = userRepository;
-    }
-    async dashboard() {
+        this.clientDeviceService = clientDeviceService;
     }
     async fetchUser(id) {
-        const user = await this.userRepository.fetchUser(id);
-        if (!user) {
+        try {
+            const user = await this.userRepository.fetchUser(id);
+            if (!user) {
+                throw new common_1.NotFoundException('User not found!');
+            }
+            return user;
+        }
+        catch (error) {
             throw new common_1.NotFoundException('User not found!');
         }
-        return user;
     }
     async findByIdentity(identity) {
-        return await this.userRepository.findByIdentity(identity);
+        try {
+            const user = await this.userRepository.findByIdentity(identity);
+            if (!user) {
+                throw new common_1.NotFoundException('User not found!');
+            }
+            return user;
+        }
+        catch (error) {
+            throw new common_1.NotFoundException('User not found!');
+        }
     }
     async findByEmail(email) {
         return await this.userRepository.findByEmail(email);
@@ -44,10 +59,43 @@ let UserService = class UserService {
     async restore(id) {
         await this.userRepository.restore(id);
     }
+    async dashboard(data, userId) {
+        try {
+            const { deviceFCMToken, ipAddress, name } = data;
+            const user = await this.userRepository.fetchUser(userId);
+            if (!user) {
+                throw new common_1.NotFoundException('User not found!');
+            }
+            const clientDevice = await this.clientDeviceService.findByUserIdAndDeviceToken(userId, deviceFCMToken);
+            if (clientDevice == null) {
+                await this.clientDeviceService.registerDevice({
+                    userId: userId,
+                    deviceFCMToken: deviceFCMToken,
+                    ipAddress: ipAddress,
+                    name: name,
+                    userType: user.userType
+                });
+            }
+            else {
+                await this.clientDeviceService.updateDeviceToken(clientDevice.id, deviceFCMToken);
+            }
+            const dashboardRes = {
+                fullName: user.fullName,
+                email: user.email,
+                phoneNo: user.phoneNo,
+                userId: user.id
+            };
+            return dashboardRes;
+        }
+        catch (error) {
+            throw new common_1.NotFoundException('User not found!');
+        }
+    }
 };
 exports.UserService = UserService;
 exports.UserService = UserService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [user_repository_1.UserRepository])
+    __metadata("design:paramtypes", [user_repository_1.UserRepository,
+        client_device_service_1.ClientDeviceService])
 ], UserService);
 //# sourceMappingURL=user.service.js.map

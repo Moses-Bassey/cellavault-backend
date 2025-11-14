@@ -12,10 +12,45 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.DriverService = void 0;
 const common_1 = require("@nestjs/common");
 const driver_repository_1 = require("../repositories/driver.repository");
+const client_device_service_1 = require("../../client-devices/services/client-device.service");
 let DriverService = class DriverService {
     driverRepository;
-    constructor(driverRepository) {
+    clientDeviceService;
+    constructor(driverRepository, clientDeviceService) {
         this.driverRepository = driverRepository;
+        this.clientDeviceService = clientDeviceService;
+    }
+    async dashboard(data, userId) {
+        try {
+            const { deviceFCMToken, ipAddress, name } = data;
+            const user = await this.driverRepository.findById(userId);
+            if (!user) {
+                throw new common_1.NotFoundException('User not found!');
+            }
+            const clientDevice = await this.clientDeviceService.findByUserIdAndDeviceToken(userId, deviceFCMToken);
+            if (clientDevice == null) {
+                await this.clientDeviceService.registerDevice({
+                    userId: userId,
+                    deviceFCMToken: deviceFCMToken,
+                    ipAddress: ipAddress,
+                    name: name,
+                    userType: user.userType
+                });
+            }
+            else {
+                await this.clientDeviceService.updateDeviceToken(clientDevice.id, deviceFCMToken);
+            }
+            const dashboardRes = {
+                fullName: user.fullName,
+                email: user.email,
+                phoneNo: user.phoneNo,
+                userId: user.id
+            };
+            return dashboardRes;
+        }
+        catch (error) {
+            throw new common_1.NotFoundException('User not found!');
+        }
     }
     async fetchDriver(id) {
         const driver = await this.driverRepository.fetchDriver(id);
@@ -46,6 +81,7 @@ let DriverService = class DriverService {
 exports.DriverService = DriverService;
 exports.DriverService = DriverService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [driver_repository_1.DriverRepository])
+    __metadata("design:paramtypes", [driver_repository_1.DriverRepository,
+        client_device_service_1.ClientDeviceService])
 ], DriverService);
 //# sourceMappingURL=driver.service.js.map

@@ -46,11 +46,15 @@ export class UserController {
     @Body() userData: DashboardDto,
   ){
     const userId = Validators.validateUuid(req.user.userId);
-    userData.userId = userId;
-    const data = await this.userService.dashboard({...userData, userId: userId});
+    const ipAddress = req.ip;
+    const data = await this.userService.dashboard({
+      deviceFCMToken: userData.deviceFCMToken,
+      ipAddress: ipAddress || '',
+      name: userData.name || '',
+    }, userId);
     return ResponseUtil.handleResponse(
       data,
-      'User updated successfully',
+      'User dashboard data retrieved successfully',
       HttpStatus.OK,
     );
   }

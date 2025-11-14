@@ -42,12 +42,16 @@ export class DriverController {
   @ApiOperation({ summary: 'Driver dashboard' })
   @ApiResponse({ status: 200, description: 'Driver dashboard data' })
   async dashboard(
-    @Body() driverData: DashboardDto,
+    @Body() reqBody: DashboardDto,
     @Request() req: ExpressRequest & { user: JwtAuthPayload },
   ){
     const userId = Validators.validateUuid(req.user.userId);
-    driverData.userId = userId;
-    const data = await this.driverService.dashboard(driverData);
+    const ipAddress = req.ip;
+    const data = await this.driverService.dashboard({
+      ipAddress: ipAddress || '',
+      name: reqBody.name || '',
+      deviceFCMToken: reqBody.deviceFCMToken,
+    }, userId);
     return ResponseUtil.handleResponse(
       data,
       'Driver dashboard data retrieved successfully',

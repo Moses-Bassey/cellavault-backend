@@ -36,6 +36,7 @@ const mail_module_1 = require("../../services/mail/mail.module");
 const token_module_1 = require("../../services/token/token.module");
 const sms_module_1 = require("../../services/sms/sms.module");
 const auth_module_1 = require("../auth/auth.module");
+const client_device_service_1 = require("../client-devices/services/client-device.service");
 let DriversModule = class DriversModule {
 };
 exports.DriversModule = DriversModule;
@@ -75,6 +76,7 @@ exports.DriversModule = DriversModule = __decorate([
             kyc1_repository_1.Kyc1Repository,
             kyc2_repository_1.Kyc2Repository,
             kyc3_repository_1.Kyc3Repository,
+            client_device_service_1.ClientDeviceService,
         ],
         exports: [
             driver_service_1.DriverService,
@@ -85,6 +87,7 @@ exports.DriversModule = DriversModule = __decorate([
             kyc1_repository_1.Kyc1Repository,
             kyc2_repository_1.Kyc2Repository,
             kyc3_repository_1.Kyc3Repository,
+            client_device_service_1.ClientDeviceService,
         ],
     })
 ], DriversModule);

@@ -13,12 +13,16 @@ const user_entity_1 = require("./entities/user.entity");
 const user_controller_1 = require("./controllers/user.controller");
 const user_service_1 = require("./services/user.service");
 const user_repository_1 = require("./repositories/user.repository");
+const client_devices_module_1 = require("../client-devices/client-devices.module");
 let UsersModule = class UsersModule {
 };
 exports.UsersModule = UsersModule;
 exports.UsersModule = UsersModule = __decorate([
     (0, common_1.Module)({
-        imports: [sequelize_1.SequelizeModule.forFeature([user_entity_1.User])],
+        imports: [
+            sequelize_1.SequelizeModule.forFeature([user_entity_1.User]),
+            client_devices_module_1.ClientDevicesModule,
+        ],
         controllers: [user_controller_1.UserController],
         providers: [user_service_1.UserService, user_repository_1.UserRepository],
         exports: [user_service_1.UserService, user_repository_1.UserRepository],

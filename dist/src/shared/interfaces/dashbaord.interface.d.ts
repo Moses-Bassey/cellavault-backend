@@ -1,20 +1,11 @@
-import { IsString } from "class-validator";
-
 export interface IDashboard {
     userId: string;
     email: string;
     fullName: string;
     phoneNo: string;
-  }
-
-
-export class IDashboardInput {
-    @IsString()
+}
+export declare class IDashboardInput {
     deviceFCMToken: string;
-
-    @IsString()
     ipAddress: string;
-
-    @IsString()
     name: string;
 }

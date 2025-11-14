@@ -27,6 +27,7 @@ import { MailModule } from 'src/services/mail/mail.module';
 import { TokenModule } from 'src/services/token/token.module';
 import { SmsModule } from 'src/services/sms/sms.module';
 import { AuthModule } from '../auth/auth.module';
+import { ClientDeviceService } from '../client-devices/services/client-device.service';
 
 @Module({
   imports: [
@@ -63,6 +64,7 @@ import { AuthModule } from '../auth/auth.module';
     Kyc1Repository,
     Kyc2Repository,
     Kyc3Repository,
+    ClientDeviceService,
   ],
   exports: [
     DriverService,
@@ -73,6 +75,7 @@ import { AuthModule } from '../auth/auth.module';
     Kyc1Repository,
     Kyc2Repository,
     Kyc3Repository,
+    ClientDeviceService,
   ],
 })
 export class DriversModule {}

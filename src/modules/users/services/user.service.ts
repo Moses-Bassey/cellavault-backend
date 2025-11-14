@@ -4,7 +4,7 @@ import { UserRepository } from '../repositories/user.repository';
 import { ClientDeviceService } from 'src/modules/client-devices/services/client-device.service';
 import { DashboardDto } from '../dto/user.dto';
 import { DriverService } from 'src/modules/drivers/services/driver.service';
-import { IDashboard } from 'src/shared/interfaces/dashbaord.interface';
+import { IDashboard, IDashboardInput } from 'src/shared/interfaces/dashbaord.interface';
 
 @Injectable()
 export class UserService {
@@ -59,9 +59,9 @@ export class UserService {
     await this.userRepository.restore(id);
   }
 
-  async dashboard(data: DashboardDto): Promise<IDashboard> {
+  async dashboard(data: IDashboardInput, userId: string): Promise<IDashboard> {
     try{
-      const { userId, deviceFCMToken, ipAddress, name, userType } = data;
+      const { deviceFCMToken, ipAddress, name } = data;
 
       const user = await this.userRepository.fetchUser(userId);
       if (!user){
