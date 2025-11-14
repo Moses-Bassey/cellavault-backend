@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Put, Delete, Body, Request, UseGuards, HttpStatus, HttpCode } from '@nestjs/common';
+import { Controller, Get, Param, Put, Delete, Body, Request, UseGuards, HttpStatus, HttpCode, Post } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { Driver } from '../entities/driver.entity';
 import { DriverService } from '../services/driver.service';
@@ -10,6 +10,7 @@ import { JwtAuthPayload } from 'src/modules/auth/auth.interface';
 import { ResponseUtil } from 'src/utils/response.utils';
 import type { Request as ExpressRequest } from 'express';
 import { Validators } from 'src/utils/validators.utils';
+import { DashboardDto } from 'src/modules/users/dto/user.dto';
 
 @ApiTags('Drivers')
 @ApiBearerAuth()
@@ -27,7 +28,6 @@ export class DriverController {
   async fetchDriver(
     @Request() req: ExpressRequest & { user: JwtAuthPayload },
   ){
-    console.log(req.user)
     const userId = Validators.validateUuid(req.user.userId);
     const data = await this.driverService.fetchDriver(userId);
     return ResponseUtil.handleResponse(
@@ -37,13 +37,22 @@ export class DriverController {
     );
   }
 
-  @Put('dashboard')
+  @Post('dashboard')
+  @Roles(UserType.DRIVER)
   @ApiOperation({ summary: 'Driver dashboard' })
   @ApiResponse({ status: 200, description: 'Driver dashboard data' })
   async dashboard(
-    @Body() driverData: Partial<Driver>,
+    @Body() driverData: DashboardDto,
+    @Request() req: ExpressRequest & { user: JwtAuthPayload },
   ){
-    // return await this.driverService.dashboard();
+    const userId = Validators.validateUuid(req.user.userId);
+    driverData.userId = userId;
+    const data = await this.driverService.dashboard(driverData);
+    return ResponseUtil.handleResponse(
+      data,
+      'Driver dashboard data retrieved successfully',
+      HttpStatus.OK,
+    );
   }
 }
 

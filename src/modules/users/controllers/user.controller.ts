@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Put, Delete, Body, UseGuards, Request, HttpCode, HttpStatus, NotFoundException } from '@nestjs/common';
+import { Controller, Get, Param, Put, Delete, Body, UseGuards, Request, HttpCode, HttpStatus, NotFoundException, Post } from '@nestjs/common';
 import type { Request as ExpressRequest } from 'express';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { User } from '../entities/user.entity';
@@ -10,6 +10,7 @@ import { UserType } from '../../../enums/user-type.enum';
 import { ResponseUtil } from 'src/utils/response.utils';
 import { JwtAuthPayload } from '../../auth/auth.interface';
 import { Validators } from 'src/utils/validators.utils';
+import { DashboardDto } from '../dto/user.dto';
 
 @ApiTags('Users')
 @ApiBearerAuth()
@@ -35,24 +36,23 @@ export class UserController {
     );
   }
 
-  @Put()
-  @ApiOperation({ summary: 'Dashboard user' })
-  @ApiResponse({ status: 200, description: 'User updated successfully' })
-  @ApiResponse({ status: 404, description: 'User not found' })
-  async updateUser(
-    @Body() userData: Partial<User>,
-  ){
-    // return await this.userService.update(id, userData);
-  }
-
-  @Put('dashboard')
+  @Post('dashboard')
+  @Roles(UserType.USER)
   @ApiOperation({ summary: 'Dashboard user' })
   @ApiResponse({ status: 200, description: 'User updated successfully' })
   @ApiResponse({ status: 404, description: 'User not found' })
   async dashboard(
-    @Body() userData: Partial<User>,
+    @Request() req: ExpressRequest & { user: JwtAuthPayload },
+    @Body() userData: DashboardDto,
   ){
-    // return await this.userService.update(id, userData);
+    const userId = Validators.validateUuid(req.user.userId);
+    userData.userId = userId;
+    const data = await this.userService.dashboard({...userData, userId: userId});
+    return ResponseUtil.handleResponse(
+      data,
+      'User updated successfully',
+      HttpStatus.OK,
+    );
   }
 
 }
