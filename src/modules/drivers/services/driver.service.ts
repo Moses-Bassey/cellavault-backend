@@ -1,8 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { Driver } from '../entities/driver.entity';
 import { DriverRepository } from '../repositories/driver.repository';
 import { DashboardDto } from 'src/modules/users/dto/user.dto';
-import { IDashboard } from 'src/shared/interfaces/dashbaord.interface';
+import { IDashboard, IDashboardInput } from 'src/shared/interfaces/dashbaord.interface';
 import { ClientDeviceService } from 'src/modules/client-devices/services/client-device.service';
 
 @Injectable()
@@ -13,7 +13,7 @@ export class DriverService {
     private readonly clientDeviceService: ClientDeviceService    
   ) {}
 
-  async dashboard(data: { deviceFCMToken: string, ipAddress: string, name: string }, userId: string): Promise<IDashboard> {
+  async dashboard(data: IDashboardInput, userId: string): Promise<IDashboard> {
     try{
       const { deviceFCMToken, ipAddress, name } = data;
 
@@ -22,14 +22,14 @@ export class DriverService {
         throw new NotFoundException('User not found!')
       }
 
-      const clientDevice = await this.clientDeviceService.findByUserIdAndDeviceToken(userId, deviceFCMToken);
+      const clientDevice = await this.clientDeviceService.findByDriverIdAndDeviceToken(userId, deviceFCMToken);
       if (clientDevice == null){
         await this.clientDeviceService.registerDevice({
-          userId: userId,
+          driverId: userId,
           deviceFCMToken: deviceFCMToken,
           ipAddress: ipAddress,
           name: name,
-          userType: user.userType as 'DRIVER' | 'USER'
+          userType: user.userType
         });
       } else{
         await this.clientDeviceService.updateDeviceToken(clientDevice.id, deviceFCMToken);
@@ -43,10 +43,9 @@ export class DriverService {
       }
       return dashboardRes;
     }catch(error: unknown){
-      throw new NotFoundException('User not found!')
+      throw new BadRequestException(error)
     }
   }
-
 
   async fetchDriver(id: string): Promise<Driver | null> {
     const driver = await this.driverRepository.fetchDriver(id);

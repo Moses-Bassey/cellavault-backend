@@ -17,6 +17,7 @@ const common_1 = require("@nestjs/common");
 const sequelize_1 = require("@nestjs/sequelize");
 const user_entity_1 = require("../entities/user.entity");
 const sequelize_2 = require("sequelize");
+const entities_1 = require("../../countries/entities");
 let UserRepository = class UserRepository {
     userModel;
     constructor(userModel) {
@@ -37,21 +38,29 @@ let UserRepository = class UserRepository {
         return await this.userModel.findByPk(id, { raw: true });
     }
     async fetchUser(id) {
-        return await this.userModel.findByPk(id, { raw: true, attributes: {
-                exclude: ['password', 'deletedAt']
-            } });
+        const user = await this.userModel.findByPk(id, {
+            attributes: {
+                exclude: ['password', 'deletedAt', 'isDisabled'],
+            },
+            include: [
+                {
+                    model: entities_1.Country
+                },
+            ],
+        });
+        return user ? user.toJSON() : null;
     }
     async findByEmail(email) {
-        return await this.userModel.findOne({
+        const user = await this.userModel.findOne({
             where: { email },
-            raw: true
         });
+        return user ? user.toJSON() : null;
     }
     async findByPhone(phoneNo) {
-        return await this.userModel.findOne({
-            where: { phoneNo },
-            raw: true
+        const user = await this.userModel.findOne({
+            where: { phoneNo }
         });
+        return user ? user.toJSON() : null;
     }
     async findByEmailAndRole(email, userType) {
         return await this.userModel.findOne({

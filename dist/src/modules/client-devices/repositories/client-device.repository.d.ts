@@ -13,5 +13,6 @@ export declare class ClientDeviceRepository {
     delete(id: string): Promise<number>;
     restore(id: string): Promise<void>;
     findByUserAndDevice(userId: string, deviceFCMToken: string): Promise<ClientDevice | null>;
+    findByDriverAndDevice(driverId: string, deviceFCMToken: string): Promise<ClientDevice | null>;
     updateOrCreateDevice(deviceData: Partial<ClientDevice>): Promise<ClientDevice>;
 }

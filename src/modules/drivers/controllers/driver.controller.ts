@@ -46,6 +46,7 @@ export class DriverController {
     @Request() req: ExpressRequest & { user: JwtAuthPayload },
   ){
     const userId = Validators.validateUuid(req.user.userId);
+    console.log(userId);
     const ipAddress = req.ip;
     const data = await this.driverService.dashboard({
       ipAddress: ipAddress || '',

@@ -17,47 +17,72 @@ const common_1 = require("@nestjs/common");
 const sequelize_1 = require("@nestjs/sequelize");
 const driver_entity_1 = require("../entities/driver.entity");
 const sequelize_2 = require("sequelize");
+const entities_1 = require("../../countries/entities");
+const guarantor_entity_1 = require("../entities/guarantor.entity");
+const kyc1_personal_Info_entity_1 = require("../entities/kyc1-personal-Info.entity");
+const kyc2_Id_Information_entity_1 = require("../entities/kyc2-Id-Information.entity");
+const kyc3_residential_Information_entity_1 = require("../entities/kyc3-residential-Information.entity");
 let DriverRepository = class DriverRepository {
     driverModel;
     constructor(driverModel) {
         this.driverModel = driverModel;
     }
     async findByIdentity(identity) {
-        return await this.driverModel.findOne({
+        const driver = await this.driverModel.findOne({
             where: {
                 [sequelize_2.Op.or]: [
                     { email: identity },
                     { phoneNo: identity },
                 ],
             },
-            raw: true
         });
+        return driver ? driver.toJSON() : null;
     }
     async findById(id) {
         return await this.driverModel.findByPk(id, { raw: true });
     }
     async fetchDriver(id) {
-        return await this.driverModel.findByPk(id, { raw: true, attributes: {
-                exclude: ['password']
-            } });
+        const driver = await this.driverModel.findByPk(id, {
+            attributes: {
+                exclude: ['password', 'deletedAt', 'isDisabled'],
+            },
+            include: [
+                {
+                    model: entities_1.Country,
+                },
+                {
+                    model: guarantor_entity_1.Guarantor,
+                },
+                {
+                    model: kyc1_personal_Info_entity_1.kyc1PersonalInfo,
+                },
+                {
+                    model: kyc2_Id_Information_entity_1.kyc2IdInformation,
+                },
+                {
+                    model: kyc3_residential_Information_entity_1.kyc3ResidentialInformation,
+                },
+            ],
+        });
+        return driver ? driver.toJSON() : null;
     }
     async findByEmail(email) {
-        return await this.driverModel.findOne({
+        const driver = await this.driverModel.findOne({
             where: { email },
-            raw: true
         });
+        return driver ? driver.toJSON() : null;
     }
     async findByPhone(phoneNo) {
-        return await this.driverModel.findOne({
+        const driver = await this.driverModel.findOne({
             where: { phoneNo },
-            raw: true
         });
+        return driver ? driver.toJSON() : null;
     }
     async findByEmailAndRole(email, userType) {
-        return await this.driverModel.findOne({
+        const driver = await this.driverModel.findOne({
             where: { email, userType },
-            raw: true
         });
+        return driver ? driver.toJSON() : null;
     }
     async create(driverData) {
         const driver = await this.driverModel.create(driverData, { raw: true, returning: true });

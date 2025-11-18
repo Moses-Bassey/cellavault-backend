@@ -75,7 +75,7 @@ export class UserService {
           deviceFCMToken: deviceFCMToken,
           ipAddress: ipAddress,
           name: name,
-          userType: user.userType as 'DRIVER' | 'USER'
+          userType: user.userType
         });
       } else{
         await this.clientDeviceService.updateDeviceToken(clientDevice.id, deviceFCMToken);

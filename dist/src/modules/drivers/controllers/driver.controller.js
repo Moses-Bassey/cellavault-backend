@@ -35,6 +35,7 @@ let DriverController = class DriverController {
     }
     async dashboard(reqBody, req) {
         const userId = validators_utils_1.Validators.validateUuid(req.user.userId);
+        console.log(userId);
         const ipAddress = req.ip;
         const data = await this.driverService.dashboard({
             ipAddress: ipAddress || '',

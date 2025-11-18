@@ -1,6 +1,7 @@
 import { HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { ClientDevice } from '../entities/client-device.entity';
 import { ClientDeviceRepository } from '../repositories/client-device.repository';
+import { UserType } from 'src/enums';
 
 @Injectable()
 export class ClientDeviceService {
@@ -22,6 +23,10 @@ export class ClientDeviceService {
 
   async findByUserIdAndDeviceToken(userId: string, deviceFCMToken: string): Promise<ClientDevice | null> {
     return await this.clientDeviceRepository.findByUserIdAndDeviceToken(userId, deviceFCMToken);
+  }
+
+  async findByDriverIdAndDeviceToken(driverId: string, deviceFCMToken: string): Promise<ClientDevice | null> {
+    return await this.clientDeviceRepository.findByDriverAndDevice(driverId, deviceFCMToken);
   }
 
   async findAll(options?: any) {
@@ -50,14 +55,15 @@ export class ClientDeviceService {
     deviceFCMToken?: string;
     name?: string;
     userId?: string;
-    userType?: 'DRIVER' | 'USER';
+    driverId?: string;
+    userType?: UserType;
   }) {
     const device = await this.clientDeviceRepository.updateOrCreateDevice(deviceData);
     return device;
   }
 
-  async updateDeviceToken(deviceId: string, deviceFCMToken: string) {
-    const [affectedCount, updatedDevices] = await this.clientDeviceRepository.update(deviceId, {
+  async updateDeviceToken(clientDeviceId: string, deviceFCMToken: string) {
+    const [affectedCount, updatedDevices] = await this.clientDeviceRepository.update(clientDeviceId, {
       deviceFCMToken,
     });
     

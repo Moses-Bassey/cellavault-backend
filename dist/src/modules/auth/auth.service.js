@@ -66,7 +66,9 @@ let AuthService = class AuthService {
             subject: token_enum_1.TokenSubject.SIGN_UP_PHONE,
         });
         await this.smsEventService.emitSignUpOtpSms(utils_1.Utils.phoneSMSFormat(phone), otpToken.token);
-        return {};
+        {
+            otpToken: otpToken.token;
+        }
     }
     async signUpEmail(input) {
         input.email = validators_utils_1.Validators.validateEmail(input.email);

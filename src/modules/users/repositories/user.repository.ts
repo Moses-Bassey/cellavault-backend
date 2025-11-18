@@ -4,6 +4,7 @@ import { Model } from 'sequelize-typescript';
 import { User } from '../entities/user.entity';
 import { UserType } from '../../../enums/user-type.enum';
 import { Op } from 'sequelize';
+import { Country } from 'src/modules/countries/entities';
 
 @Injectable()
 export class UserRepository {
@@ -29,23 +30,31 @@ export class UserRepository {
   }
 
   async fetchUser(id: string): Promise<User | null> {
-    return await this.userModel.findByPk(id, {raw: true, attributes: {
-      exclude: ['password', 'deletedAt']
-    }});
+    const user = await this.userModel.findByPk(id, {
+      attributes: {
+        exclude: ['password', 'deletedAt', 'isDisabled'],
+      },
+      include: [
+        {
+          model: Country
+        },
+      ],
+    });
+    return user ? (user.toJSON() as User) : null;
   }
 
   async findByEmail(email: string): Promise<User | null> {
-    return await this.userModel.findOne({
+    const user = await this.userModel.findOne({
       where: { email },
-      raw: true
     });
+    return user ? (user.toJSON() as User) : null;
   }
 
   async findByPhone(phoneNo: string): Promise<User | null> {
-    return await this.userModel.findOne({
-      where: { phoneNo },
-      raw: true
+    const user = await this.userModel.findOne({
+      where: { phoneNo }
     });
+    return user ? (user.toJSON() as User) : null;
   }
 
   async findByEmailAndRole(email: string, userType: UserType): Promise<User | null> {

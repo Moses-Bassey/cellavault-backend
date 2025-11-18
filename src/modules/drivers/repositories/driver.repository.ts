@@ -4,6 +4,11 @@ import { Model } from 'sequelize-typescript';
 import { Driver } from '../entities/driver.entity';
 import { UserType } from '../../../enums/user-type.enum';
 import { Op } from 'sequelize';
+import { Country } from 'src/modules/countries/entities';
+import { Guarantor } from '../entities/guarantor.entity';
+import { kyc1PersonalInfo } from '../entities/kyc1-personal-Info.entity';
+import { kyc2IdInformation } from '../entities/kyc2-Id-Information.entity';
+import { kyc3ResidentialInformation } from '../entities/kyc3-residential-Information.entity';
 
 @Injectable()
 export class DriverRepository {
@@ -13,15 +18,15 @@ export class DriverRepository {
   ) {}
 
   async findByIdentity(identity: string): Promise<Driver | null> {
-    return await this.driverModel.findOne({
+    const driver = await this.driverModel.findOne({
       where: {
         [Op.or]: [
           { email: identity },
           { phoneNo: identity },
         ],
       },
-      raw: true
     });
+    return driver ? (driver.toJSON() as Driver) : null;
   }
 
   async findById(id: string): Promise<Driver | null> {
@@ -29,30 +34,50 @@ export class DriverRepository {
   }
 
   async fetchDriver(id: string): Promise<Driver | null> {
-    return await this.driverModel.findByPk(id, {raw: true, attributes: {
-      exclude: ['password']
-    }});
+    const driver = await this.driverModel.findByPk(id, {
+      attributes: {
+        exclude: ['password', 'deletedAt', 'isDisabled'],
+      },
+      include: [
+        {
+          model: Country,
+        },
+        {
+          model: Guarantor,
+        },
+        {
+          model: kyc1PersonalInfo,
+        },
+        {
+          model: kyc2IdInformation,
+        },
+        {
+          model: kyc3ResidentialInformation,
+        },
+      ],
+    });
+    return driver ? (driver.toJSON() as Driver) : null;
   }
 
   async findByEmail(email: string): Promise<Driver | null> {
-    return await this.driverModel.findOne({
+    const driver = await this.driverModel.findOne({
       where: { email },
-      raw: true
     });
+    return driver ? (driver.toJSON() as Driver) : null;
   }
 
   async findByPhone(phoneNo: string): Promise<Driver | null> {
-    return await this.driverModel.findOne({
+    const driver = await this.driverModel.findOne({
       where: { phoneNo },
-      raw: true
     });
+    return driver ? (driver.toJSON() as Driver) : null;
   }
 
   async findByEmailAndRole(email: string, userType: UserType): Promise<Driver | null> {
-    return await this.driverModel.findOne({
+    const driver = await this.driverModel.findOne({
       where: { email, userType },
-      raw: true
     });
+    return driver ? (driver.toJSON() as Driver) : null;
   }
 
   async create(driverData: Partial<Driver>): Promise<Driver> {

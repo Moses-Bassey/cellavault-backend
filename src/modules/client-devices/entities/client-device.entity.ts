@@ -10,9 +10,11 @@ import {
   DeletedAt,
   ForeignKey,
   BelongsTo,
+  AllowNull,
 } from 'sequelize-typescript';
 import { User } from '../../users/entities/user.entity';
 import { Driver } from '../../drivers/entities/driver.entity';
+import { UserType } from 'src/enums';
 
 @Table({
   tableName: 'client_devices',
@@ -66,12 +68,14 @@ export class ClientDevice extends Model<ClientDevice> {
     type: DataType.ENUM('DRIVER', 'USER'),
     allowNull: true,
   })
-  public declare userType: 'DRIVER' | 'USER' | null;
+  public declare userType: UserType;
 
   @BelongsTo(() => User)
+  // @AllowNull(true)
   public declare user: User;
 
   @BelongsTo(() => Driver)
+  // @AllowNull(true)
   public declare driver: Driver;
 
   @CreatedAt

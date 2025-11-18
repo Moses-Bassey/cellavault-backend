@@ -45,11 +45,8 @@ let ClientDeviceRepository = class ClientDeviceRepository {
     async findByUserIdAndDeviceToken(userId, deviceFCMToken) {
         const data = await this.clientDeviceModel.findOne({
             where: { userId, deviceFCMToken },
-            raw: true,
         });
-        if (data != null)
-            return data.toJSON();
-        return null;
+        return data ? data.toJSON() : null;
     }
     async create(clientDeviceData) {
         return await this.clientDeviceModel.create(clientDeviceData);
@@ -78,12 +75,25 @@ let ClientDeviceRepository = class ClientDeviceRepository {
             },
         });
     }
+    async findByDriverAndDevice(driverId, deviceFCMToken) {
+        return await this.clientDeviceModel.findOne({
+            where: {
+                driverId,
+                deviceFCMToken,
+            },
+        });
+    }
     async updateOrCreateDevice(deviceData) {
-        const { userId, deviceFCMToken, ipAddress } = deviceData;
-        if (!userId || !deviceFCMToken || !ipAddress) {
-            throw new Error('userId, deviceFCMToken, and ipAddress are required');
+        const { userId, driverId, deviceFCMToken, ipAddress } = deviceData;
+        if (!deviceFCMToken || !ipAddress) {
+            throw new Error('deviceFCMToken and ipAddress are required');
         }
-        const existingDevice = await this.findByUserAndDevice(userId, deviceFCMToken);
+        if (!userId && !driverId) {
+            throw new Error('Either userId or driverId must be provided');
+        }
+        const existingDevice = userId
+            ? await this.findByUserAndDevice(userId, deviceFCMToken)
+            : await this.findByDriverAndDevice(driverId, deviceFCMToken);
         if (existingDevice) {
             await this.update(existingDevice.id, deviceData);
             const data = await this.clientDeviceModel.findOne({

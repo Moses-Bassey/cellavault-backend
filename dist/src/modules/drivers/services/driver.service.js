@@ -27,10 +27,10 @@ let DriverService = class DriverService {
             if (!user) {
                 throw new common_1.NotFoundException('User not found!');
             }
-            const clientDevice = await this.clientDeviceService.findByUserIdAndDeviceToken(userId, deviceFCMToken);
+            const clientDevice = await this.clientDeviceService.findByDriverIdAndDeviceToken(userId, deviceFCMToken);
             if (clientDevice == null) {
                 await this.clientDeviceService.registerDevice({
-                    userId: userId,
+                    driverId: userId,
                     deviceFCMToken: deviceFCMToken,
                     ipAddress: ipAddress,
                     name: name,
@@ -49,7 +49,7 @@ let DriverService = class DriverService {
             return dashboardRes;
         }
         catch (error) {
-            throw new common_1.NotFoundException('User not found!');
+            throw new common_1.BadRequestException(error);
         }
     }
     async fetchDriver(id) {

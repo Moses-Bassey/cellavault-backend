@@ -37,13 +37,10 @@ export class ClientDeviceRepository {
   }
 
   async findByUserIdAndDeviceToken(userId: string, deviceFCMToken: string): Promise<ClientDevice | null> {
-    const data =await this.clientDeviceModel.findOne({
+    const data = await this.clientDeviceModel.findOne({
       where: { userId, deviceFCMToken },
-      raw: true,
     });
-    if (data != null)
-      return data.toJSON() as ClientDevice;
-    return null;
+    return data ? (data.toJSON() as ClientDevice) : null;
   } 
 
   async create(clientDeviceData: Partial<ClientDevice>): Promise<ClientDevice> {
@@ -78,14 +75,30 @@ export class ClientDeviceRepository {
     });
   }
 
+  async findByDriverAndDevice(driverId: string, deviceFCMToken: string): Promise<ClientDevice | null> {
+    return await this.clientDeviceModel.findOne({
+      where: { 
+        driverId,
+        deviceFCMToken,
+      },
+    });
+  }
+
   async updateOrCreateDevice(deviceData: Partial<ClientDevice>): Promise<ClientDevice> {
-    const { userId, deviceFCMToken, ipAddress } = deviceData;
+    const { userId, driverId, deviceFCMToken, ipAddress } = deviceData;
     
-    if (!userId || !deviceFCMToken || !ipAddress) {
-      throw new Error('userId, deviceFCMToken, and ipAddress are required');
+    if (!deviceFCMToken || !ipAddress) {
+      throw new Error('deviceFCMToken and ipAddress are required');
     }
 
-    const existingDevice = await this.findByUserAndDevice(userId, deviceFCMToken);
+    if (!userId && !driverId) {
+      throw new Error('Either userId or driverId must be provided');
+    }
+
+    // Find existing device by userId or driverId and device token
+    const existingDevice = userId 
+      ? await this.findByUserAndDevice(userId, deviceFCMToken)
+      : await this.findByDriverAndDevice(driverId!, deviceFCMToken);
     
     if (existingDevice) {
       await this.update(existingDevice.id, deviceData);
@@ -94,7 +107,7 @@ export class ClientDeviceRepository {
       })
       if (data != null)
         return data;
-    return existingDevice;
+      return existingDevice;
     } else {
       return await this.create(deviceData);
     }

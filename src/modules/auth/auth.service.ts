@@ -77,7 +77,7 @@ export class AuthService {
     // Send SMS with OTP
     await this.smsEventService.emitSignUpOtpSms(Utils.phoneSMSFormat(phone), otpToken.token);
     
-    return {};
+    {otpToken: otpToken.token}
   }
 
   async signUpEmail(input: SignupEmail){

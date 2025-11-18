@@ -13,6 +13,7 @@ exports.ClientDevice = void 0;
 const sequelize_typescript_1 = require("sequelize-typescript");
 const user_entity_1 = require("../../users/entities/user.entity");
 const driver_entity_1 = require("../../drivers/entities/driver.entity");
+const enums_1 = require("../../../enums");
 let ClientDevice = class ClientDevice extends sequelize_typescript_1.Model {
 };
 exports.ClientDevice = ClientDevice;
@@ -64,7 +65,7 @@ __decorate([
         type: sequelize_typescript_1.DataType.ENUM('DRIVER', 'USER'),
         allowNull: true,
     }),
-    __metadata("design:type", Object)
+    __metadata("design:type", String)
 ], ClientDevice.prototype, "userType", void 0);
 __decorate([
     (0, sequelize_typescript_1.BelongsTo)(() => user_entity_1.User),

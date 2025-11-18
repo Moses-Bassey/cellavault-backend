@@ -31,6 +31,9 @@ let ClientDeviceService = class ClientDeviceService {
     async findByUserIdAndDeviceToken(userId, deviceFCMToken) {
         return await this.clientDeviceRepository.findByUserIdAndDeviceToken(userId, deviceFCMToken);
     }
+    async findByDriverIdAndDeviceToken(driverId, deviceFCMToken) {
+        return await this.clientDeviceRepository.findByDriverAndDevice(driverId, deviceFCMToken);
+    }
     async findAll(options) {
         const devices = await this.clientDeviceRepository.findAll(options);
         return devices;
@@ -51,8 +54,8 @@ let ClientDeviceService = class ClientDeviceService {
         const device = await this.clientDeviceRepository.updateOrCreateDevice(deviceData);
         return device;
     }
-    async updateDeviceToken(deviceId, deviceFCMToken) {
-        const [affectedCount, updatedDevices] = await this.clientDeviceRepository.update(deviceId, {
+    async updateDeviceToken(clientDeviceId, deviceFCMToken) {
+        const [affectedCount, updatedDevices] = await this.clientDeviceRepository.update(clientDeviceId, {
             deviceFCMToken,
         });
         if (affectedCount === 0) {
