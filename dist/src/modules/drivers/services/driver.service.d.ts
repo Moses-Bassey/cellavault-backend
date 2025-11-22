@@ -6,8 +6,10 @@ export declare class DriverService {
     private readonly driverRepository;
     private readonly clientDeviceService;
     constructor(driverRepository: DriverRepository, clientDeviceService: ClientDeviceService);
+    setDriverType(userId: string, isPeppcruiseDriver: boolean): Promise<[number, Driver[]]>;
     dashboard(data: IDashboardInput, userId: string): Promise<IDashboard>;
     fetchDriver(id: string): Promise<Driver | null>;
+    findById(id: string): Promise<Driver | null>;
     findByIdentity(identity: string): Promise<Driver | null>;
     findByEmail(email: string): Promise<Driver | null>;
     findAll(options?: any): Promise<Driver[]>;

@@ -8,5 +8,6 @@ export declare class GuarantorRepository {
     create(guarantorData: Partial<Guarantor>): Promise<Guarantor>;
     update(id: string, guarantorData: Partial<Guarantor>): Promise<[number, Guarantor[]]>;
     delete(id: string): Promise<number>;
+    deleteGuarantor(id: string, driverId: string): Promise<number>;
     deleteByDriverId(driverId: string): Promise<number>;
 }

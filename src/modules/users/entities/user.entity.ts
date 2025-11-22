@@ -28,6 +28,7 @@ import { LoginType } from 'src/enums/login-type.enum';
   },
 })
 export class User extends Model<User> {
+  
   @PrimaryKey
   @Default(DataType.UUIDV4)
   @Column(DataType.UUID)
@@ -112,6 +113,13 @@ export class User extends Model<User> {
 
   @BelongsTo(() => Country)
   public country: Country;
+
+  @AllowNull
+  @Column({
+    type: DataType.STRING(1000),
+    allowNull: true,
+  })
+  public imageUrl: string;
 
   @CreatedAt
   @Column({

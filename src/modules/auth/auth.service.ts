@@ -520,4 +520,15 @@ export class AuthService {
 
     return process.env.PEPP_APP_CLIENT_URL || 'https://apps.peppcruise.com';
   }
+
+  async logout(input: {deviceToken: string}, userId: string) {
+    const user = await this.userRepository.findById(userId);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    // await this.clientDeviceService.deleteByUserIdAndDeviceToken(userId, input.deviceToken);
+
+    return null;
+  }
 }

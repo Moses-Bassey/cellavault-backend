@@ -20,6 +20,8 @@ class CreateGuarantorDto {
     identificationImageUrl;
     utilityBillImageUrl;
     policeClearanceImageUrl;
+    reference;
+    country;
 }
 exports.CreateGuarantorDto = CreateGuarantorDto;
 __decorate([
@@ -83,6 +85,26 @@ __decorate([
     (0, class_validator_1.MaxLength)(1000),
     __metadata("design:type", String)
 ], CreateGuarantorDto.prototype, "policeClearanceImageUrl", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        description: 'Reference information',
+        example: 'Reference from employer or previous contact',
+        required: false,
+    }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.MaxLength)(500),
+    __metadata("design:type", String)
+], CreateGuarantorDto.prototype, "reference", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        description: 'Country',
+        example: 'Nigeria',
+    }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsUUID)(),
+    __metadata("design:type", String)
+], CreateGuarantorDto.prototype, "country", void 0);
 class CreateGuarantorsDto {
     guarantors;
 }

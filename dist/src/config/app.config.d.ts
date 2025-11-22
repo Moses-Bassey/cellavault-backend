@@ -16,6 +16,7 @@ declare const _default: (() => {
     twilioAccountSid: string;
     twilioAuthToken: string;
     twilioFromNumber: string;
+    imageBaseUrl: string;
     database: {
         host: string;
         port: number;
@@ -43,6 +44,7 @@ declare const _default: (() => {
     twilioAccountSid: string;
     twilioAuthToken: string;
     twilioFromNumber: string;
+    imageBaseUrl: string;
     database: {
         host: string;
         port: number;

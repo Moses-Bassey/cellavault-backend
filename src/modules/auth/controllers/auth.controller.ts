@@ -108,4 +108,17 @@ export class AuthController {
     const data = await this.authService.changePassword(input, req.user);
     return ResponseUtil.handleResponse(data, 'Password changed successfully', HttpStatus.OK);
   }
+
+  @Auth()
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard)
+  @Post('logout')
+  @HttpCode(HttpStatus.OK)
+  async logout(
+    @Body() input: {deviceToken},
+    @Request() req: ExpressRequest & { user: any },
+  ) {
+    const data = await this.authService.logout(input, req.user);
+    return ResponseUtil.handleResponse(data, 'Password changed successfully', HttpStatus.OK);
+  }
 }

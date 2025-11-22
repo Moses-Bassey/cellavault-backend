@@ -43,4 +43,7 @@ export declare class AuthService {
     changePassword(input: ChangePasswordDto, authUser: JwtAuthPayload): Promise<null>;
     checkEmailExist(email: string): Promise<User | null>;
     private getBaseUrlFromRequest;
+    logout(input: {
+        deviceToken: string;
+    }, userId: string): Promise<null>;
 }

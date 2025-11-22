@@ -374,6 +374,13 @@ let AuthService = class AuthService {
         }
         return process.env.PEPP_APP_CLIENT_URL || 'https://apps.peppcruise.com';
     }
+    async logout(input, userId) {
+        const user = await this.userRepository.findById(userId);
+        if (!user) {
+            throw new common_1.NotFoundException('User not found');
+        }
+        return null;
+    }
 };
 exports.AuthService = AuthService;
 exports.AuthService = AuthService = __decorate([

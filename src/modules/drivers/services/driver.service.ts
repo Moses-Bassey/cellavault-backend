@@ -13,6 +13,14 @@ export class DriverService {
     private readonly clientDeviceService: ClientDeviceService    
   ) {}
 
+  async setDriverType(userId: string, isPeppcruiseDriver: boolean) {
+    const driver = await this.driverRepository.update(userId, { isPeppcruiseDriver });
+    if (!driver){
+      throw new NotFoundException('Driver not found!')
+    }
+    return driver;
+  }
+
   async dashboard(data: IDashboardInput, userId: string): Promise<IDashboard> {
     try{
       const { deviceFCMToken, ipAddress, name } = data;
@@ -53,6 +61,10 @@ export class DriverService {
       throw new NotFoundException('Driver not found!')
     }
     return driver;
+  }
+
+  async findById(id: string): Promise<Driver | null> {
+    return await this.driverRepository.findById(id);
   }
 
   async findByIdentity(identity: string): Promise<Driver | null> {

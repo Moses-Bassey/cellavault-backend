@@ -12,6 +12,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Guarantor = void 0;
 const sequelize_typescript_1 = require("sequelize-typescript");
 const driver_entity_1 = require("./driver.entity");
+const country_entity_1 = require("../../countries/entities/country.entity");
+const guarantor_status_enum_1 = require("../../../enums/guarantor-status.enum");
 let Guarantor = class Guarantor extends sequelize_typescript_1.Model {
     driverId;
     driver;
@@ -21,6 +23,10 @@ let Guarantor = class Guarantor extends sequelize_typescript_1.Model {
     identificationImageUrl;
     utilityBillImageUrl;
     policeClearanceImageUrl;
+    reference;
+    countryId;
+    country;
+    status;
 };
 exports.Guarantor = Guarantor;
 __decorate([
@@ -81,6 +87,35 @@ __decorate([
     }),
     __metadata("design:type", String)
 ], Guarantor.prototype, "policeClearanceImageUrl", void 0);
+__decorate([
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.STRING(500),
+        allowNull: true,
+    }),
+    __metadata("design:type", String)
+], Guarantor.prototype, "reference", void 0);
+__decorate([
+    sequelize_typescript_1.AllowNull,
+    (0, sequelize_typescript_1.ForeignKey)(() => country_entity_1.Country),
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.UUID,
+        allowNull: true,
+    }),
+    __metadata("design:type", String)
+], Guarantor.prototype, "countryId", void 0);
+__decorate([
+    (0, sequelize_typescript_1.BelongsTo)(() => country_entity_1.Country),
+    __metadata("design:type", country_entity_1.Country)
+], Guarantor.prototype, "country", void 0);
+__decorate([
+    (0, sequelize_typescript_1.Default)(guarantor_status_enum_1.GUARANTOR_STATUS.PENDING),
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.ENUM,
+        values: Object.values(guarantor_status_enum_1.GUARANTOR_STATUS),
+        allowNull: false,
+    }),
+    __metadata("design:type", String)
+], Guarantor.prototype, "status", void 0);
 __decorate([
     sequelize_typescript_1.CreatedAt,
     (0, sequelize_typescript_1.Column)({

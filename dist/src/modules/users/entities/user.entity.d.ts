@@ -17,6 +17,7 @@ export declare class User extends Model<User> {
     hasPasscode: boolean;
     countryId: string;
     country: Country;
+    imageUrl: string;
     createdAt: Date;
     updatedAt: Date;
     deletedAt: Date | null;

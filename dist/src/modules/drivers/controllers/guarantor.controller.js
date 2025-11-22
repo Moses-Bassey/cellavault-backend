@@ -20,16 +20,29 @@ const auth_guard_1 = require("../../auth/guards/auth.guard");
 const roles_guard_1 = require("../../auth/guards/roles.guard");
 const roles_decorator_1 = require("../../auth/decorators/roles.decorator");
 const user_type_enum_1 = require("../../../enums/user-type.enum");
+const validators_utils_1 = require("../../../utils/validators.utils");
+const guarantor_dto_1 = require("../dto/guarantor.dto");
+const response_utils_1 = require("../../../utils/response.utils");
 let GuarantorController = class GuarantorController {
     guarantorService;
     constructor(guarantorService) {
         this.guarantorService = guarantorService;
     }
-    async create(driverId, guarantorData) {
-        return await this.guarantorService.create(driverId, guarantorData);
+    async create(driverId, guarantorData, req) {
+        const userId = validators_utils_1.Validators.validateUuid(req.user.userId);
+        const data = await this.guarantorService.create(userId, guarantorData);
+        return response_utils_1.ResponseUtil.handleResponse(data, 'Guarantor added successfully', common_1.HttpStatus.CREATED);
     }
-    async findByDriverId(driverId) {
-        return await this.guarantorService.findByDriverId(driverId);
+    async findByDriverId(req) {
+        const userId = validators_utils_1.Validators.validateUuid(req.user.userId);
+        const data = await this.guarantorService.findByDriverId(userId);
+        return response_utils_1.ResponseUtil.handleResponse(data, 'Guarantors retrieved successfully', common_1.HttpStatus.OK);
+    }
+    async deleteGuarantor(req, id) {
+        const driverId = validators_utils_1.Validators.validateUuid(req.user.userId);
+        const guarantorId = validators_utils_1.Validators.validateUuid(id);
+        const data = await this.guarantorService.deleteGuarantor(guarantorId, driverId);
+        return response_utils_1.ResponseUtil.handleResponse(data, 'Guarantor deleted successfully', common_1.HttpStatus.OK);
     }
 };
 exports.GuarantorController = GuarantorController;
@@ -41,20 +54,32 @@ __decorate([
     (0, swagger_1.ApiResponse)({ status: 400, description: 'Maximum guarantors reached (max 3)' }),
     __param(0, (0, common_1.Param)('driverId')),
     __param(1, (0, common_1.Body)()),
+    __param(2, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:paramtypes", [String, guarantor_dto_1.CreateGuarantorDto, Object]),
     __metadata("design:returntype", Promise)
 ], GuarantorController.prototype, "create", null);
 __decorate([
     (0, common_1.Get)(),
-    (0, roles_decorator_1.Roles)(user_type_enum_1.UserType.DRIVER, user_type_enum_1.UserType.PEPP_ADMIN, user_type_enum_1.UserType.SUPER_ADMIN),
+    (0, roles_decorator_1.Roles)(user_type_enum_1.UserType.DRIVER),
     (0, swagger_1.ApiOperation)({ summary: 'Get all guarantors for a driver' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Guarantors retrieved successfully' }),
-    __param(0, (0, common_1.Param)('driverId')),
+    __param(0, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], GuarantorController.prototype, "findByDriverId", null);
+__decorate([
+    (0, common_1.Delete)(':id'),
+    (0, roles_decorator_1.Roles)(user_type_enum_1.UserType.DRIVER),
+    (0, swagger_1.ApiOperation)({ summary: 'Get all guarantors for a driver' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Guarantors retrieved successfully' }),
+    __param(0, (0, common_1.Request)()),
+    __param(1, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String]),
+    __metadata("design:returntype", Promise)
+], GuarantorController.prototype, "deleteGuarantor", null);
 exports.GuarantorController = GuarantorController = __decorate([
     (0, swagger_1.ApiTags)('Guarantors'),
     (0, swagger_1.ApiBearerAuth)(),

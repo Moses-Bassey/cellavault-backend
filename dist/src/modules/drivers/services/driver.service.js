@@ -20,6 +20,13 @@ let DriverService = class DriverService {
         this.driverRepository = driverRepository;
         this.clientDeviceService = clientDeviceService;
     }
+    async setDriverType(userId, isPeppcruiseDriver) {
+        const driver = await this.driverRepository.update(userId, { isPeppcruiseDriver });
+        if (!driver) {
+            throw new common_1.NotFoundException('Driver not found!');
+        }
+        return driver;
+    }
     async dashboard(data, userId) {
         try {
             const { deviceFCMToken, ipAddress, name } = data;
@@ -58,6 +65,9 @@ let DriverService = class DriverService {
             throw new common_1.NotFoundException('Driver not found!');
         }
         return driver;
+    }
+    async findById(id) {
+        return await this.driverRepository.findById(id);
     }
     async findByIdentity(identity) {
         return await this.driverRepository.findByIdentity(identity);

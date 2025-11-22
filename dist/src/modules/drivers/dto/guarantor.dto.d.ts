@@ -5,6 +5,8 @@ export declare class CreateGuarantorDto {
     identificationImageUrl?: string;
     utilityBillImageUrl?: string;
     policeClearanceImageUrl?: string;
+    reference?: string;
+    country: string;
 }
 export declare class CreateGuarantorsDto {
     guarantors: CreateGuarantorDto[];

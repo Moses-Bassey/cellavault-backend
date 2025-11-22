@@ -28,6 +28,7 @@ let User = class User extends sequelize_typescript_1.Model {
     hasPasscode;
     countryId;
     country;
+    imageUrl;
 };
 exports.User = User;
 __decorate([
@@ -129,6 +130,14 @@ __decorate([
     (0, sequelize_typescript_1.BelongsTo)(() => country_entity_1.Country),
     __metadata("design:type", country_entity_1.Country)
 ], User.prototype, "country", void 0);
+__decorate([
+    sequelize_typescript_1.AllowNull,
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.STRING(1000),
+        allowNull: true,
+    }),
+    __metadata("design:type", String)
+], User.prototype, "imageUrl", void 0);
 __decorate([
     sequelize_typescript_1.CreatedAt,
     (0, sequelize_typescript_1.Column)({

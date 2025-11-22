@@ -1,4 +1,4 @@
-import { IsEmail, IsEnum, IsOptional, IsString, isUUID } from "class-validator";
+import { IsEmail, IsEnum, IsOptional, IsString, isUUID, IsUrl } from "class-validator";
 import { UserType } from "src/enums";
 
 export class DashboardDto{
@@ -8,4 +8,10 @@ export class DashboardDto{
     @IsString()
     @IsOptional()
     name?: string;
+}
+
+export class UpdateImageUrlDto {
+    @IsString()
+    // @IsUrl()
+    imageUrl: string;
 }

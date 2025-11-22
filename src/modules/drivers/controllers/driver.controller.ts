@@ -1,6 +1,5 @@
 import { Controller, Get, Param, Put, Delete, Body, Request, UseGuards, HttpStatus, HttpCode, Post } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
-import { Driver } from '../entities/driver.entity';
 import { DriverService } from '../services/driver.service';
 import { AuthGuard } from '../../auth/guards/auth.guard';
 import { RolesGuard } from '../../auth/guards/roles.guard';
@@ -46,7 +45,6 @@ export class DriverController {
     @Request() req: ExpressRequest & { user: JwtAuthPayload },
   ){
     const userId = Validators.validateUuid(req.user.userId);
-    console.log(userId);
     const ipAddress = req.ip;
     const data = await this.driverService.dashboard({
       ipAddress: ipAddress || '',
@@ -56,6 +54,23 @@ export class DriverController {
     return ResponseUtil.handleResponse(
       data,
       'Driver dashboard data retrieved successfully',
+      HttpStatus.OK,
+    );
+  }
+
+  @Put('driver-type')
+  @Roles(UserType.DRIVER)
+  @ApiOperation({ summary: 'Driver dashboard' })
+  @ApiResponse({ status: 200, description: 'Driver dashboard data' })
+  async setDriverType(
+    @Body() reqBody: { isPeppcruiseDriver: boolean },
+    @Request() req: ExpressRequest & { user: JwtAuthPayload },
+  ){
+    const userId = Validators.validateUuid(req.user.userId);
+    const data = await this.driverService.setDriverType(userId, reqBody.isPeppcruiseDriver);
+    return ResponseUtil.handleResponse(
+      {},
+      'Request successfull',
       HttpStatus.OK,
     );
   }

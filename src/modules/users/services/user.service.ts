@@ -1,4 +1,5 @@
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException, OnModuleInit } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { User } from '../entities/user.entity';
 import { UserRepository } from '../repositories/user.repository';
 import { ClientDeviceService } from 'src/modules/client-devices/services/client-device.service';
@@ -11,7 +12,8 @@ export class UserService {
   
   constructor(
     private readonly userRepository: UserRepository,
-    private readonly clientDeviceService: ClientDeviceService
+    private readonly clientDeviceService: ClientDeviceService,
+    private readonly configService: ConfigService,
   ) {}  
 
   async fetchUser(id: string): Promise<User | null> {
@@ -91,6 +93,32 @@ export class UserService {
       return dashboardRes;
     }catch(error: unknown){
       throw new NotFoundException('User not found!')
+    }
+  }
+
+  async updateImageUrl(userId: string, imageUrl: string): Promise<User> {
+    try {
+      const user = await this.userRepository.fetchUser(userId);
+      if (!user) {
+        throw new NotFoundException('User not found!');
+      }
+
+      const [affectedCount, updatedUsers] = await this.userRepository.update(userId, { imageUrl });
+      if (affectedCount === 0) {
+        throw new NotFoundException('User not found!');
+      }
+
+      const updatedUser = await this.userRepository.fetchUser(userId);
+      if (!updatedUser) {
+        throw new NotFoundException('User not found!');
+      }
+
+      return updatedUser;
+    } catch (error: unknown) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new NotFoundException('Failed to update image URL');
     }
   }
 }

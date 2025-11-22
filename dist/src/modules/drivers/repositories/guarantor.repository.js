@@ -50,6 +50,11 @@ let GuarantorRepository = class GuarantorRepository {
             where: { id },
         });
     }
+    async deleteGuarantor(id, driverId) {
+        return await this.guarantorModel.destroy({
+            where: { id, driverId },
+        });
+    }
     async deleteByDriverId(driverId) {
         return await this.guarantorModel.destroy({
             where: { driverId },

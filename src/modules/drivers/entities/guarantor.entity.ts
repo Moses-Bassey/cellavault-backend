@@ -13,6 +13,8 @@ import {
   AllowNull,
 } from 'sequelize-typescript';
 import { Driver } from './driver.entity';
+import { Country } from 'src/modules/countries/entities/country.entity';
+import { GUARANTOR_STATUS } from 'src/enums/guarantor-status.enum';
 
 @Table({
   tableName: 'guarantors',
@@ -73,6 +75,31 @@ export class Guarantor extends Model<Guarantor> {
     allowNull: true,
   })
   public policeClearanceImageUrl: string;
+
+  @Column({
+    type: DataType.STRING(500),
+    allowNull: true,
+  })
+  public reference: string;
+
+  @AllowNull
+  @ForeignKey(() => Country)
+  @Column({
+    type: DataType.UUID,
+    allowNull: true,
+  })
+  public countryId: string;
+
+  @BelongsTo(() => Country)
+  public country: Country;
+
+  @Default(GUARANTOR_STATUS.PENDING)
+  @Column({
+    type: DataType.ENUM,
+    values: Object.values(GUARANTOR_STATUS),
+    allowNull: false,
+  })
+  public status: GUARANTOR_STATUS;
 
   @CreatedAt
   @Column({

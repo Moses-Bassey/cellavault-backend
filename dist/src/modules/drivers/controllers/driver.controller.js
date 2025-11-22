@@ -35,7 +35,6 @@ let DriverController = class DriverController {
     }
     async dashboard(reqBody, req) {
         const userId = validators_utils_1.Validators.validateUuid(req.user.userId);
-        console.log(userId);
         const ipAddress = req.ip;
         const data = await this.driverService.dashboard({
             ipAddress: ipAddress || '',
@@ -43,6 +42,11 @@ let DriverController = class DriverController {
             deviceFCMToken: reqBody.deviceFCMToken,
         }, userId);
         return response_utils_1.ResponseUtil.handleResponse(data, 'Driver dashboard data retrieved successfully', common_1.HttpStatus.OK);
+    }
+    async setDriverType(reqBody, req) {
+        const userId = validators_utils_1.Validators.validateUuid(req.user.userId);
+        const data = await this.driverService.setDriverType(userId, reqBody.isPeppcruiseDriver);
+        return response_utils_1.ResponseUtil.handleResponse({}, 'Request successfull', common_1.HttpStatus.OK);
     }
 };
 exports.DriverController = DriverController;
@@ -69,6 +73,17 @@ __decorate([
     __metadata("design:paramtypes", [user_dto_1.DashboardDto, Object]),
     __metadata("design:returntype", Promise)
 ], DriverController.prototype, "dashboard", null);
+__decorate([
+    (0, common_1.Put)('driver-type'),
+    (0, roles_decorator_1.Roles)(user_type_enum_1.UserType.DRIVER),
+    (0, swagger_1.ApiOperation)({ summary: 'Driver dashboard' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Driver dashboard data' }),
+    __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Request)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], DriverController.prototype, "setDriverType", null);
 exports.DriverController = DriverController = __decorate([
     (0, swagger_1.ApiTags)('Drivers'),
     (0, swagger_1.ApiBearerAuth)(),

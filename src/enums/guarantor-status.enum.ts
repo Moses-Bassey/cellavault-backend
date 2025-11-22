@@ -1,0 +1,7 @@
+export enum GUARANTOR_STATUS {
+  PENDING = 'PENDING',
+  APPROVED = 'APPROVED',
+  REJECTED = 'REJECTED',
+}
+
+

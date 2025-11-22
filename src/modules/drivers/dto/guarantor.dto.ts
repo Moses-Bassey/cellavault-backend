@@ -9,6 +9,7 @@ import {
   ArrayMaxSize,
   MaxLength,
   MinLength,
+  IsUUID,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
@@ -67,6 +68,24 @@ export class CreateGuarantorDto {
   @IsOptional()
   @MaxLength(1000)
   policeClearanceImageUrl?: string;
+
+  @ApiProperty({
+    description: 'Reference information',
+    example: 'Reference from employer or previous contact',
+    required: false,
+  })
+  @IsString()
+  @IsOptional()
+  @MaxLength(500)
+  reference?: string;
+
+  @ApiProperty({
+    description: 'Country',
+    example: 'Nigeria',
+  })
+  @IsString()
+  @IsUUID()
+  country: string;
 }
 
 export class CreateGuarantorsDto {

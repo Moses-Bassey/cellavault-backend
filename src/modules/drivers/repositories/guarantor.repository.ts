@@ -45,6 +45,12 @@ export class GuarantorRepository {
     });
   }
 
+  async deleteGuarantor(id: string, driverId: string): Promise<number> {
+    return await this.guarantorModel.destroy({
+      where: { id, driverId },
+    });
+  }
+
   async deleteByDriverId(driverId: string): Promise<number> {
     return await this.guarantorModel.destroy({
       where: { driverId },

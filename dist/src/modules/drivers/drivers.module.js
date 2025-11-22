@@ -16,17 +16,21 @@ const kyc2_Id_Information_entity_1 = require("./entities/kyc2-Id-Information.ent
 const kyc3_residential_Information_entity_1 = require("./entities/kyc3-residential-Information.entity");
 const vehicle_entity_1 = require("./entities/vehicle.entity");
 const pepp_driver_vehicles_entity_1 = require("./entities/pepp-driver-vehicles.entity");
+const vehicle_registration_entity_1 = require("./entities/vehicle-registration.entity");
 const driver_controller_1 = require("./controllers/driver.controller");
 const guarantor_controller_1 = require("./controllers/guarantor.controller");
 const kyc_controller_1 = require("./controllers/kyc.controller");
+const vehicle_registration_controller_1 = require("./controllers/vehicle-registration.controller");
 const driver_service_1 = require("./services/driver.service");
 const guarantor_service_1 = require("./services/guarantor.service");
 const kyc_service_1 = require("./services/kyc.service");
+const vehicle_registration_service_1 = require("./services/vehicle-registration.service");
 const driver_repository_1 = require("./repositories/driver.repository");
 const guarantor_repository_1 = require("./repositories/guarantor.repository");
 const kyc1_repository_1 = require("./repositories/kyc1.repository");
 const kyc2_repository_1 = require("./repositories/kyc2.repository");
 const kyc3_repository_1 = require("./repositories/kyc3.repository");
+const vehicle_registration_repository_1 = require("./repositories/vehicle-registration.repository");
 const auth_driver_controller_1 = require("./controllers/auth.driver.controller");
 const auth_driver_service_1 = require("./services/auth.driver.service");
 const countries_module_1 = require("../countries/countries.module");
@@ -51,6 +55,7 @@ exports.DriversModule = DriversModule = __decorate([
                 kyc3_residential_Information_entity_1.kyc3ResidentialInformation,
                 vehicle_entity_1.Vehicle,
                 pepp_driver_vehicles_entity_1.PeppDriverVehicles,
+                vehicle_registration_entity_1.VehicleRegistration,
                 country_entity_1.Country,
             ]),
             countries_module_1.CountriesModule,
@@ -65,28 +70,33 @@ exports.DriversModule = DriversModule = __decorate([
             guarantor_controller_1.GuarantorController,
             kyc_controller_1.KycController,
             auth_driver_controller_1.AuthDriverController,
+            vehicle_registration_controller_1.VehicleRegistrationController,
         ],
         providers: [
             driver_service_1.DriverService,
             auth_driver_service_1.AuthDriverService,
             guarantor_service_1.GuarantorService,
             kyc_service_1.KycService,
+            vehicle_registration_service_1.VehicleRegistrationService,
             driver_repository_1.DriverRepository,
             guarantor_repository_1.GuarantorRepository,
             kyc1_repository_1.Kyc1Repository,
             kyc2_repository_1.Kyc2Repository,
             kyc3_repository_1.Kyc3Repository,
+            vehicle_registration_repository_1.VehicleRegistrationRepository,
             client_device_service_1.ClientDeviceService,
         ],
         exports: [
             driver_service_1.DriverService,
             guarantor_service_1.GuarantorService,
             kyc_service_1.KycService,
+            vehicle_registration_service_1.VehicleRegistrationService,
             driver_repository_1.DriverRepository,
             guarantor_repository_1.GuarantorRepository,
             kyc1_repository_1.Kyc1Repository,
             kyc2_repository_1.Kyc2Repository,
             kyc3_repository_1.Kyc3Repository,
+            vehicle_registration_repository_1.VehicleRegistrationRepository,
             client_device_service_1.ClientDeviceService,
         ],
     })

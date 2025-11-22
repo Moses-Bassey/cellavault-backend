@@ -26,4 +26,9 @@ export declare class AuthController {
     changePassword(input: ChangePasswordDto, req: ExpressRequest & {
         user: any;
     }): Promise<import("src/utils/response.utils").ApiResponse<null>>;
+    logout(input: {
+        deviceToken: any;
+    }, req: ExpressRequest & {
+        user: any;
+    }): Promise<import("src/utils/response.utils").ApiResponse<null>>;
 }
