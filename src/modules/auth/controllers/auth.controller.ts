@@ -51,6 +51,13 @@ export class AuthController {
     return ResponseUtil.handleResponse(data, 'OTP Validated successfully', HttpStatus.OK);
   }
 
+  @Post('verify-password-reset-otp')
+  @HttpCode(HttpStatus.OK)
+  async verifyPasswordResetOtp(@Body() input: VerifyOtpDto) {
+    const data = await this.authService.verifyPasswordResetOtp(input);
+    return ResponseUtil.handleResponse(data, 'Password reset OTP Validated successfully', HttpStatus.OK);
+  }
+
   @Post('sign-up')
   @HttpCode(HttpStatus.CREATED)
   async signUp(@Body() input: SignUpUserDto) {

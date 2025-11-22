@@ -137,6 +137,21 @@ export class AuthService {
     return input;
   }
 
+  async verifyPasswordResetOtp(input: VerifyOtpDto) {
+
+    const { token, subject, email } = input;
+
+
+    input.email = Validators.validateEmail(input.email);
+    const data = await this.tokenService.validatePasswordResetOtp({token, subject, email});
+
+    if(!data){
+      throw new BadRequestException('Invalid Password Reset OTP');
+    }
+
+    return input;
+  }
+
   async signUp(input: SignUpUserDto){
     const country = await this.countryService.findById(input.country);
     if (!country) {

@@ -10,11 +10,11 @@ import { UserType } from '../../../enums/user-type.enum';
 @ApiTags('Guarantors')
 @ApiBearerAuth()
 @UseGuards(AuthGuard, RolesGuard)
-@Controller('guarantors')
+@Controller('drivers/guarantors')
 export class GuarantorController {
   constructor(private readonly guarantorService: GuarantorService) {}
 
-  @Post(':driverId')
+  @Post()
   @Roles(UserType.DRIVER)
   @ApiOperation({ summary: 'Add a guarantor to a driver' })
   @ApiResponse({ status: 201, description: 'Guarantor added successfully' })
@@ -26,7 +26,7 @@ export class GuarantorController {
     return await this.guarantorService.create(driverId, guarantorData);
   }
 
-  @Get('')
+  @Get()
   @Roles(UserType.DRIVER, UserType.PEPP_ADMIN, UserType.SUPER_ADMIN)
   @ApiOperation({ summary: 'Get all guarantors for a driver' })
   @ApiResponse({ status: 200, description: 'Guarantors retrieved successfully' })

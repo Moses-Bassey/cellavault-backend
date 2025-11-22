@@ -7,6 +7,7 @@ export declare class AuthController {
     signUpPhoneNo(input: SignupPhone): Promise<import("src/utils/response.utils").ApiResponse<void>>;
     signUpEmail(input: SignupEmail): Promise<import("src/utils/response.utils").ApiResponse<null>>;
     verifyOtp(input: VerifyOtpDto): Promise<import("src/utils/response.utils").ApiResponse<VerifyOtpDto>>;
+    verifyPasswordResetOtp(input: VerifyOtpDto): Promise<import("src/utils/response.utils").ApiResponse<VerifyOtpDto>>;
     signUp(input: SignUpUserDto): Promise<import("src/utils/response.utils").ApiResponse<{
         email: string;
         userType: import("../../../enums").UserType;

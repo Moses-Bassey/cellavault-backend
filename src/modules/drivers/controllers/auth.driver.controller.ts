@@ -26,7 +26,7 @@ import {
   import { CreateAccountDto } from '../dto/auth.driver.dto';
   import { ResponseUtil } from 'src/utils/response.utils';
   
-  @Controller('auth/driver')
+  @Controller('auth/drivers')
   export class AuthDriverController {
     constructor(private readonly authService: AuthDriverService) {}
   

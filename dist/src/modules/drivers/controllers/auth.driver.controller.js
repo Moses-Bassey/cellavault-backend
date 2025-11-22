@@ -142,7 +142,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], AuthDriverController.prototype, "changePassword", null);
 exports.AuthDriverController = AuthDriverController = __decorate([
-    (0, common_1.Controller)('auth/driver'),
+    (0, common_1.Controller)('auth/drivers'),
     __metadata("design:paramtypes", [auth_driver_service_1.AuthDriverService])
 ], AuthDriverController);
 //# sourceMappingURL=auth.driver.controller.js.map

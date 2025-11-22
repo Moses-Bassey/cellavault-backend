@@ -12,6 +12,9 @@ export declare class TokenService {
     validateOtp(input: IOTPInterface): Promise<{
         token: string;
     }>;
+    validatePasswordResetOtp(input: IOTPInterface): Promise<{
+        token: string;
+    }>;
     verifyOTP(input: IOTPInterface): Promise<{
         token: string;
     }>;

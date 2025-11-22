@@ -34,7 +34,7 @@ let GuarantorController = class GuarantorController {
 };
 exports.GuarantorController = GuarantorController;
 __decorate([
-    (0, common_1.Post)(':driverId'),
+    (0, common_1.Post)(),
     (0, roles_decorator_1.Roles)(user_type_enum_1.UserType.DRIVER),
     (0, swagger_1.ApiOperation)({ summary: 'Add a guarantor to a driver' }),
     (0, swagger_1.ApiResponse)({ status: 201, description: 'Guarantor added successfully' }),
@@ -46,7 +46,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], GuarantorController.prototype, "create", null);
 __decorate([
-    (0, common_1.Get)(''),
+    (0, common_1.Get)(),
     (0, roles_decorator_1.Roles)(user_type_enum_1.UserType.DRIVER, user_type_enum_1.UserType.PEPP_ADMIN, user_type_enum_1.UserType.SUPER_ADMIN),
     (0, swagger_1.ApiOperation)({ summary: 'Get all guarantors for a driver' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Guarantors retrieved successfully' }),
@@ -59,7 +59,7 @@ exports.GuarantorController = GuarantorController = __decorate([
     (0, swagger_1.ApiTags)('Guarantors'),
     (0, swagger_1.ApiBearerAuth)(),
     (0, common_1.UseGuards)(auth_guard_1.AuthGuard, roles_guard_1.RolesGuard),
-    (0, common_1.Controller)('guarantors'),
+    (0, common_1.Controller)('drivers/guarantors'),
     __metadata("design:paramtypes", [guarantor_service_1.GuarantorService])
 ], GuarantorController);
 //# sourceMappingURL=guarantor.controller.js.map

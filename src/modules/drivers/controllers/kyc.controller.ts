@@ -27,7 +27,7 @@ import { ResponseUtil } from 'src/utils/response.utils';
 @ApiTags('KYC')
 @ApiBearerAuth()
 @UseGuards(AuthGuard, RolesGuard)
-@Controller('driver/kyc')
+@Controller('drivers/kyc')
 export class KycController {
   
   constructor(private readonly kycService: KycService) {}

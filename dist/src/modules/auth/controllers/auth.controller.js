@@ -37,6 +37,10 @@ let AuthController = class AuthController {
         const data = await this.authService.verifyOtp(input);
         return response_utils_1.ResponseUtil.handleResponse(data, 'OTP Validated successfully', common_1.HttpStatus.OK);
     }
+    async verifyPasswordResetOtp(input) {
+        const data = await this.authService.verifyPasswordResetOtp(input);
+        return response_utils_1.ResponseUtil.handleResponse(data, 'Password reset OTP Validated successfully', common_1.HttpStatus.OK);
+    }
     async signUp(input) {
         const data = await this.authService.signUp(input);
         return response_utils_1.ResponseUtil.handleResponse(data, 'User created successfully', common_1.HttpStatus.CREATED);
@@ -87,6 +91,14 @@ __decorate([
     __metadata("design:paramtypes", [auth_dto_1.VerifyOtpDto]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "verifyOtp", null);
+__decorate([
+    (0, common_1.Post)('verify-password-reset-otp'),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [auth_dto_1.VerifyOtpDto]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "verifyPasswordResetOtp", null);
 __decorate([
     (0, common_1.Post)('sign-up'),
     (0, common_1.HttpCode)(common_1.HttpStatus.CREATED),

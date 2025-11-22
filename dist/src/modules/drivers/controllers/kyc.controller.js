@@ -155,7 +155,7 @@ exports.KycController = KycController = __decorate([
     (0, swagger_1.ApiTags)('KYC'),
     (0, swagger_1.ApiBearerAuth)(),
     (0, common_1.UseGuards)(auth_guard_1.AuthGuard, roles_guard_1.RolesGuard),
-    (0, common_1.Controller)('driver/kyc'),
+    (0, common_1.Controller)('drivers/kyc'),
     __metadata("design:paramtypes", [kyc_service_1.KycService])
 ], KycController);
 //# sourceMappingURL=kyc.controller.js.map

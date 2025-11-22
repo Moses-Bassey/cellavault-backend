@@ -47,6 +47,24 @@ export class TokenService {
     return { token: userToken.token };
   }
 
+  public async validatePasswordResetOtp(input: IOTPInterface): Promise<{ token: string }> {
+    const { token, email, subject } = input;
+    
+    let userToken: Token | null = null;
+    
+    userToken = await this.tokenRepository.findByEmailToken(token, email || "");
+
+    if (!userToken) throw new BadRequestException('Invalid Password Reset OTP');
+
+    const isExpired = isAfter(new Date(), userToken.expiry);
+    if (isExpired) {
+      await this.deleteOTPtoken(userToken.id);
+      throw new BadRequestException('Invalid or expired Token')
+    }
+
+    return { token: userToken.token };
+  }
+
   public async verifyOTP(input: IOTPInterface): Promise<{ token: string }> {
     console.log(input);
     const { token, email, subject: subject } = input;

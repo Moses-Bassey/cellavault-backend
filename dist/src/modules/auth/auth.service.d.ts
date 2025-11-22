@@ -24,6 +24,7 @@ export declare class AuthService {
     signUpPhoneNo(input: SignupPhone): Promise<void>;
     signUpEmail(input: SignupEmail): Promise<null>;
     verifyOtp(input: VerifyOtpDto): Promise<VerifyOtpDto>;
+    verifyPasswordResetOtp(input: VerifyOtpDto): Promise<VerifyOtpDto>;
     signUp(input: SignUpUserDto): Promise<{
         email: string;
         userType: UserType;

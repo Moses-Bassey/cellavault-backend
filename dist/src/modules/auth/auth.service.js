@@ -110,6 +110,15 @@ let AuthService = class AuthService {
         }
         return input;
     }
+    async verifyPasswordResetOtp(input) {
+        const { token, subject, email } = input;
+        input.email = validators_utils_1.Validators.validateEmail(input.email);
+        const data = await this.tokenService.validatePasswordResetOtp({ token, subject, email });
+        if (!data) {
+            throw new common_1.BadRequestException('Invalid Password Reset OTP');
+        }
+        return input;
+    }
     async signUp(input) {
         const country = await this.countryService.findById(input.country);
         if (!country) {
