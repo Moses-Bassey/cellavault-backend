@@ -4,6 +4,7 @@ import { DriverRepository } from '../repositories/driver.repository';
 import { DashboardDto } from 'src/modules/users/dto/user.dto';
 import { IDashboard, IDashboardInput } from 'src/shared/interfaces/dashbaord.interface';
 import { ClientDeviceService } from 'src/modules/client-devices/services/client-device.service';
+import { UpdateBankAccountDto, ValidateBankAccountDto } from '../dto/kyc.dto';
 
 @Injectable()
 export class DriverService {
@@ -12,6 +13,26 @@ export class DriverService {
     private readonly driverRepository: DriverRepository,
     private readonly clientDeviceService: ClientDeviceService    
   ) {}
+
+  async updateBankAccount(userId: string, reqBody: UpdateBankAccountDto) {
+    try{
+      const driver = await this.driverRepository.update(userId, { 
+        accountName: reqBody.accountName, 
+        accountNo: reqBody.accountNo,
+        bankName: reqBody.bankName,
+        bankCode: reqBody.bankCode,
+      });
+
+      if (!driver){
+        throw new NotFoundException('Driver not found!')
+      }
+
+      return reqBody;
+    
+    }catch(error: unknown){
+      throw new BadRequestException(error)
+    }
+  }
 
   async setDriverType(userId: string, isPeppcruiseDriver: boolean) {
     const driver = await this.driverRepository.update(userId, { isPeppcruiseDriver });

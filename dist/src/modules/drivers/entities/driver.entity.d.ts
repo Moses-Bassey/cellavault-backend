@@ -36,6 +36,7 @@ export declare class Driver extends Model<Driver> {
     countryId: string;
     accountNo: string;
     bankName: string;
+    bankCode: string;
     accountName: string;
     bvn: string | null;
     country: Country;

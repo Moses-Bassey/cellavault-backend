@@ -21,3 +21,13 @@ export declare class CreateKyc3Dto {
     stateId: string;
     city: string;
 }
+export declare class ValidateBankAccountDto {
+    bankCode: string;
+    accountNo: string;
+}
+export declare class UpdateBankAccountDto {
+    bankCode: string;
+    accountNo: string;
+    accountName: string;
+    bankName: string;
+}

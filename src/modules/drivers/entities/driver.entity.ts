@@ -214,6 +214,12 @@ export class Driver extends Model<Driver> {
     type: DataType.STRING,
     allowNull: true,
   })
+  public bankCode: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+  })
   public accountName: string;
 
   @Column({

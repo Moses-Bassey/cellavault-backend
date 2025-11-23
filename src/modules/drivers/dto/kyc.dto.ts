@@ -145,3 +145,57 @@ export class CreateKyc3Dto {
   city: string;
 }
 
+
+export class ValidateBankAccountDto {
+  @ApiProperty({
+    description: 'Bank code',
+    example: '044',
+  })
+  @IsString()
+  @MaxLength(6)
+  bankCode: string;
+
+  @ApiProperty({
+    description: 'Account number',
+    example: '0123456789',
+  })
+  @IsString()
+  @MaxLength(10)
+  accountNo: string;
+}
+
+
+export class UpdateBankAccountDto {
+  @ApiProperty({
+    description: 'Bank code',
+    example: '044',
+  })
+  @IsString()
+  @MaxLength(10)
+  bankCode: string;
+
+  @ApiProperty({
+    description: 'Account number',
+    example: '0123456789',
+  })
+  @IsString()
+  @MaxLength(10)
+  accountNo: string;
+
+  @ApiProperty({
+    description: 'Account name',
+    example: 'John Doe',
+  })
+  @IsString()
+  @MaxLength(150)
+  accountName: string;
+
+  @ApiProperty({
+    description: 'Bank Name',
+    example: 'Access Bank',
+  })
+  @IsString()
+  @MaxLength(150)
+  bankName: string;
+}
+

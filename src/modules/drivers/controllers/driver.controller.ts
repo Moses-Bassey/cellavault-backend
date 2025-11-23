@@ -10,6 +10,8 @@ import { ResponseUtil } from 'src/utils/response.utils';
 import type { Request as ExpressRequest } from 'express';
 import { Validators } from 'src/utils/validators.utils';
 import { DashboardDto } from 'src/modules/users/dto/user.dto';
+import { monifyAPI } from '../utils/monnify';
+import { UpdateBankAccountDto, ValidateBankAccountDto } from '../dto/kyc.dto';
 
 @ApiTags('Drivers')
 @ApiBearerAuth()
@@ -58,7 +60,7 @@ export class DriverController {
     );
   }
 
-  @Put('driver-type')
+  @Put('set-driver-type')
   @Roles(UserType.DRIVER)
   @ApiOperation({ summary: 'Driver dashboard' })
   @ApiResponse({ status: 200, description: 'Driver dashboard data' })
@@ -73,6 +75,55 @@ export class DriverController {
       'Request successfull',
       HttpStatus.OK,
     );
+  } 
+
+  @Get('bank-list')
+  @Roles(UserType.DRIVER)
+  @ApiOperation({ summary: 'Get list of banks' })
+  @ApiResponse({ status: 200, description: 'Banks retrieved successfully' })
+  async getBankAccountList(
+    @Request() req: ExpressRequest & { user: JwtAuthPayload },
+  ){
+    const data = await monifyAPI.fetchBanks();
+    return ResponseUtil.handleResponse(
+      data,
+      'Banks retrieved successfully',
+      HttpStatus.OK,
+    );
   }
+
+  @Post('bank-account-validation')
+  @Roles(UserType.DRIVER)
+  @ApiOperation({ summary: 'Validate bank account' })
+  @ApiResponse({ status: 200, description: 'Bank account validated successfully' })
+  async validateBankAccount(
+    @Body() reqBody: ValidateBankAccountDto,
+    @Request() req: ExpressRequest & { user: JwtAuthPayload },
+  ){
+    const data = await monifyAPI.validateAccount({ bankCode: reqBody.bankCode, accountNumber: reqBody.accountNo });
+    return ResponseUtil.handleResponse(
+      data,
+      'Bank account validated successfully',
+      HttpStatus.OK,
+    );
+  }
+
+  @Put('bank-account-info')
+  @Roles(UserType.DRIVER)
+  @ApiOperation({ summary: 'Update bank account' })
+  @ApiResponse({ status: 200, description: 'Update bank account ' })
+  async createBankAccount(
+    @Body() reqBody: UpdateBankAccountDto,
+    @Request() req: ExpressRequest & { user: JwtAuthPayload },
+  ){
+    const userId = Validators.validateUuid(req.user.userId);
+    const data = await this.driverService.updateBankAccount(userId, reqBody);
+    return ResponseUtil.handleResponse(
+      data,
+      'Bank account updated successfully',
+      HttpStatus.OK,
+    );
+  }
+
 }
 

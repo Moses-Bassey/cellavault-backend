@@ -20,6 +20,23 @@ let DriverService = class DriverService {
         this.driverRepository = driverRepository;
         this.clientDeviceService = clientDeviceService;
     }
+    async updateBankAccount(userId, reqBody) {
+        try {
+            const driver = await this.driverRepository.update(userId, {
+                accountName: reqBody.accountName,
+                accountNo: reqBody.accountNo,
+                bankName: reqBody.bankName,
+                bankCode: reqBody.bankCode,
+            });
+            if (!driver) {
+                throw new common_1.NotFoundException('Driver not found!');
+            }
+            return reqBody;
+        }
+        catch (error) {
+            throw new common_1.BadRequestException(error);
+        }
+    }
     async setDriverType(userId, isPeppcruiseDriver) {
         const driver = await this.driverRepository.update(userId, { isPeppcruiseDriver });
         if (!driver) {

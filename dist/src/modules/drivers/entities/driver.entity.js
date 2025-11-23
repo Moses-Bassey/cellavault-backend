@@ -47,6 +47,7 @@ let Driver = class Driver extends sequelize_typescript_1.Model {
     countryId;
     accountNo;
     bankName;
+    bankCode;
     accountName;
     bvn;
     country;
@@ -250,6 +251,13 @@ __decorate([
     }),
     __metadata("design:type", String)
 ], Driver.prototype, "bankName", void 0);
+__decorate([
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.STRING,
+        allowNull: true,
+    }),
+    __metadata("design:type", String)
+], Driver.prototype, "bankCode", void 0);
 __decorate([
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.STRING,

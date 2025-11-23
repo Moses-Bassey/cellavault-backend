@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CreateKyc3Dto = exports.CreateKyc2Dto = exports.CreateKyc1Dto = void 0;
+exports.UpdateBankAccountDto = exports.ValidateBankAccountDto = exports.CreateKyc3Dto = exports.CreateKyc2Dto = exports.CreateKyc1Dto = void 0;
 const swagger_1 = require("@nestjs/swagger");
 const class_validator_1 = require("class-validator");
 const gender_enum_1 = require("../../../enums/gender.enum");
@@ -176,4 +176,70 @@ __decorate([
     (0, class_validator_1.MaxLength)(255),
     __metadata("design:type", String)
 ], CreateKyc3Dto.prototype, "city", void 0);
+class ValidateBankAccountDto {
+    bankCode;
+    accountNo;
+}
+exports.ValidateBankAccountDto = ValidateBankAccountDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        description: 'Bank code',
+        example: '044',
+    }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.MaxLength)(6),
+    __metadata("design:type", String)
+], ValidateBankAccountDto.prototype, "bankCode", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        description: 'Account number',
+        example: '0123456789',
+    }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.MaxLength)(10),
+    __metadata("design:type", String)
+], ValidateBankAccountDto.prototype, "accountNo", void 0);
+class UpdateBankAccountDto {
+    bankCode;
+    accountNo;
+    accountName;
+    bankName;
+}
+exports.UpdateBankAccountDto = UpdateBankAccountDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        description: 'Bank code',
+        example: '044',
+    }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.MaxLength)(10),
+    __metadata("design:type", String)
+], UpdateBankAccountDto.prototype, "bankCode", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        description: 'Account number',
+        example: '0123456789',
+    }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.MaxLength)(10),
+    __metadata("design:type", String)
+], UpdateBankAccountDto.prototype, "accountNo", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        description: 'Account name',
+        example: 'John Doe',
+    }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.MaxLength)(150),
+    __metadata("design:type", String)
+], UpdateBankAccountDto.prototype, "accountName", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        description: 'Bank Name',
+        example: 'Access Bank',
+    }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.MaxLength)(150),
+    __metadata("design:type", String)
+], UpdateBankAccountDto.prototype, "bankName", void 0);
 //# sourceMappingURL=kyc.dto.js.map
