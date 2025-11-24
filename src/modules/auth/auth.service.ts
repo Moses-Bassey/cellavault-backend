@@ -23,9 +23,11 @@ import {
   ForgotPasswordDto,
   LoginOtpDto,
   LoginUserDto,
+  LoginUserSocialDto,
   ResetPasswordDto,
   SignupEmail,
   SignupPhone,
+  SignUpSocialUserDto,
   SignUpUserDto,
   VerifyOtpDto,
 } from './dto/auth.dto';
@@ -231,6 +233,75 @@ export class AuthService {
     };
   }
 
+  async signUpSocial(input: SignUpSocialUserDto){
+    const country = await this.countryService.findById(input.country);
+    if (!country) {
+      throw new NotFoundException('Country not found');
+    }
+
+    input.email = Validators.validateEmail(input.email);
+
+    const emailUser = await this.checkEmailExist(input.email);
+    if(emailUser) {
+      throw new ConflictException("User with email already exist")
+    }
+
+    if (!input.country){
+      throw new BadRequestException('Must provide a valid country!')
+    }
+
+    const existingCountry = await this.countryService.findById(input.country)
+    if (!existingCountry){
+      throw new ConflictException('Country code not found!') 
+    }
+
+    const phone = Utils.normalizeCountryPhone(existingCountry.phoneCode, input.phoneNo, existingCountry.phoneLength)
+
+    const verifyPhoneOtp = await this.tokenService.verifySignUpOTP({
+      phoneNo: phone,
+      token: input.otpPhone,
+      subject: TokenSubject.SIGN_UP_PHONE,
+    });
+
+    if (!verifyPhoneOtp) {
+      throw new BadRequestException('Invalid OTP');
+    }
+    
+    const password = await PasswordUtil.hashPassword(input.password)
+
+    const user = await this.userRepository.create({
+      email: input.email,
+      phoneNo: phone,
+      fullName: input.fullName,
+      password: password,
+      countryId: country.id,
+      userType: UserType.USER,
+      loginType: input.loginType,
+      isEmailVerified: true,
+      isPhoneVerified: true,
+      isActive: true,
+    });
+
+    const payload = {
+      sub: user.id,
+      userType: UserType.USER,
+      userId: user!.id,
+      email: input.email
+    };
+
+    const token: string = await this.tokenService.generateJWTtoken(payload);
+
+    // Send welcome email
+    await this.emailEventService.emitWelcomeEmail(user.email, user.fullName);
+
+    return {
+      email: input.email, 
+      userType: UserType.USER, 
+      id: user.id, 
+      token: token
+    };
+  }
+
   async login(input: LoginUserDto) {
     const { identity, country } = input;
     const identityType = Utils.getLoginIdentityType(identity);
@@ -278,6 +349,68 @@ export class AuthService {
     if (!verifyPassword) {
       throw new UnauthorizedException('Invalid Credentials');
     }
+
+    //Detect if the user login with a new device using the x-client-device-toke provided in the request header
+    const clientDeviceToken = request.headers['x-client-device-token'] as string;
+    if (clientDeviceToken) {
+      const clientDevice = await this.clientDeviceService.findByUserIdAndDeviceToken(user.id, clientDeviceToken);
+      if (!clientDevice) {
+        //send new device email with otp here 
+        const otpToken = await this.tokenService.generateOTPtoken({
+          email: user.email,
+          expiry: moment().add(10, 'minutes').toDate(),
+          subject: TokenSubject.NEW_DEVICE_LOGIN_OTP,
+        });
+        await this.emailEventService.emitNewDeviceLoginOtpEmail(user.email, otpToken.token);
+        throw new UnauthorizedException('Detected new device login');
+      }
+    }
+
+    const payload : JwtAuthPayload = {
+      sub: user.id,
+      userType: user.userType,
+      userId: user.id,
+      email: user.email,
+    };
+
+    const token: string = await this.tokenService.generateJWTtoken(payload);
+
+    const { password, ...rest } = user;
+
+    const data: IUserLoginData = { 
+      id: user.id,
+      token, 
+      userType: user.userType,
+      userId: user.id,
+      email: user.email,
+    };
+
+    return data;
+  }
+
+  async loginSocial(input: LoginUserSocialDto) {
+    const { identity } = input;
+
+    let user;
+
+    user = await this.checkEmailExist(Validators.validateEmail(identity));
+
+    if (!user) {
+      throw new UnauthorizedException('Invalid Credentials');
+    }
+
+    if(user.loginType == LoginType.NORMAL){
+      throw new BadRequestException('login with email/phone and password');
+    }
+    
+    if (user.isDisabled) {
+      throw new NotFoundException('Your account is disabled, contact Admin');
+    }
+
+    if (!user.isEmailVerified || !user.isPhoneVerified){
+      throw new UnauthorizedException('Your account is not verified');
+    }
+
 
     //Detect if the user login with a new device using the x-client-device-toke provided in the request header
     const clientDeviceToken = request.headers['x-client-device-token'] as string;

@@ -6,7 +6,7 @@ import { SmsEventService } from 'src/services/sms/sms-event.service';
 import { TokenService } from 'src/services/token/token.service';
 import { UserRepository } from '../users/repositories/user.repository';
 import { JwtAuthPayload } from './auth.interface';
-import { ChangePasswordDto, ForgotPasswordDto, LoginOtpDto, LoginUserDto, ResetPasswordDto, SignupEmail, SignupPhone, SignUpUserDto, VerifyOtpDto } from './dto/auth.dto';
+import { ChangePasswordDto, ForgotPasswordDto, LoginOtpDto, LoginUserDto, LoginUserSocialDto, ResetPasswordDto, SignupEmail, SignupPhone, SignUpSocialUserDto, SignUpUserDto, VerifyOtpDto } from './dto/auth.dto';
 import { CountryService } from '../countries/services/country.service';
 import { UserService } from '../users/services/user.service';
 import { ClientDeviceService } from '../client-devices/services/client-device.service';
@@ -31,7 +31,14 @@ export declare class AuthService {
         id: string;
         token: string;
     }>;
+    signUpSocial(input: SignUpSocialUserDto): Promise<{
+        email: string;
+        userType: UserType;
+        id: string;
+        token: string;
+    }>;
     login(input: LoginUserDto): Promise<IUserLoginData>;
+    loginSocial(input: LoginUserSocialDto): Promise<IUserLoginData>;
     loginOtp(input: LoginOtpDto): Promise<{
         email: string;
         userType: UserType;

@@ -3,6 +3,7 @@ import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagg
 import { Country } from '../entities/country.entity';
 import { CountryService } from '../services/country.service';
 import { StateService } from '../services/state.service';
+import { LgaService } from '../services/lga.service';
 import { AuthGuard } from '../../auth/guards/auth.guard';
 import { RolesGuard } from '../../auth/guards/roles.guard';
 import { Roles } from '../../auth/decorators/roles.decorator';
@@ -16,6 +17,7 @@ export class CountryController {
   constructor(
     private readonly countryService: CountryService,
     private readonly stateService: StateService,
+    private readonly lgaService: LgaService,
   ) {}
 
   @Get()
@@ -35,8 +37,17 @@ export class CountryController {
     return ResponseUtil.handleResponse(data, 'States retrieved successfully', HttpStatus.OK);
   }
 
+  @Get('states/:stateId/lgas')
+  @ApiOperation({ summary: 'Get all LGAs for a state' })
+  @ApiResponse({ status: 200, description: 'LGAs retrieved successfully' })
+  @ApiResponse({ status: 404, description: 'State not found' })
+  async getLgasByState(@Param('stateId') stateId: string) {
+    const data = await this.lgaService.findByStateId(stateId);
+    return ResponseUtil.handleResponse(data, 'LGAs retrieved successfully', HttpStatus.OK);
+  }
+
   @Get(':id')
-  @Roles(UserType.PEPP_ADMIN, UserType.SUPER_ADMIN)
+  @Roles(UserType.PEPP_ADMIN, UserType.SUPER_ADMIN, UserType.USER, UserType.DRIVER)
   @UseGuards(AuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get country by ID' })

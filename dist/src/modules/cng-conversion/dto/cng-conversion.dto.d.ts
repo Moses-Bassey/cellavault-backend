@@ -1,0 +1,29 @@
+import { TRANSMISSION } from 'src/enums/transmission.enum';
+import { FUEL_TYPE } from 'src/enums/fuel-type.enum';
+import { ENGINE_CONDITION } from 'src/enums/engine-condition.enum';
+export declare class CreateCngConversionDto {
+    fullName: string;
+    email: string;
+    contactPhone: string;
+    nin: string;
+    vehicleRegisterationNo: string;
+    brandOfVehicle: string;
+    color: string;
+    makeOfVehicle: string;
+    yearOfManufacture: string;
+    vinNumber: string;
+    registerationExpiryDate: string;
+    engineCapacity: string;
+    cylinder: string;
+    engineCondition: ENGINE_CONDITION;
+    fuelType: FUEL_TYPE;
+    transmission: TRANSMISSION;
+    mileage: string;
+    usualRoute: string;
+    operatingMotorPark?: string;
+    conversionCenter: string;
+    residentialState: string;
+    lga: string;
+    address: string;
+    additionalNote?: string;
+}

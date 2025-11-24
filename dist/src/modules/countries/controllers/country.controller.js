@@ -17,6 +17,7 @@ const common_1 = require("@nestjs/common");
 const swagger_1 = require("@nestjs/swagger");
 const country_service_1 = require("../services/country.service");
 const state_service_1 = require("../services/state.service");
+const lga_service_1 = require("../services/lga.service");
 const auth_guard_1 = require("../../auth/guards/auth.guard");
 const roles_decorator_1 = require("../../auth/decorators/roles.decorator");
 const user_type_enum_1 = require("../../../enums/user-type.enum");
@@ -24,9 +25,11 @@ const response_utils_1 = require("../../../utils/response.utils");
 let CountryController = class CountryController {
     countryService;
     stateService;
-    constructor(countryService, stateService) {
+    lgaService;
+    constructor(countryService, stateService, lgaService) {
         this.countryService = countryService;
         this.stateService = stateService;
+        this.lgaService = lgaService;
     }
     async findAll() {
         const data = await this.countryService.findAll();
@@ -35,6 +38,10 @@ let CountryController = class CountryController {
     async getStatesByCountry(countryId) {
         const data = await this.stateService.findByCountryId(countryId);
         return response_utils_1.ResponseUtil.handleResponse(data, 'States retrieved successfully', common_1.HttpStatus.OK);
+    }
+    async getLgasByState(stateId) {
+        const data = await this.lgaService.findByStateId(stateId);
+        return response_utils_1.ResponseUtil.handleResponse(data, 'LGAs retrieved successfully', common_1.HttpStatus.OK);
     }
     async findById(id) {
         return await this.countryService.findById(id);
@@ -69,8 +76,18 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], CountryController.prototype, "getStatesByCountry", null);
 __decorate([
+    (0, common_1.Get)('states/:stateId/lgas'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get all LGAs for a state' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'LGAs retrieved successfully' }),
+    (0, swagger_1.ApiResponse)({ status: 404, description: 'State not found' }),
+    __param(0, (0, common_1.Param)('stateId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], CountryController.prototype, "getLgasByState", null);
+__decorate([
     (0, common_1.Get)(':id'),
-    (0, roles_decorator_1.Roles)(user_type_enum_1.UserType.PEPP_ADMIN, user_type_enum_1.UserType.SUPER_ADMIN),
+    (0, roles_decorator_1.Roles)(user_type_enum_1.UserType.PEPP_ADMIN, user_type_enum_1.UserType.SUPER_ADMIN, user_type_enum_1.UserType.USER, user_type_enum_1.UserType.DRIVER),
     (0, common_1.UseGuards)(auth_guard_1.AuthGuard),
     (0, swagger_1.ApiBearerAuth)(),
     (0, swagger_1.ApiOperation)({ summary: 'Get country by ID' }),
@@ -124,6 +141,7 @@ exports.CountryController = CountryController = __decorate([
     (0, swagger_1.ApiTags)('Countries'),
     (0, common_1.Controller)('countries'),
     __metadata("design:paramtypes", [country_service_1.CountryService,
-        state_service_1.StateService])
+        state_service_1.StateService,
+        lga_service_1.LgaService])
 ], CountryController);
 //# sourceMappingURL=country.controller.js.map

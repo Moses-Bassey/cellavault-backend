@@ -11,20 +11,23 @@ const common_1 = require("@nestjs/common");
 const sequelize_1 = require("@nestjs/sequelize");
 const country_entity_1 = require("./entities/country.entity");
 const state_entity_1 = require("./entities/state.entity");
+const lga_entity_1 = require("./entities/lga.entity");
 const country_controller_1 = require("./controllers/country.controller");
 const country_service_1 = require("./services/country.service");
 const state_service_1 = require("./services/state.service");
+const lga_service_1 = require("./services/lga.service");
 const country_repository_1 = require("./repositories/country.repository");
 const state_repository_1 = require("./repositories/state.repository");
+const lga_repository_1 = require("./repositories/lga.repository");
 let CountriesModule = class CountriesModule {
 };
 exports.CountriesModule = CountriesModule;
 exports.CountriesModule = CountriesModule = __decorate([
     (0, common_1.Module)({
-        imports: [sequelize_1.SequelizeModule.forFeature([country_entity_1.Country, state_entity_1.State])],
+        imports: [sequelize_1.SequelizeModule.forFeature([country_entity_1.Country, state_entity_1.State, lga_entity_1.LGA])],
         controllers: [country_controller_1.CountryController],
-        providers: [country_service_1.CountryService, state_service_1.StateService, country_repository_1.CountryRepository, state_repository_1.StateRepository],
-        exports: [country_service_1.CountryService, state_service_1.StateService, country_repository_1.CountryRepository, state_repository_1.StateRepository],
+        providers: [country_service_1.CountryService, state_service_1.StateService, lga_service_1.LgaService, country_repository_1.CountryRepository, state_repository_1.StateRepository, lga_repository_1.LgaRepository],
+        exports: [country_service_1.CountryService, state_service_1.StateService, lga_service_1.LgaService, country_repository_1.CountryRepository, state_repository_1.StateRepository, lga_repository_1.LgaRepository],
     })
 ], CountriesModule);
 //# sourceMappingURL=countries.module.js.map

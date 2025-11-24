@@ -73,6 +73,72 @@ export class SignUpUserDto {
   readonly referalCode: string;
 }
 
+export class SignUpSocialUserDto {
+  @ApiProperty({
+    description: 'Login type',
+    example: 'NORMAL',
+  })
+  @IsEnum(LoginType)
+  readonly loginType: LoginType;
+
+  @ApiProperty({
+    description: 'User email address',
+    example: 'user@example.com',
+  })
+  @IsEmail()
+  @MaxLength(320)
+  email: string;
+
+  @ApiProperty({
+    description: 'User password',
+    example: 'password123',
+  })
+  @IsString()
+  @MinLength(8)
+  password: string;
+
+  @ApiProperty({
+    description: 'User Phone No',
+    example: '+234 8100000000',
+  })
+  @IsString()
+  @MaxLength(15)
+  phoneNo: string;
+
+  @IsString()
+  @MaxLength(6)
+  otpPhone: string;
+
+  @IsString()
+  @MaxLength(6)
+  otpEmail: string;
+
+  @ApiProperty({
+    description: 'Country',
+    example: 'Country',
+  })
+  @IsString()
+  @IsUUID()
+  country: string;
+
+  @ApiProperty({
+    description: 'User full name',
+    example: 'John Doe',
+  })
+  @IsString()
+  @MinLength(4)
+  readonly fullName: string;
+  
+  @ApiProperty({
+    description: 'Referal code',
+    example: '123456',
+  })
+  @IsString()
+  @IsOptional()
+  @MaxLength(10)
+  readonly referalCode: string;
+}
+
 export class LoginUserDto {
   @ApiProperty({
     description: 'User email address or phone number',
@@ -99,6 +165,25 @@ export class LoginUserDto {
   // })
   // @IsString()
   // readonly loginType: LoginType;
+}
+
+export class LoginUserSocialDto {
+  @ApiProperty({
+    description: 'User email address or phone number',
+    example: 'user@example.com or 08100000000',
+  })
+  @IsString()
+  @MinLength(4)
+  @MaxLength(100)
+  readonly identity: string;
+
+
+  @ApiProperty({
+    description: 'Login type',
+    example: 'NORMAL',
+  })
+  @IsString()
+  readonly loginType: LoginType;
 }
 
 export class LoginOtpDto {

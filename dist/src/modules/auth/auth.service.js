@@ -181,6 +181,60 @@ let AuthService = class AuthService {
             token: token
         };
     }
+    async signUpSocial(input) {
+        const country = await this.countryService.findById(input.country);
+        if (!country) {
+            throw new common_1.NotFoundException('Country not found');
+        }
+        input.email = validators_utils_1.Validators.validateEmail(input.email);
+        const emailUser = await this.checkEmailExist(input.email);
+        if (emailUser) {
+            throw new common_1.ConflictException("User with email already exist");
+        }
+        if (!input.country) {
+            throw new common_1.BadRequestException('Must provide a valid country!');
+        }
+        const existingCountry = await this.countryService.findById(input.country);
+        if (!existingCountry) {
+            throw new common_1.ConflictException('Country code not found!');
+        }
+        const phone = utils_1.Utils.normalizeCountryPhone(existingCountry.phoneCode, input.phoneNo, existingCountry.phoneLength);
+        const verifyPhoneOtp = await this.tokenService.verifySignUpOTP({
+            phoneNo: phone,
+            token: input.otpPhone,
+            subject: token_enum_1.TokenSubject.SIGN_UP_PHONE,
+        });
+        if (!verifyPhoneOtp) {
+            throw new common_1.BadRequestException('Invalid OTP');
+        }
+        const password = await password_util_1.PasswordUtil.hashPassword(input.password);
+        const user = await this.userRepository.create({
+            email: input.email,
+            phoneNo: phone,
+            fullName: input.fullName,
+            password: password,
+            countryId: country.id,
+            userType: user_type_enum_1.UserType.USER,
+            loginType: input.loginType,
+            isEmailVerified: true,
+            isPhoneVerified: true,
+            isActive: true,
+        });
+        const payload = {
+            sub: user.id,
+            userType: user_type_enum_1.UserType.USER,
+            userId: user.id,
+            email: input.email
+        };
+        const token = await this.tokenService.generateJWTtoken(payload);
+        await this.emailEventService.emitWelcomeEmail(user.email, user.fullName);
+        return {
+            email: input.email,
+            userType: user_type_enum_1.UserType.USER,
+            id: user.id,
+            token: token
+        };
+    }
     async login(input) {
         const { identity, country } = input;
         const identityType = utils_1.Utils.getLoginIdentityType(identity);
@@ -214,6 +268,52 @@ let AuthService = class AuthService {
         const verifyPassword = await password_util_1.PasswordUtil.verifyPassword(input.password, user.password);
         if (!verifyPassword) {
             throw new common_1.UnauthorizedException('Invalid Credentials');
+        }
+        const clientDeviceToken = express_1.request.headers['x-client-device-token'];
+        if (clientDeviceToken) {
+            const clientDevice = await this.clientDeviceService.findByUserIdAndDeviceToken(user.id, clientDeviceToken);
+            if (!clientDevice) {
+                const otpToken = await this.tokenService.generateOTPtoken({
+                    email: user.email,
+                    expiry: (0, moment_1.default)().add(10, 'minutes').toDate(),
+                    subject: token_enum_1.TokenSubject.NEW_DEVICE_LOGIN_OTP,
+                });
+                await this.emailEventService.emitNewDeviceLoginOtpEmail(user.email, otpToken.token);
+                throw new common_1.UnauthorizedException('Detected new device login');
+            }
+        }
+        const payload = {
+            sub: user.id,
+            userType: user.userType,
+            userId: user.id,
+            email: user.email,
+        };
+        const token = await this.tokenService.generateJWTtoken(payload);
+        const { password, ...rest } = user;
+        const data = {
+            id: user.id,
+            token,
+            userType: user.userType,
+            userId: user.id,
+            email: user.email,
+        };
+        return data;
+    }
+    async loginSocial(input) {
+        const { identity } = input;
+        let user;
+        user = await this.checkEmailExist(validators_utils_1.Validators.validateEmail(identity));
+        if (!user) {
+            throw new common_1.UnauthorizedException('Invalid Credentials');
+        }
+        if (user.loginType == login_type_enum_1.LoginType.NORMAL) {
+            throw new common_1.BadRequestException('login with email/phone and password');
+        }
+        if (user.isDisabled) {
+            throw new common_1.NotFoundException('Your account is disabled, contact Admin');
+        }
+        if (!user.isEmailVerified || !user.isPhoneVerified) {
+            throw new common_1.UnauthorizedException('Your account is not verified');
         }
         const clientDeviceToken = express_1.request.headers['x-client-device-token'];
         if (clientDeviceToken) {

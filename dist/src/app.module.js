@@ -21,6 +21,7 @@ const auth_module_1 = require("./modules/auth/auth.module");
 const users_module_1 = require("./modules/users/users.module");
 const drivers_module_1 = require("./modules/drivers/drivers.module");
 const countries_module_1 = require("./modules/countries/countries.module");
+const cng_conversion_module_1 = require("./modules/cng-conversion/cng-conversion.module");
 const client_devices_module_1 = require("./modules/client-devices/client-devices.module");
 const token_module_1 = require("./services/token/token.module");
 const mail_module_1 = require("./services/mail/mail.module");
@@ -36,7 +37,8 @@ const kyc3_residential_Information_entity_1 = require("./modules/drivers/entitie
 const vehicle_entity_1 = require("./modules/drivers/entities/vehicle.entity");
 const pepp_driver_vehicles_entity_1 = require("./modules/drivers/entities/pepp-driver-vehicles.entity");
 const entities_3 = require("./modules/countries/entities");
-const state_entity_1 = require("./modules/countries/entities/state.entity");
+const cng_conversion_entity_1 = require("./modules/cng-conversion/entities/cng-conversion.entity");
+const cng_station_entity_1 = require("./modules/cng-conversion/entities/cng-station.entity");
 const client_device_entity_1 = require("./modules/client-devices/entities/client-device.entity");
 const entities_4 = require("./services/token/entities");
 let AppModule = class AppModule {
@@ -67,7 +69,10 @@ exports.AppModule = AppModule = __decorate([
                     vehicle_entity_1.Vehicle,
                     pepp_driver_vehicles_entity_1.PeppDriverVehicles,
                     entities_3.Country,
-                    state_entity_1.State,
+                    entities_3.State,
+                    entities_3.LGA,
+                    cng_conversion_entity_1.CngConversion,
+                    cng_station_entity_1.CngStation,
                     client_device_entity_1.ClientDevice,
                     entities_4.Token,
                 ],
@@ -87,6 +92,7 @@ exports.AppModule = AppModule = __decorate([
             users_module_1.UsersModule,
             drivers_module_1.DriversModule,
             countries_module_1.CountriesModule,
+            cng_conversion_module_1.CngConversionModule,
             client_devices_module_1.ClientDevicesModule,
             token_module_1.TokenModule,
             mail_module_1.MailModule,

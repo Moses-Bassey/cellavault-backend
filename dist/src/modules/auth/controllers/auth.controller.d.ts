@@ -1,6 +1,6 @@
 import type { Request as ExpressRequest } from 'express';
 import { AuthService } from '../auth.service';
-import { ChangePasswordDto, ForgotPasswordDto, LoginOtpDto, LoginUserDto, ResetPasswordDto, SignupEmail, SignupPhone, SignUpUserDto, VerifyOtpDto } from '../dto/auth.dto';
+import { ChangePasswordDto, ForgotPasswordDto, LoginOtpDto, LoginUserDto, ResetPasswordDto, SignupEmail, SignupPhone, SignUpSocialUserDto, SignUpUserDto, VerifyOtpDto } from '../dto/auth.dto';
 export declare class AuthController {
     private readonly authService;
     constructor(authService: AuthService);
@@ -14,6 +14,13 @@ export declare class AuthController {
         id: string;
         token: string;
     }>>;
+    signUpGoogle(input: SignUpSocialUserDto): Promise<import("src/utils/response.utils").ApiResponse<{
+        email: string;
+        userType: import("../../../enums").UserType;
+        id: string;
+        token: string;
+    }>>;
+    loginSocial(input: LoginUserDto): Promise<import("src/utils/response.utils").ApiResponse<import("../../../shared/interfaces/auth.interface").IUserLoginData>>;
     login(input: LoginUserDto): Promise<import("src/utils/response.utils").ApiResponse<import("../../../shared/interfaces/auth.interface").IUserLoginData>>;
     loginOtp(input: LoginOtpDto): Promise<import("src/utils/response.utils").ApiResponse<{
         email: string;

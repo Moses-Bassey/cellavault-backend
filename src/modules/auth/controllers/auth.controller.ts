@@ -18,6 +18,7 @@ import {
   ResetPasswordDto,
   SignupEmail,
   SignupPhone,
+  SignUpSocialUserDto,
   SignUpUserDto,
   VerifyOtpDto,
 } from '../dto/auth.dto';
@@ -63,6 +64,20 @@ export class AuthController {
   async signUp(@Body() input: SignUpUserDto) {
     const data = await this.authService.signUp(input);
     return ResponseUtil.handleResponse(data, 'User created successfully', HttpStatus.CREATED);
+  }
+
+  @Post('sign-up-social')
+  @HttpCode(HttpStatus.CREATED)
+  async signUpGoogle(@Body() input: SignUpSocialUserDto) {
+    const data = await this.authService.signUpSocial(input);
+    return ResponseUtil.handleResponse(data, 'User created successfully', HttpStatus.CREATED);
+  }
+
+  @Post('login-social')
+  @HttpCode(HttpStatus.OK)
+  async loginSocial(@Body() input: LoginUserDto) {
+    const data = await this.authService.login(input);
+    return ResponseUtil.handleResponse(data, 'Login Successful', HttpStatus.OK);
   }
 
   @Post('login')
