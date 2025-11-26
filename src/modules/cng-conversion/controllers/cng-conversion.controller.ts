@@ -30,8 +30,7 @@ export class CngConversionController {
   @ApiResponse({ status: 201, description: 'CNG conversion request created successfully' })
   async create(@Body() cngConversionData: CreateCngConversionDto, @Request() req: ExpressRequest & { user: JwtAuthPayload }) {
     const userId = Validators.validateUuid(req.user.userId);
-    const userType = req.user.userType;
-    const data = await this.cngConversionService.create(userId, userType, cngConversionData);
+    const data = await this.cngConversionService.create(userId, req.user.userType, cngConversionData);
     return ResponseUtil.handleResponse(data, 'CNG conversion request created successfully', HttpStatus.CREATED);
   }
 

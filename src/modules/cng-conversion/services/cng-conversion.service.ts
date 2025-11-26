@@ -86,48 +86,48 @@ export class CngConversionService {
     try{
         let validUserId: string | undefined = undefined;
     
-    if (userType === UserType.USER) {
-      // Validate that the user exists
-      const user = await this.userService.fetchUser(userId);
-      if (!user) {
-        throw new NotFoundException('User not found');
+      if (userType === UserType.USER) {
+        // Validate that the user exists
+        const user = await this.userService.fetchUser(userId);
+        if (!user) {
+          throw new NotFoundException('User not found');
+        }
+        validUserId = userId;
       }
-      validUserId = userId;
-    }
-    // For DRIVER or other types, userId will be undefined (null in DB)
+      // For DRIVER or other types, userId will be undefined (null in DB)
 
-    const data = await this.cngConversionRepository.create({
-      fullName: cngConversionData.fullName,
-      userId: validUserId,
-      email: cngConversionData.email,
-      contactPhone: cngConversionData.contactPhone,
-      nin: cngConversionData.nin,
-      vehicleRegisterationNo: cngConversionData.vehicleRegisterationNo,
-      brandOfVehicle: cngConversionData.brandOfVehicle,
-      color: cngConversionData.color,
-      makeOfVehicle: cngConversionData.makeOfVehicle,
-      yearOfManufacture: cngConversionData.yearOfManufacture,
-      vinNumber: cngConversionData.vinNumber,
-      registerationExpiryDate: new Date(cngConversionData.registerationExpiryDate),
-      engineCapacity: cngConversionData.engineCapacity,
-      cylinder: cngConversionData.cylinder,
-      engineCondition: cngConversionData.engineCondition,
-      fuelType: cngConversionData.fuelType,
-      transmission: cngConversionData.transmission,
-      mileage: cngConversionData.mileage,
-      usualRoute: cngConversionData.usualRoute,
-      operatingMotorPark: cngConversionData.operatingMotorPark,
-      conversionCenter: cngConversionData.conversionCenter,
-      residentialState: cngConversionData.residentialState,
-      lga: cngConversionData.lga,
-      address: cngConversionData.address,
-      additionalNote: cngConversionData.additionalNote,
-    });
+      const data = await this.cngConversionRepository.create({
+        fullName: cngConversionData.fullName,
+        userId: validUserId,
+        email: cngConversionData.email,
+        contactPhone: cngConversionData.contactPhone,
+        nin: cngConversionData.nin,
+        vehicleRegisterationNo: cngConversionData.vehicleRegisterationNo,
+        brandOfVehicle: cngConversionData.brandOfVehicle,
+        color: cngConversionData.color,
+        makeOfVehicle: cngConversionData.makeOfVehicle,
+        yearOfManufacture: cngConversionData.yearOfManufacture,
+        vinNumber: cngConversionData.vinNumber,
+        registerationExpiryDate: new Date(cngConversionData.registerationExpiryDate),
+        engineCapacity: cngConversionData.engineCapacity,
+        cylinder: cngConversionData.cylinder,
+        engineCondition: cngConversionData.engineCondition,
+        fuelType: cngConversionData.fuelType,
+        transmission: cngConversionData.transmission,
+        mileage: cngConversionData.mileage,
+        usualRoute: cngConversionData.usualRoute,
+        operatingMotorPark: cngConversionData.operatingMotorPark,
+        conversionCenter: cngConversionData.conversionCenter,
+        residentialState: cngConversionData.residentialState,
+        lga: cngConversionData.lga,
+        address: cngConversionData.address,
+        additionalNote: cngConversionData.additionalNote,
+      });
 
-    return cngConversionData;
-    } catch (error) {
-      throw new BadRequestException(error.message);
-    }
+      return cngConversionData;
+      } catch (error) {
+        throw new BadRequestException(error.message);
+      }
     
   }
 

@@ -32,46 +32,59 @@ export class GuarantorService {
   }
 
   async create(driverId: string, guarantorData: CreateGuarantorDto): Promise<Guarantor> {
-    const count = await this.guarantorRepository.countByDriverId(driverId);
+
+    try {
+      const count = await this.guarantorRepository.countByDriverId(driverId);
     
-    const driver = await this.driverService.findById(driverId);
-    if (!driver) {
-      throw new BadRequestException('Driver not found');
+      const driver = await this.driverService.findById(driverId);
+      if (!driver) {
+        throw new BadRequestException('Driver not found');
+      }
+
+      if (count > this.MAX_GUARANTORS) {
+        throw new BadRequestException(`Maximum of ${this.MAX_GUARANTORS} guarantors allowed per driver`);
+      }
+
+      const country = await this.countryService.findById(guarantorData.country);
+      if (!country) {
+        throw new BadRequestException('Country not found');
+      }
+
+      if (guarantorData.phoneNo.length !== country.phoneLength) {
+        throw new BadRequestException(`Phone number must be exactly ${country.phoneLength} digits`);
+      }
+
+      const phone = Utils.normalizeCountryPhone(country.phoneCode, guarantorData.phoneNo, country.phoneLength);
+      const email = Validators.validateEmail(guarantorData.email);
+
+      if(driver.email == email || driver.phoneNo == phone){
+        throw new BadRequestException("You cannot be a guarantor")
+      }
+
+      const data = await this.guarantorRepository.create({
+        fullName: guarantorData.fullName,
+        phoneNo: phone,
+        email: email,
+        identificationImageUrl: guarantorData.identificationImageUrl,
+        utilityBillImageUrl: guarantorData.utilityBillImageUrl,
+        policeClearanceImageUrl: guarantorData.policeClearanceImageUrl,
+        reference: guarantorData.reference,
+        countryId: country.id,
+        driverId,
+      });
+
+      if(count == 1) {
+        if (data.id) {
+          await this.driverService.update(driverId, {
+            isGuarantorCompleted: true,
+          });
+        }
+      }
+
+      return data;
+    } catch (error) {
+      throw new BadRequestException(error.message);
     }
-
-    if (count >= this.MAX_GUARANTORS) {
-      throw new BadRequestException(`Maximum of ${this.MAX_GUARANTORS} guarantors allowed per driver`);
-    }
-
-    const country = await this.countryService.findById(guarantorData.country);
-    if (!country) {
-      throw new BadRequestException('Country not found');
-    }
-
-    if (guarantorData.phoneNo.length !== country.phoneLength) {
-      throw new BadRequestException(`Phone number must be exactly ${country.phoneLength} digits`);
-    }
-
-    const phone = Utils.normalizeCountryPhone(country.phoneCode, guarantorData.phoneNo, country.phoneLength);
-    const email = Validators.validateEmail(guarantorData.email);
-
-    if(driver.email == email || driver.phoneNo == phone){
-      throw new BadRequestException("You cannot be a guarantor")
-    }
-
-    const data = await this.guarantorRepository.create({
-      fullName: guarantorData.fullName,
-      phoneNo: phone,
-      email: email,
-      identificationImageUrl: guarantorData.identificationImageUrl,
-      utilityBillImageUrl: guarantorData.utilityBillImageUrl,
-      policeClearanceImageUrl: guarantorData.policeClearanceImageUrl,
-      reference: guarantorData.reference,
-      countryId: country.id,
-      driverId,
-    });
-
-    return data;
   }
 
   async update(id: string, guarantorData: Partial<Guarantor>): Promise<[number, Guarantor[]]> {

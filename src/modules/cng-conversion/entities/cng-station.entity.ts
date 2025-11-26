@@ -69,3 +69,4 @@ export class CngStation extends Model<CngStation> {
   public declare deletedAt: Date | null;
 }
 
+

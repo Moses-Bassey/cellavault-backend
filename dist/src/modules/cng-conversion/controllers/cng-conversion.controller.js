@@ -32,8 +32,7 @@ let CngConversionController = class CngConversionController {
     }
     async create(cngConversionData, req) {
         const userId = validators_utils_1.Validators.validateUuid(req.user.userId);
-        const userType = req.user.userType;
-        const data = await this.cngConversionService.create(userId, userType, cngConversionData);
+        const data = await this.cngConversionService.create(userId, req.user.userType, cngConversionData);
         return response_utils_1.ResponseUtil.handleResponse(data, 'CNG conversion request created successfully', common_1.HttpStatus.CREATED);
     }
     async getTransmissions() {

@@ -63,3 +63,4 @@ export class LGA extends Model<LGA> {
   public declare deletedAt: Date | null;
 }
 
+

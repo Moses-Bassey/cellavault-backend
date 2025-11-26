@@ -37,38 +37,50 @@ let GuarantorService = class GuarantorService {
         return await this.guarantorRepository.countByDriverId(driverId);
     }
     async create(driverId, guarantorData) {
-        const count = await this.guarantorRepository.countByDriverId(driverId);
-        const driver = await this.driverService.findById(driverId);
-        if (!driver) {
-            throw new common_1.BadRequestException('Driver not found');
+        try {
+            const count = await this.guarantorRepository.countByDriverId(driverId);
+            const driver = await this.driverService.findById(driverId);
+            if (!driver) {
+                throw new common_1.BadRequestException('Driver not found');
+            }
+            if (count > this.MAX_GUARANTORS) {
+                throw new common_1.BadRequestException(`Maximum of ${this.MAX_GUARANTORS} guarantors allowed per driver`);
+            }
+            const country = await this.countryService.findById(guarantorData.country);
+            if (!country) {
+                throw new common_1.BadRequestException('Country not found');
+            }
+            if (guarantorData.phoneNo.length !== country.phoneLength) {
+                throw new common_1.BadRequestException(`Phone number must be exactly ${country.phoneLength} digits`);
+            }
+            const phone = utils_1.Utils.normalizeCountryPhone(country.phoneCode, guarantorData.phoneNo, country.phoneLength);
+            const email = validators_utils_1.Validators.validateEmail(guarantorData.email);
+            if (driver.email == email || driver.phoneNo == phone) {
+                throw new common_1.BadRequestException("You cannot be a guarantor");
+            }
+            const data = await this.guarantorRepository.create({
+                fullName: guarantorData.fullName,
+                phoneNo: phone,
+                email: email,
+                identificationImageUrl: guarantorData.identificationImageUrl,
+                utilityBillImageUrl: guarantorData.utilityBillImageUrl,
+                policeClearanceImageUrl: guarantorData.policeClearanceImageUrl,
+                reference: guarantorData.reference,
+                countryId: country.id,
+                driverId,
+            });
+            if (count == 1) {
+                if (data.id) {
+                    await this.driverService.update(driverId, {
+                        isGuarantorCompleted: true,
+                    });
+                }
+            }
+            return data;
         }
-        if (count >= this.MAX_GUARANTORS) {
-            throw new common_1.BadRequestException(`Maximum of ${this.MAX_GUARANTORS} guarantors allowed per driver`);
+        catch (error) {
+            throw new common_1.BadRequestException(error.message);
         }
-        const country = await this.countryService.findById(guarantorData.country);
-        if (!country) {
-            throw new common_1.BadRequestException('Country not found');
-        }
-        if (guarantorData.phoneNo.length !== country.phoneLength) {
-            throw new common_1.BadRequestException(`Phone number must be exactly ${country.phoneLength} digits`);
-        }
-        const phone = utils_1.Utils.normalizeCountryPhone(country.phoneCode, guarantorData.phoneNo, country.phoneLength);
-        const email = validators_utils_1.Validators.validateEmail(guarantorData.email);
-        if (driver.email == email || driver.phoneNo == phone) {
-            throw new common_1.BadRequestException("You cannot be a guarantor");
-        }
-        const data = await this.guarantorRepository.create({
-            fullName: guarantorData.fullName,
-            phoneNo: phone,
-            email: email,
-            identificationImageUrl: guarantorData.identificationImageUrl,
-            utilityBillImageUrl: guarantorData.utilityBillImageUrl,
-            policeClearanceImageUrl: guarantorData.policeClearanceImageUrl,
-            reference: guarantorData.reference,
-            countryId: country.id,
-            driverId,
-        });
-        return data;
     }
     async update(id, guarantorData) {
         return await this.guarantorRepository.update(id, guarantorData);
