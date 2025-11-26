@@ -131,10 +131,19 @@ let TokenService = class TokenService {
         return { token: userToken.token };
     }
     async generateOTPtoken(payload) {
-        const token = randomstring.generate({
-            length: 6,
-            charset: 'numeric',
-        });
+        let token = '';
+        if (payload.phoneNo) {
+            token = process.env.NODE_ENV === 'development' ? '123456' : randomstring.generate({
+                length: 6,
+                charset: 'numeric',
+            });
+        }
+        else {
+            token = randomstring.generate({
+                length: 6,
+                charset: 'numeric',
+            });
+        }
         const created = await this.tokenRepository.create({
             ...payload,
             token: token,

@@ -5,9 +5,7 @@ import { CreateAccountDto } from '../dto/auth.driver.dto';
 export declare class AuthDriverController {
     private readonly authService;
     constructor(authService: AuthDriverService);
-    signUpPhoneNo(input: SignupPhone): Promise<import("src/utils/response.utils").ApiResponse<{
-        otpToken: string;
-    }>>;
+    signUpPhoneNo(input: SignupPhone): Promise<import("src/utils/response.utils").ApiResponse<{}>>;
     signUpEmail(input: SignupEmail): Promise<import("src/utils/response.utils").ApiResponse<null>>;
     verifyOtp(input: VerifyOtpDto): Promise<import("src/utils/response.utils").ApiResponse<VerifyOtpDto>>;
     signUp(input: CreateAccountDto): Promise<import("src/utils/response.utils").ApiResponse<import("../../../shared/interfaces/auth.interface").IDriverLoginData>>;

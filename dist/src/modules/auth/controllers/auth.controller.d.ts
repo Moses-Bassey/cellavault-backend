@@ -4,7 +4,7 @@ import { ChangePasswordDto, ForgotPasswordDto, LoginOtpDto, LoginUserDto, ResetP
 export declare class AuthController {
     private readonly authService;
     constructor(authService: AuthService);
-    signUpPhoneNo(input: SignupPhone): Promise<import("src/utils/response.utils").ApiResponse<void>>;
+    signUpPhoneNo(input: SignupPhone): Promise<import("src/utils/response.utils").ApiResponse<{}>>;
     signUpEmail(input: SignupEmail): Promise<import("src/utils/response.utils").ApiResponse<null>>;
     verifyOtp(input: VerifyOtpDto): Promise<import("src/utils/response.utils").ApiResponse<VerifyOtpDto>>;
     verifyPasswordResetOtp(input: VerifyOtpDto): Promise<import("src/utils/response.utils").ApiResponse<VerifyOtpDto>>;

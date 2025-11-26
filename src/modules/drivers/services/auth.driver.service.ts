@@ -72,7 +72,7 @@ import { KYC_COMPLETED } from 'src/enums/kyc.enums';
       // Send SMS with OTP
       await this.smsEventService.emitSignUpOtpSms(Utils.phoneSMSFormat(phone), otpToken.token);
       
-      return {otpToken: otpToken.token};
+      return {};
     }
   
     async signUpEmail(input: SignupEmail){

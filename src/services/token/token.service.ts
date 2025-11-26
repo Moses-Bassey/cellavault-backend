@@ -114,10 +114,18 @@ export class TokenService {
   }
 
   async generateOTPtoken(payload: CreateTokenDto) : Promise<ITokenInterface & { token: string }> {
-    const token = randomstring.generate({
-      length: 6,
-      charset: 'numeric',
-    })
+    let token = '';
+    if (payload.phoneNo) {
+      token = process.env.NODE_ENV === 'development' ? '123456' : randomstring.generate({
+        length: 6,
+        charset: 'numeric',
+      })
+    } else {
+      token = randomstring.generate({
+        length: 6,
+        charset: 'numeric',
+      })
+    }
     
     const created = await this.tokenRepository.create({
       ...payload,

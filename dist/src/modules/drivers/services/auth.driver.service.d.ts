@@ -17,9 +17,7 @@ export declare class AuthDriverService {
     private readonly countryService;
     private readonly clientDeviceService;
     constructor(driverRepository: DriverRepository, tokenService: TokenService, emailEventService: EmailEventService, smsEventService: SmsEventService, countryService: CountryService, clientDeviceService: ClientDeviceService);
-    signUpPhoneNo(input: SignupPhone): Promise<{
-        otpToken: string;
-    }>;
+    signUpPhoneNo(input: SignupPhone): Promise<{}>;
     signUpEmail(input: SignupEmail): Promise<null>;
     verifyOtp(input: VerifyOtpDto): Promise<VerifyOtpDto>;
     createAccount(input: CreateAccountDto): Promise<IDriverLoginData>;
