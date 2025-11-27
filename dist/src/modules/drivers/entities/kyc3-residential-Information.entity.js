@@ -13,10 +13,16 @@ exports.kyc3ResidentialInformation = void 0;
 const sequelize_typescript_1 = require("sequelize-typescript");
 const driver_entity_1 = require("./driver.entity");
 const state_entity_1 = require("../../countries/entities/state.entity");
+const proof_of_address_type_enum_1 = require("../../../enums/proof-of-address-type.enum");
 let kyc3ResidentialInformation = class kyc3ResidentialInformation extends sequelize_typescript_1.Model {
     stateId;
     state;
     city;
+    streetAddress;
+    landmark;
+    postalOrZipCode;
+    proofOfAddressType;
+    proofOfAddressImage;
     verified;
     driverId;
     driver;
@@ -47,6 +53,47 @@ __decorate([
     }),
     __metadata("design:type", String)
 ], kyc3ResidentialInformation.prototype, "city", void 0);
+__decorate([
+    sequelize_typescript_1.AllowNull,
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.STRING(500),
+        allowNull: true,
+    }),
+    __metadata("design:type", String)
+], kyc3ResidentialInformation.prototype, "streetAddress", void 0);
+__decorate([
+    sequelize_typescript_1.AllowNull,
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.STRING(255),
+        allowNull: true,
+    }),
+    __metadata("design:type", String)
+], kyc3ResidentialInformation.prototype, "landmark", void 0);
+__decorate([
+    sequelize_typescript_1.AllowNull,
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.STRING(20),
+        allowNull: true,
+    }),
+    __metadata("design:type", String)
+], kyc3ResidentialInformation.prototype, "postalOrZipCode", void 0);
+__decorate([
+    sequelize_typescript_1.AllowNull,
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.ENUM,
+        values: Object.values(proof_of_address_type_enum_1.PROOF_OF_ADDRESS_TYPE),
+        allowNull: true,
+    }),
+    __metadata("design:type", String)
+], kyc3ResidentialInformation.prototype, "proofOfAddressType", void 0);
+__decorate([
+    sequelize_typescript_1.AllowNull,
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.STRING(1000),
+        allowNull: true,
+    }),
+    __metadata("design:type", String)
+], kyc3ResidentialInformation.prototype, "proofOfAddressImage", void 0);
 __decorate([
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.BOOLEAN,

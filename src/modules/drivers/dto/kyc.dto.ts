@@ -12,6 +12,7 @@ import {
 } from 'class-validator';
 import { GENDER } from 'src/enums/gender.enum';
 import { IDENTIFICATION_TYPE } from 'src/enums/identification.enums';
+import { PROOF_OF_ADDRESS_TYPE } from 'src/enums/proof-of-address-type.enum';
 
 // KYC1 Personal Information DTO
 export class CreateKyc1Dto {
@@ -143,6 +144,56 @@ export class CreateKyc3Dto {
   @MinLength(2)
   @MaxLength(255)
   city: string;
+
+  @ApiProperty({
+    description: 'Street address',
+    example: '123 Main Street',
+    required: false,
+  })
+  @IsString()
+  @IsOptional()
+  @MaxLength(500)
+  streetAddress?: string;
+
+  @ApiProperty({
+    description: 'Landmark',
+    example: 'Near the shopping mall',
+    required: false,
+  })
+  @IsString()
+  @IsOptional()
+  @MaxLength(255)
+  landmark?: string;
+
+  @ApiProperty({
+    description: 'Postal or Zip code',
+    example: '100001',
+    required: false,
+  })
+  @IsString()
+  @IsOptional()
+  @MaxLength(20)
+  postalOrZipCode?: string;
+
+  @ApiProperty({
+    description: 'Proof of address type',
+    example: PROOF_OF_ADDRESS_TYPE.UTILITY_BILL,
+    enum: PROOF_OF_ADDRESS_TYPE,
+    required: false,
+  })
+  @IsEnum(PROOF_OF_ADDRESS_TYPE)
+  @IsOptional()
+  proofOfAddressType?: PROOF_OF_ADDRESS_TYPE;
+
+  @ApiProperty({
+    description: 'Proof of address image URL',
+    example: 'https://example.com/proof-of-address.jpg',
+    required: false,
+  })
+  @IsString()
+  @IsOptional()
+  @MaxLength(1000)
+  proofOfAddressImage?: string;
 }
 
 

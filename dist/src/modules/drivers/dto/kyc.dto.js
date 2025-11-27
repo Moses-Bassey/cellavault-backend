@@ -14,6 +14,7 @@ const swagger_1 = require("@nestjs/swagger");
 const class_validator_1 = require("class-validator");
 const gender_enum_1 = require("../../../enums/gender.enum");
 const identification_enums_1 = require("../../../enums/identification.enums");
+const proof_of_address_type_enum_1 = require("../../../enums/proof-of-address-type.enum");
 class CreateKyc1Dto {
     fullName;
     phoneNo;
@@ -156,6 +157,11 @@ __decorate([
 class CreateKyc3Dto {
     stateId;
     city;
+    streetAddress;
+    landmark;
+    postalOrZipCode;
+    proofOfAddressType;
+    proofOfAddressImage;
 }
 exports.CreateKyc3Dto = CreateKyc3Dto;
 __decorate([
@@ -176,6 +182,61 @@ __decorate([
     (0, class_validator_1.MaxLength)(255),
     __metadata("design:type", String)
 ], CreateKyc3Dto.prototype, "city", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        description: 'Street address',
+        example: '123 Main Street',
+        required: false,
+    }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.MaxLength)(500),
+    __metadata("design:type", String)
+], CreateKyc3Dto.prototype, "streetAddress", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        description: 'Landmark',
+        example: 'Near the shopping mall',
+        required: false,
+    }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.MaxLength)(255),
+    __metadata("design:type", String)
+], CreateKyc3Dto.prototype, "landmark", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        description: 'Postal or Zip code',
+        example: '100001',
+        required: false,
+    }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.MaxLength)(20),
+    __metadata("design:type", String)
+], CreateKyc3Dto.prototype, "postalOrZipCode", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        description: 'Proof of address type',
+        example: proof_of_address_type_enum_1.PROOF_OF_ADDRESS_TYPE.UTILITY_BILL,
+        enum: proof_of_address_type_enum_1.PROOF_OF_ADDRESS_TYPE,
+        required: false,
+    }),
+    (0, class_validator_1.IsEnum)(proof_of_address_type_enum_1.PROOF_OF_ADDRESS_TYPE),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateKyc3Dto.prototype, "proofOfAddressType", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        description: 'Proof of address image URL',
+        example: 'https://example.com/proof-of-address.jpg',
+        required: false,
+    }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.MaxLength)(1000),
+    __metadata("design:type", String)
+], CreateKyc3Dto.prototype, "proofOfAddressImage", void 0);
 class ValidateBankAccountDto {
     bankCode;
     accountNo;

@@ -14,6 +14,7 @@ import {
 } from 'sequelize-typescript';
 import { Driver } from './driver.entity';
 import { State } from '../../countries/entities/state.entity';
+import { PROOF_OF_ADDRESS_TYPE } from '../../../enums/proof-of-address-type.enum';
 
 @Table({
   tableName: 'driver_kyc_3_residential_information',
@@ -47,6 +48,42 @@ export class kyc3ResidentialInformation extends Model<kyc3ResidentialInformation
   })
   public city: string;
   //a city model is required, for now we use string
+
+  @AllowNull
+  @Column({
+    type: DataType.STRING(500),
+    allowNull: true,
+  })
+  public streetAddress: string;
+
+  @AllowNull
+  @Column({
+    type: DataType.STRING(255),
+    allowNull: true,
+  })
+  public landmark: string;
+
+  @AllowNull
+  @Column({
+    type: DataType.STRING(20),
+    allowNull: true,
+  })
+  public postalOrZipCode: string;
+
+  @AllowNull
+  @Column({
+    type: DataType.ENUM,
+    values: Object.values(PROOF_OF_ADDRESS_TYPE),
+    allowNull: true,
+  })
+  public proofOfAddressType: PROOF_OF_ADDRESS_TYPE;
+
+  @AllowNull
+  @Column({
+    type: DataType.STRING(1000),
+    allowNull: true,
+  })
+  public proofOfAddressImage: string;
 
   @Column({
     type: DataType.BOOLEAN,

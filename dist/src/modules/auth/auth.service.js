@@ -50,38 +50,48 @@ let AuthService = class AuthService {
         this.clientDeviceService = clientDeviceService;
     }
     async signUpPhoneNo(input) {
-        const { country, phoneNo } = input;
-        const existingCountry = await this.countryService.findById(country);
-        if (!existingCountry) {
-            throw new common_1.ConflictException('Country code not found!');
+        try {
+            const { country, phoneNo } = input;
+            const existingCountry = await this.countryService.findById(country);
+            if (!existingCountry) {
+                throw new common_1.ConflictException('Country code not found!');
+            }
+            const phone = utils_1.Utils.normalizeCountryPhone(existingCountry.phoneCode, phoneNo, existingCountry.phoneLength);
+            const existingUser = await this.userRepository.findByPhone(phone);
+            if (existingUser) {
+                throw new common_1.ConflictException('User with this phoneNo already exist');
+            }
+            const otpToken = await this.tokenService.generateOTPtoken({
+                phoneNo: phone,
+                expiry: (0, moment_1.default)().add(10, 'minutes').toDate(),
+                subject: token_enum_1.TokenSubject.SIGN_UP_PHONE,
+            });
+            await this.smsEventService.emitSignUpOtpSms(utils_1.Utils.phoneSMSFormat(phone), otpToken.token);
+            return {};
         }
-        const phone = utils_1.Utils.normalizeCountryPhone(existingCountry.phoneCode, phoneNo, existingCountry.phoneLength);
-        const existingUser = await this.userRepository.findByPhone(phone);
-        if (existingUser) {
-            throw new common_1.ConflictException('User with this phoneNo already exist');
+        catch (error) {
+            throw new common_1.BadRequestException(error);
         }
-        const otpToken = await this.tokenService.generateOTPtoken({
-            phoneNo: phone,
-            expiry: (0, moment_1.default)().add(10, 'minutes').toDate(),
-            subject: token_enum_1.TokenSubject.SIGN_UP_PHONE,
-        });
-        await this.smsEventService.emitSignUpOtpSms(utils_1.Utils.phoneSMSFormat(phone), otpToken.token);
-        return {};
     }
     async signUpEmail(input) {
-        input.email = validators_utils_1.Validators.validateEmail(input.email);
-        const existingUser = await this.userRepository.findByEmail(input.email);
-        if (existingUser) {
-            throw new common_1.ConflictException('User with this email already exist');
+        try {
+            input.email = validators_utils_1.Validators.validateEmail(input.email);
+            const existingUser = await this.userRepository.findByEmail(input.email);
+            if (existingUser) {
+                throw new common_1.ConflictException('User with this email already exist');
+            }
+            const expiryDate = (0, moment_1.default)().add(10, 'minutes').toDate();
+            const otpToken = await this.tokenService.generateOTPtoken({
+                email: input.email,
+                expiry: expiryDate,
+                subject: token_enum_1.TokenSubject.SIGN_UP_EMAIL,
+            });
+            await this.emailEventService.emitSignUpOtpEmail(input.email, otpToken.token, expiryDate.toISOString());
+            return null;
         }
-        const expiryDate = (0, moment_1.default)().add(10, 'minutes').toDate();
-        const otpToken = await this.tokenService.generateOTPtoken({
-            email: input.email,
-            expiry: expiryDate,
-            subject: token_enum_1.TokenSubject.SIGN_UP_EMAIL,
-        });
-        await this.emailEventService.emitSignUpOtpEmail(input.email, otpToken.token, expiryDate.toISOString());
-        return null;
+        catch (error) {
+            throw new common_1.BadRequestException(error);
+        }
     }
     async verifyOtp(input) {
         const { token, subject, email, phoneNo, country } = input;

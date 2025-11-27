@@ -56,7 +56,9 @@ export class AuthService {
 
   async signUpPhoneNo(input: SignupPhone){
 
-    const { country, phoneNo } = input;
+    try {
+
+      const { country, phoneNo } = input;
 
     const existingCountry = await this.countryService.findById(country)
     if (!existingCountry){
@@ -80,26 +82,34 @@ export class AuthService {
     await this.smsEventService.emitSignUpOtpSms(Utils.phoneSMSFormat(phone), otpToken.token);
     
     return {};
+      
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
   }
 
   async signUpEmail(input: SignupEmail){
-    input.email = Validators.validateEmail(input.email);
-    const existingUser= await this.userRepository.findByEmail(input.email);
+    try{
+      input.email = Validators.validateEmail(input.email);
+      const existingUser= await this.userRepository.findByEmail(input.email);
 
-    if(existingUser){
-      throw new ConflictException('User with this email already exist');
+      if(existingUser){
+        throw new ConflictException('User with this email already exist');
+      }
+      const expiryDate = moment().add(10, 'minutes').toDate();
+      const otpToken = await this.tokenService.generateOTPtoken({
+        email: input.email,
+        expiry: expiryDate,
+        subject: TokenSubject.SIGN_UP_EMAIL,
+      })
+
+      // Send forget password email
+      await this.emailEventService.emitSignUpOtpEmail(input.email, otpToken.token, expiryDate.toISOString());    
+
+      return null;
+    } catch (error) {
+      throw new BadRequestException(error);
     }
-    const expiryDate = moment().add(10, 'minutes').toDate();
-    const otpToken = await this.tokenService.generateOTPtoken({
-      email: input.email,
-      expiry: expiryDate,
-      subject: TokenSubject.SIGN_UP_EMAIL,
-    })
-
-    // Send forget password email
-    await this.emailEventService.emitSignUpOtpEmail(input.email, otpToken.token, expiryDate.toISOString());    
-
-    return null;
   }
 
   async verifyOtp(input: VerifyOtpDto) {
