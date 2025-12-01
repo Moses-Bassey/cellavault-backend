@@ -76,5 +76,4 @@ export class UserController {
       HttpStatus.OK,
     );
   }
-
 }

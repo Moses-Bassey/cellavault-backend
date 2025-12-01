@@ -13,7 +13,7 @@ module.exports = {
         allowNull: false,
       },
       phoneNo: {
-        type: DataTypes.STRING(15),
+        type: DataTypes.STRING(300),
         allowNull: false,
         unique: true,
       },

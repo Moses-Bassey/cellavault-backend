@@ -1,6 +1,7 @@
 import {
     Body,
     Controller,
+    Delete,
     HttpCode,
     HttpStatus,
     Patch,
@@ -21,7 +22,7 @@ import {
   } from '../dto/auth.driver.dto';
   import { Auth } from '../../auth/decorators/auth.decorator';
   import { AuthGuard } from '../../auth/guards/auth.guard';
-  import { ApiBearerAuth } from '@nestjs/swagger';
+  import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
   import { AuthDriverService } from '../services/auth.driver.service';
   import { CreateAccountDto } from '../dto/auth.driver.dto';
   import { ResponseUtil } from 'src/utils/response.utils';
@@ -100,6 +101,26 @@ import {
     ) {
       const data = await this.authService.changePassword(input, req.user);
       return ResponseUtil.handleResponse(data, 'Password changed successfully', HttpStatus.OK);
+    }
+
+    @Delete()
+    @HttpCode(HttpStatus.OK)
+    @ApiOperation({ summary: 'Delete user account' })
+    @ApiResponse({
+      status: 200,
+      description: 'User account deleted successfully'
+    })
+    @ApiResponse({ status: 404, description: 'User not found' })
+    async deleteDriverAccount(
+      @Body() userCredentials: { email: string; password: string },
+    ) {
+      const { email, password } = userCredentials;
+      const data = await this.authService.deleteUserAccount(email, password);
+      return ResponseUtil.handleResponse(
+        {},
+        'Driver account deleted successfully',
+        HttpStatus.OK,
+      );
     }
   }
   

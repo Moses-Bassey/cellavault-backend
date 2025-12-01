@@ -38,7 +38,7 @@ export class User extends Model<User> {
   public fullName: string;
 
   @Unique
-  @Column(DataType.STRING(15))
+  @Column(DataType.STRING(300))
   public phoneNo: string;
 
   @Unique

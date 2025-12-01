@@ -6,6 +6,7 @@ import { ClientDeviceService } from 'src/modules/client-devices/services/client-
 import { DashboardDto } from '../dto/user.dto';
 import { DriverService } from 'src/modules/drivers/services/driver.service';
 import { IDashboard, IDashboardInput } from 'src/shared/interfaces/dashbaord.interface';
+import { PasswordUtil } from 'src/utils/password.util';
 
 @Injectable()
 export class UserService {
@@ -15,6 +16,7 @@ export class UserService {
     private readonly clientDeviceService: ClientDeviceService,
     private readonly configService: ConfigService,
   ) {}  
+
 
   async fetchUser(id: string): Promise<User | null> {
     try{

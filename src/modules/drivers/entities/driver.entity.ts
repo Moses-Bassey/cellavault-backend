@@ -48,7 +48,7 @@ export class Driver extends Model<Driver> {
 
   // @Unique
   @Column({
-    type: DataType.STRING(15),
+    type: DataType.STRING(300),
     unique: true,
     allowNull: false,
   })

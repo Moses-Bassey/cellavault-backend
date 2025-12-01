@@ -88,6 +88,40 @@ export class AuthService {
     }
   }
 
+  async deleteUserAccount(identity: string, password: string): Promise<null> {
+    try {
+      // Step 1: Find user
+      const user = await this.userService.findByIdentity(identity);
+      if (!user) {
+        throw new NotFoundException('User not found');
+      }
+
+      // Step 2: Verify password
+      const verifyPassword = await PasswordUtil.verifyPassword(password, user.password);
+      if (!verifyPassword) {
+        throw new UnauthorizedException('Invalid credentials');
+      }
+
+      // Step 4: Update email to email-uuid
+      const newEmail = `${user.email}-${user.id}`;
+      const newPhoneNo = `${user.phoneNo}-${user.id}`;
+
+      const updatedDriver = await this.userRepository.update(user.id, { email: newEmail, phoneNo: newPhoneNo });
+      if (!updatedDriver) {
+        throw new NotFoundException('User not found after deletion');
+      }
+
+      await this.userRepository.delete(user.id);
+
+      return null;
+    } catch (error: unknown) {
+      if (error instanceof NotFoundException || error instanceof UnauthorizedException) {
+        throw error;
+      }
+      throw new NotFoundException('Failed to delete driver account');
+    }
+  }
+
   async signUpEmail(input: SignupEmail){
     try{
       input.email = Validators.validateEmail(input.email);

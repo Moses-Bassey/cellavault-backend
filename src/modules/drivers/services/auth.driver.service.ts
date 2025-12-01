@@ -47,6 +47,40 @@ import { KYC_COMPLETED } from 'src/enums/kyc.enums';
       private readonly countryService: CountryService,
       private readonly clientDeviceService: ClientDeviceService,
     ) {} 
+
+    async deleteUserAccount(identity: string, password: string): Promise<null> {
+      try {
+        // Step 1: Find user
+        const user = await this.driverRepository.findByIdentity(identity);
+        if (!user) {
+          throw new NotFoundException('User not found');
+        }
+  
+        // Step 2: Verify password
+        const verifyPassword = await PasswordUtil.verifyPassword(password, user.password);
+        if (!verifyPassword) {
+          throw new UnauthorizedException('Invalid credentials');
+        }
+  
+        // Step 4: Update email to email-uuid
+        const newEmail = `${user.email}-${user.id}`;
+        const newPhoneNo = `${user.phoneNo}-${user.id}`;
+  
+        const updatedDriver = await this.driverRepository.update(user.id, { email: newEmail, phoneNo: newPhoneNo });
+        if (!updatedDriver) {
+          throw new NotFoundException('User not found after deletion');
+        }
+  
+        await this.driverRepository.delete(user.id);
+  
+        return null;
+      } catch (error: unknown) {
+        if (error instanceof NotFoundException || error instanceof UnauthorizedException) {
+          throw error;
+        }
+        throw new NotFoundException('Failed to delete driver account');
+      }
+    }
   
     async signUpPhoneNo(input: SignupPhone){
       const { country, phoneNo } = input;
