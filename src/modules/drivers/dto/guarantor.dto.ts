@@ -10,6 +10,7 @@ import {
   MaxLength,
   MinLength,
   IsUUID,
+  IsAlpha,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
@@ -21,6 +22,8 @@ export class CreateGuarantorDto {
   @IsString()
   @MinLength(2)
   @MaxLength(150)
+  @MaxLength(150)
+  @IsAlpha()
   fullName: string;
 
   @ApiProperty({

@@ -32,6 +32,8 @@ __decorate([
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.MinLength)(2),
     (0, class_validator_1.MaxLength)(150),
+    (0, class_validator_1.MaxLength)(150),
+    (0, class_validator_1.IsAlpha)(),
     __metadata("design:type", String)
 ], CreateGuarantorDto.prototype, "fullName", void 0);
 __decorate([

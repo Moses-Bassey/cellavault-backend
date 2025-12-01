@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsEnum, IsOptional, IsPhoneNumber, IsString, IsUUID, MaxLength, MinLength } from 'class-validator';
+import { IsAlpha, IsEmail, IsEnum, IsOptional, IsPhoneNumber, IsString, IsUUID, MaxLength, MinLength } from 'class-validator';
 import { min } from 'date-fns';
 import { NotNull } from 'sequelize-typescript';
 import { GENDER } from 'src/enums/gender.enum';
@@ -61,6 +61,8 @@ export class SignUpUserDto {
   })
   @IsString()
   @MinLength(4)
+  @MaxLength(150)
+  @IsAlpha()
   readonly fullName: string;
   
   @ApiProperty({
@@ -127,6 +129,8 @@ export class SignUpSocialUserDto {
   })
   @IsString()
   @MinLength(4)
+  @MaxLength(150)
+  @IsAlpha()
   readonly fullName: string;
   
   @ApiProperty({

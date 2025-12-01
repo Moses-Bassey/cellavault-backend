@@ -9,6 +9,7 @@ import {
   IsDateString,
   MaxLength,
   MinLength,
+  IsAlpha,
 } from 'class-validator';
 import { GENDER } from 'src/enums/gender.enum';
 import { IDENTIFICATION_TYPE } from 'src/enums/identification.enums';
@@ -203,7 +204,7 @@ export class ValidateBankAccountDto {
     example: '044',
   })
   @IsString()
-  @MaxLength(6)
+  @MaxLength(10)
   bankCode: string;
 
   @ApiProperty({
@@ -239,6 +240,7 @@ export class UpdateBankAccountDto {
   })
   @IsString()
   @MaxLength(150)
+  @IsAlpha()
   accountName: string;
 
   @ApiProperty({
@@ -250,3 +252,13 @@ export class UpdateBankAccountDto {
   bankName: string;
 }
 
+export class AddDriverLicenseDto {
+
+  @ApiProperty({
+    description: 'License image URL',
+    example: 'https://example.com/license.jpg',
+  })
+  @IsString()
+  @MaxLength(1000)
+  licenseImageUrl: string;
+}

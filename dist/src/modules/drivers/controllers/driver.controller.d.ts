@@ -2,7 +2,7 @@ import { DriverService } from '../services/driver.service';
 import { JwtAuthPayload } from 'src/modules/auth/auth.interface';
 import type { Request as ExpressRequest } from 'express';
 import { DashboardDto } from 'src/modules/users/dto/user.dto';
-import { UpdateBankAccountDto, ValidateBankAccountDto } from '../dto/kyc.dto';
+import { AddDriverLicenseDto, UpdateBankAccountDto, ValidateBankAccountDto } from '../dto/kyc.dto';
 export declare class DriverController {
     private readonly driverService;
     constructor(driverService: DriverService);
@@ -26,4 +26,7 @@ export declare class DriverController {
     createBankAccount(reqBody: UpdateBankAccountDto, req: ExpressRequest & {
         user: JwtAuthPayload;
     }): Promise<import("src/utils/response.utils").ApiResponse<UpdateBankAccountDto>>;
+    driverLicense(reqBody: AddDriverLicenseDto, req: ExpressRequest & {
+        user: JwtAuthPayload;
+    }): Promise<import("src/utils/response.utils").ApiResponse<AddDriverLicenseDto>>;
 }

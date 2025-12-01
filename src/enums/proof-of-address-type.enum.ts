@@ -8,3 +8,4 @@ export enum PROOF_OF_ADDRESS_TYPE {
   OTHER = 'OTHER',
 }
 
+

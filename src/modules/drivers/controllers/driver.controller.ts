@@ -11,7 +11,7 @@ import type { Request as ExpressRequest } from 'express';
 import { Validators } from 'src/utils/validators.utils';
 import { DashboardDto } from 'src/modules/users/dto/user.dto';
 import { monifyAPI } from '../utils/monnify';
-import { UpdateBankAccountDto, ValidateBankAccountDto } from '../dto/kyc.dto';
+import { AddDriverLicenseDto, UpdateBankAccountDto, ValidateBankAccountDto } from '../dto/kyc.dto';
 
 @ApiTags('Drivers')
 @ApiBearerAuth()
@@ -118,6 +118,23 @@ export class DriverController {
   ){
     const userId = Validators.validateUuid(req.user.userId);
     const data = await this.driverService.updateBankAccount(userId, reqBody);
+    return ResponseUtil.handleResponse(
+      data,
+      'Bank account updated successfully',
+      HttpStatus.OK,
+    );
+  }
+
+  @Put('license')
+  @Roles(UserType.DRIVER)
+  @ApiOperation({ summary: 'Update bank account' })
+  @ApiResponse({ status: 200, description: 'Update bank account ' })
+  async driverLicense(
+    @Body() reqBody: AddDriverLicenseDto,
+    @Request() req: ExpressRequest & { user: JwtAuthPayload },
+  ){
+    const userId = Validators.validateUuid(req.user.userId);
+    const data = await this.driverService.addDriverLicense(userId, reqBody);
     return ResponseUtil.handleResponse(
       data,
       'Bank account updated successfully',

@@ -44,6 +44,7 @@ export declare class Driver extends Model<Driver> {
     driverPersonalInfoKyc: kyc1PersonalInfo;
     driverIdKyc: kyc2IdInformation;
     driverAddressKyc: kyc3ResidentialInformation;
+    licenseImageUrl: string;
     createdAt: Date;
     updatedAt: Date;
     deletedAt: Date | null;

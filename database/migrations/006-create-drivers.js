@@ -91,7 +91,7 @@ module.exports = {
       },
       isPeppcruiseDriver: {
         type: DataTypes.BOOLEAN,
-        allowNull: false,
+        allowNull: true,
         defaultValue: false,
       },
       countryId: {

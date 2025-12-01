@@ -185,8 +185,7 @@ export class Driver extends Model<Driver> {
 
   @Column({
     type: DataType.BOOLEAN,
-    allowNull: false,
-    defaultValue: false,
+    allowNull: true,
   })
   public isPeppcruiseDriver: boolean;
 
@@ -242,6 +241,12 @@ export class Driver extends Model<Driver> {
 
   @HasOne(() => kyc3ResidentialInformation)
   public driverAddressKyc: kyc3ResidentialInformation;
+
+  @Column({
+    type: DataType.STRING(1000),
+    allowNull: true,
+  })
+  public licenseImageUrl: string;
 
   @CreatedAt
   @Column({

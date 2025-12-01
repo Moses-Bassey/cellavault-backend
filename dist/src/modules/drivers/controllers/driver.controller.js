@@ -63,6 +63,11 @@ let DriverController = class DriverController {
         const data = await this.driverService.updateBankAccount(userId, reqBody);
         return response_utils_1.ResponseUtil.handleResponse(data, 'Bank account updated successfully', common_1.HttpStatus.OK);
     }
+    async driverLicense(reqBody, req) {
+        const userId = validators_utils_1.Validators.validateUuid(req.user.userId);
+        const data = await this.driverService.addDriverLicense(userId, reqBody);
+        return response_utils_1.ResponseUtil.handleResponse(data, 'Bank account updated successfully', common_1.HttpStatus.OK);
+    }
 };
 exports.DriverController = DriverController;
 __decorate([
@@ -131,6 +136,17 @@ __decorate([
     __metadata("design:paramtypes", [kyc_dto_1.UpdateBankAccountDto, Object]),
     __metadata("design:returntype", Promise)
 ], DriverController.prototype, "createBankAccount", null);
+__decorate([
+    (0, common_1.Put)('license'),
+    (0, roles_decorator_1.Roles)(user_type_enum_1.UserType.DRIVER),
+    (0, swagger_1.ApiOperation)({ summary: 'Update bank account' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Update bank account ' }),
+    __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Request)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [kyc_dto_1.AddDriverLicenseDto, Object]),
+    __metadata("design:returntype", Promise)
+], DriverController.prototype, "driverLicense", null);
 exports.DriverController = DriverController = __decorate([
     (0, swagger_1.ApiTags)('Drivers'),
     (0, swagger_1.ApiBearerAuth)(),

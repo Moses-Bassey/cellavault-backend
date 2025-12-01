@@ -78,6 +78,8 @@ __decorate([
     }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.MinLength)(4),
+    (0, class_validator_1.MaxLength)(150),
+    (0, class_validator_1.IsAlpha)(),
     __metadata("design:type", String)
 ], SignUpUserDto.prototype, "fullName", void 0);
 __decorate([
@@ -163,6 +165,8 @@ __decorate([
     }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.MinLength)(4),
+    (0, class_validator_1.MaxLength)(150),
+    (0, class_validator_1.IsAlpha)(),
     __metadata("design:type", String)
 ], SignUpSocialUserDto.prototype, "fullName", void 0);
 __decorate([

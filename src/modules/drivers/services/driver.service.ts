@@ -4,7 +4,7 @@ import { DriverRepository } from '../repositories/driver.repository';
 import { DashboardDto } from 'src/modules/users/dto/user.dto';
 import { IDashboard, IDashboardInput } from 'src/shared/interfaces/dashbaord.interface';
 import { ClientDeviceService } from 'src/modules/client-devices/services/client-device.service';
-import { UpdateBankAccountDto, ValidateBankAccountDto } from '../dto/kyc.dto';
+import { AddDriverLicenseDto, UpdateBankAccountDto, ValidateBankAccountDto } from '../dto/kyc.dto';
 
 @Injectable()
 export class DriverService {
@@ -13,6 +13,20 @@ export class DriverService {
     private readonly driverRepository: DriverRepository,
     private readonly clientDeviceService: ClientDeviceService    
   ) {}
+
+  async addDriverLicense(userId: string, reqBody: AddDriverLicenseDto) {
+      try{
+        const driver = await this.driverRepository.update(userId, { 
+          licenseImageUrl: reqBody.licenseImageUrl,
+        });
+        if (!driver){
+          throw new NotFoundException('Driver not found!')
+        }
+        return reqBody;
+      }catch(error: unknown){
+        throw new BadRequestException(error)
+      }
+  }
 
   async updateBankAccount(userId: string, reqBody: UpdateBankAccountDto) {
     try{

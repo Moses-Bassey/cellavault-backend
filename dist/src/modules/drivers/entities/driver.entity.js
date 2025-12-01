@@ -55,6 +55,7 @@ let Driver = class Driver extends sequelize_typescript_1.Model {
     driverPersonalInfoKyc;
     driverIdKyc;
     driverAddressKyc;
+    licenseImageUrl;
 };
 exports.Driver = Driver;
 __decorate([
@@ -223,8 +224,7 @@ __decorate([
 __decorate([
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.BOOLEAN,
-        allowNull: false,
-        defaultValue: false,
+        allowNull: true,
     }),
     __metadata("design:type", Boolean)
 ], Driver.prototype, "isPeppcruiseDriver", void 0);
@@ -292,6 +292,13 @@ __decorate([
     (0, sequelize_typescript_1.HasOne)(() => kyc3_residential_Information_entity_1.kyc3ResidentialInformation),
     __metadata("design:type", kyc3_residential_Information_entity_1.kyc3ResidentialInformation)
 ], Driver.prototype, "driverAddressKyc", void 0);
+__decorate([
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.STRING(1000),
+        allowNull: true,
+    }),
+    __metadata("design:type", String)
+], Driver.prototype, "licenseImageUrl", void 0);
 __decorate([
     sequelize_typescript_1.CreatedAt,
     (0, sequelize_typescript_1.Column)({

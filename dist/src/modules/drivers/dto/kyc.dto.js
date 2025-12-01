@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UpdateBankAccountDto = exports.ValidateBankAccountDto = exports.CreateKyc3Dto = exports.CreateKyc2Dto = exports.CreateKyc1Dto = void 0;
+exports.AddDriverLicenseDto = exports.UpdateBankAccountDto = exports.ValidateBankAccountDto = exports.CreateKyc3Dto = exports.CreateKyc2Dto = exports.CreateKyc1Dto = void 0;
 const swagger_1 = require("@nestjs/swagger");
 const class_validator_1 = require("class-validator");
 const gender_enum_1 = require("../../../enums/gender.enum");
@@ -248,7 +248,7 @@ __decorate([
         example: '044',
     }),
     (0, class_validator_1.IsString)(),
-    (0, class_validator_1.MaxLength)(6),
+    (0, class_validator_1.MaxLength)(10),
     __metadata("design:type", String)
 ], ValidateBankAccountDto.prototype, "bankCode", void 0);
 __decorate([
@@ -292,6 +292,7 @@ __decorate([
     }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.MaxLength)(150),
+    (0, class_validator_1.IsAlpha)(),
     __metadata("design:type", String)
 ], UpdateBankAccountDto.prototype, "accountName", void 0);
 __decorate([
@@ -303,4 +304,17 @@ __decorate([
     (0, class_validator_1.MaxLength)(150),
     __metadata("design:type", String)
 ], UpdateBankAccountDto.prototype, "bankName", void 0);
+class AddDriverLicenseDto {
+    licenseImageUrl;
+}
+exports.AddDriverLicenseDto = AddDriverLicenseDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        description: 'License image URL',
+        example: 'https://example.com/license.jpg',
+    }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.MaxLength)(1000),
+    __metadata("design:type", String)
+], AddDriverLicenseDto.prototype, "licenseImageUrl", void 0);
 //# sourceMappingURL=kyc.dto.js.map
