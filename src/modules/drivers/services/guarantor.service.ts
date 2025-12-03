@@ -73,7 +73,7 @@ export class GuarantorService {
         driverId,
       });
 
-      if(count == 1) {
+      if(count >= 1) {
         if (data.id) {
           await this.driverService.update(driverId, {
             isGuarantorCompleted: true,

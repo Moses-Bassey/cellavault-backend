@@ -69,7 +69,7 @@ let GuarantorService = class GuarantorService {
                 countryId: country.id,
                 driverId,
             });
-            if (count == 1) {
+            if (count >= 1) {
                 if (data.id) {
                     await this.driverService.update(driverId, {
                         isGuarantorCompleted: true,
