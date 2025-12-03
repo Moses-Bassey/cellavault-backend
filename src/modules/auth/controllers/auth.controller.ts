@@ -143,7 +143,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Delete user account' })
   @ApiResponse({
     status: 200,
-    description: 'User account deleted successfully'
+    description: 'Driver account deleted successfully'
   })
   @ApiResponse({ status: 404, description: 'User not found' })
   async deleteUserAccount(

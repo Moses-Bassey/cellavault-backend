@@ -77,6 +77,11 @@ let AuthController = class AuthController {
         const data = await this.authService.logout(input, req.user);
         return response_utils_1.ResponseUtil.handleResponse(data, 'Password changed successfully', common_1.HttpStatus.OK);
     }
+    async deleteUserAccount(reqBody) {
+        const { identity, password } = reqBody;
+        const data = await this.authService.deleteUserAccount(identity, password);
+        return response_utils_1.ResponseUtil.handleResponse({}, 'Driver account deleted successfully', common_1.HttpStatus.OK);
+    }
 };
 exports.AuthController = AuthController;
 __decorate([
@@ -192,6 +197,20 @@ __decorate([
     __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "logout", null);
+__decorate([
+    (0, common_1.Delete)(),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    (0, swagger_1.ApiOperation)({ summary: 'Delete user account' }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Driver account deleted successfully'
+    }),
+    (0, swagger_1.ApiResponse)({ status: 404, description: 'User not found' }),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [auth_dto_1.LoginUserDto]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "deleteUserAccount", null);
 exports.AuthController = AuthController = __decorate([
     (0, common_1.Controller)('auth'),
     __metadata("design:paramtypes", [auth_service_1.AuthService])

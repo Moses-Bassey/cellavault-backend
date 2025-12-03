@@ -1,0 +1,6 @@
+export declare enum PAYMENT_TYPE {
+    WALLET = "WALLET",
+    PI_COIN = "PI_COIN",
+    CASH = "CASH",
+    PEPP_COIN = "PEPP_COIN"
+}

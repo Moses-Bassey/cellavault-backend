@@ -73,6 +73,32 @@ let AuthService = class AuthService {
             throw new common_1.BadRequestException(error);
         }
     }
+    async deleteUserAccount(identity, password) {
+        try {
+            const user = await this.userService.findByIdentity(identity);
+            if (!user) {
+                throw new common_1.NotFoundException('User not found');
+            }
+            const verifyPassword = await password_util_1.PasswordUtil.verifyPassword(password, user.password);
+            if (!verifyPassword) {
+                throw new common_1.UnauthorizedException('Invalid credentials');
+            }
+            const newEmail = `${user.email}-${user.id}`;
+            const newPhoneNo = `${user.phoneNo}-${user.id}`;
+            const updatedDriver = await this.userRepository.update(user.id, { email: newEmail, phoneNo: newPhoneNo });
+            if (!updatedDriver) {
+                throw new common_1.NotFoundException('User not found after deletion');
+            }
+            await this.userRepository.delete(user.id);
+            return null;
+        }
+        catch (error) {
+            if (error instanceof common_1.NotFoundException || error instanceof common_1.UnauthorizedException) {
+                throw error;
+            }
+            throw new common_1.NotFoundException('Failed to delete driver account');
+        }
+    }
     async signUpEmail(input) {
         try {
             input.email = validators_utils_1.Validators.validateEmail(input.email);

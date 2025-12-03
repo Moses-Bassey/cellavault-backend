@@ -7,6 +7,7 @@ import { DashboardDto } from '../dto/user.dto';
 import { DriverService } from 'src/modules/drivers/services/driver.service';
 import { IDashboard, IDashboardInput } from 'src/shared/interfaces/dashbaord.interface';
 import { PasswordUtil } from 'src/utils/password.util';
+import { PAYMENT_TYPE } from 'src/enums/payment.enums';
 
 @Injectable()
 export class UserService {
@@ -91,7 +92,9 @@ export class UserService {
         email: user.email,
         phoneNo: user.phoneNo,
         userId: user.id
+        // paymentType: [PAYMENT_TYPE.CASH, PAYMENT_TYPE.PEPP_COIN, PAYMENT_TYPE.PI_COIN, PAYMENT_TYPE.WALLET]
       }
+
       return dashboardRes;
     }catch(error: unknown){
       throw new NotFoundException('User not found!')

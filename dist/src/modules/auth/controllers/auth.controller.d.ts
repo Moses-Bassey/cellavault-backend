@@ -38,4 +38,5 @@ export declare class AuthController {
     }, req: ExpressRequest & {
         user: any;
     }): Promise<import("src/utils/response.utils").ApiResponse<null>>;
+    deleteUserAccount(reqBody: LoginUserDto): Promise<import("src/utils/response.utils").ApiResponse<{}>>;
 }

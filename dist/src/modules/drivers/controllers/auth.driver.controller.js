@@ -62,6 +62,11 @@ let AuthDriverController = class AuthDriverController {
         const data = await this.authService.changePassword(input, req.user);
         return response_utils_1.ResponseUtil.handleResponse(data, 'Password changed successfully', common_1.HttpStatus.OK);
     }
+    async deleteDriverAccount(userCredentials) {
+        const { email, password } = userCredentials;
+        const data = await this.authService.deleteUserAccount(email, password);
+        return response_utils_1.ResponseUtil.handleResponse({}, 'Driver account deleted successfully', common_1.HttpStatus.OK);
+    }
 };
 exports.AuthDriverController = AuthDriverController;
 __decorate([
@@ -141,6 +146,20 @@ __decorate([
     __metadata("design:paramtypes", [auth_driver_dto_1.ChangePasswordDto, Object]),
     __metadata("design:returntype", Promise)
 ], AuthDriverController.prototype, "changePassword", null);
+__decorate([
+    (0, common_1.Delete)(),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    (0, swagger_1.ApiOperation)({ summary: 'Delete user account' }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'User account deleted successfully'
+    }),
+    (0, swagger_1.ApiResponse)({ status: 404, description: 'User not found' }),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], AuthDriverController.prototype, "deleteDriverAccount", null);
 exports.AuthDriverController = AuthDriverController = __decorate([
     (0, common_1.Controller)('auth/drivers'),
     __metadata("design:paramtypes", [auth_driver_service_1.AuthDriverService])

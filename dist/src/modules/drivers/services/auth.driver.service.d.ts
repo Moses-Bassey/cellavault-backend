@@ -17,6 +17,7 @@ export declare class AuthDriverService {
     private readonly countryService;
     private readonly clientDeviceService;
     constructor(driverRepository: DriverRepository, tokenService: TokenService, emailEventService: EmailEventService, smsEventService: SmsEventService, countryService: CountryService, clientDeviceService: ClientDeviceService);
+    deleteUserAccount(identity: string, password: string): Promise<null>;
     signUpPhoneNo(input: SignupPhone): Promise<{}>;
     signUpEmail(input: SignupEmail): Promise<null>;
     verifyOtp(input: VerifyOtpDto): Promise<VerifyOtpDto>;

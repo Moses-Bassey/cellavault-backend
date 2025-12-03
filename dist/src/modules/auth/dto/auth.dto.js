@@ -79,7 +79,9 @@ __decorate([
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.MinLength)(4),
     (0, class_validator_1.MaxLength)(150),
-    (0, class_validator_1.IsAlpha)(),
+    (0, class_validator_1.Matches)(/^[A-Za-z _'-]+$/, {
+        message: 'Only letters, spaces, underscores, apostrophes, and hyphens are allowed in fullName field'
+    }),
     __metadata("design:type", String)
 ], SignUpUserDto.prototype, "fullName", void 0);
 __decorate([
@@ -166,7 +168,9 @@ __decorate([
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.MinLength)(4),
     (0, class_validator_1.MaxLength)(150),
-    (0, class_validator_1.IsAlpha)(),
+    (0, class_validator_1.Matches)(/^[A-Za-z _'-]+$/, {
+        message: 'Only letters, spaces, underscores, apostrophes, and hyphens are allowed in fullName field'
+    }),
     __metadata("design:type", String)
 ], SignUpSocialUserDto.prototype, "fullName", void 0);
 __decorate([
@@ -445,6 +449,9 @@ __decorate([
         example: 'John Doe',
     }),
     (0, class_validator_1.IsString)(),
+    (0, class_validator_1.Matches)(/^[A-Za-z _'-]+$/, {
+        message: 'Only letters, spaces, underscores, apostrophes, and hyphens are allowed in fullName field'
+    }),
     __metadata("design:type", String)
 ], SignUserDto.prototype, "fullName", void 0);
 __decorate([

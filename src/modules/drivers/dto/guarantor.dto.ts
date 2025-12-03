@@ -11,6 +11,7 @@ import {
   MinLength,
   IsUUID,
   IsAlpha,
+  Matches,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
@@ -23,7 +24,9 @@ export class CreateGuarantorDto {
   @MinLength(2)
   @MaxLength(150)
   @MaxLength(150)
-  @IsAlpha()
+  @Matches(/^[A-Za-z _'-]+$/, {
+    message: 'Only letters, spaces, underscores, apostrophes, and hyphens are allowed in fullName field'
+  })
   fullName: string;
 
   @ApiProperty({

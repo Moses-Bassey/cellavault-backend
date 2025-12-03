@@ -10,6 +10,7 @@ import {
   MaxLength,
   MinLength,
   IsAlpha,
+  Matches,
 } from 'class-validator';
 import { GENDER } from 'src/enums/gender.enum';
 import { IDENTIFICATION_TYPE } from 'src/enums/identification.enums';
@@ -24,6 +25,9 @@ export class CreateKyc1Dto {
   @IsString()
   @MinLength(2)
   @MaxLength(255)
+  @Matches(/^[A-Za-z _'-]+$/, {
+    message: 'Only letters, spaces, underscores, apostrophes, and hyphens are allowed in fullName field'
+  })
   fullName: string;
 
   @ApiProperty({

@@ -43,7 +43,7 @@ __decorate([
 ], User.prototype, "fullName", void 0);
 __decorate([
     sequelize_typescript_1.Unique,
-    (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.STRING(15)),
+    (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.STRING(300)),
     __metadata("design:type", String)
 ], User.prototype, "phoneNo", void 0);
 __decorate([

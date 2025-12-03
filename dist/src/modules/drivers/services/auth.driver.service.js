@@ -44,6 +44,32 @@ let AuthDriverService = class AuthDriverService {
         this.countryService = countryService;
         this.clientDeviceService = clientDeviceService;
     }
+    async deleteUserAccount(identity, password) {
+        try {
+            const user = await this.driverRepository.findByIdentity(identity);
+            if (!user) {
+                throw new common_1.NotFoundException('User not found');
+            }
+            const verifyPassword = await password_util_1.PasswordUtil.verifyPassword(password, user.password);
+            if (!verifyPassword) {
+                throw new common_1.UnauthorizedException('Invalid credentials');
+            }
+            const newEmail = `${user.email}-${user.id}`;
+            const newPhoneNo = `${user.phoneNo}-${user.id}`;
+            const updatedDriver = await this.driverRepository.update(user.id, { email: newEmail, phoneNo: newPhoneNo });
+            if (!updatedDriver) {
+                throw new common_1.NotFoundException('User not found after deletion');
+            }
+            await this.driverRepository.delete(user.id);
+            return null;
+        }
+        catch (error) {
+            if (error instanceof common_1.NotFoundException || error instanceof common_1.UnauthorizedException) {
+                throw error;
+            }
+            throw new common_1.NotFoundException('Failed to delete driver account');
+        }
+    }
     async signUpPhoneNo(input) {
         const { country, phoneNo } = input;
         const existingCountry = await this.countryService.findById(country);

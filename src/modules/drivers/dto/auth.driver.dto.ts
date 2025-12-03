@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsAlpha, IsEmail, IsEnum, IsOptional, IsPhoneNumber, IsString, IsUUID, MaxLength, MinLength } from 'class-validator';
+import { IsAlpha, IsEmail, IsEnum, IsOptional, IsPhoneNumber, IsString, IsUUID, Matches, MaxLength, MinLength } from 'class-validator';
 import { min } from 'date-fns';
 import { GENDER } from 'src/enums/gender.enum';
 import { LoginType } from 'src/enums/login-type.enum';
@@ -62,7 +62,9 @@ export class CreateAccountDto {
   @IsString()
   @MinLength(4)
   @MaxLength(150)
-  @IsAlpha()
+  @Matches(/^[A-Za-z _'-]+$/, {
+    message: 'Only letters, spaces, underscores, apostrophes, and hyphens are allowed in fullName field'
+  })
   readonly fullName: string;
   
   @ApiProperty({
@@ -290,6 +292,9 @@ export class SignUserDto {
     example: 'John Doe',
   })
   @IsString()
+  @Matches(/^[A-Za-z _'-]+$/, {
+    message: 'Only letters, spaces, underscores, apostrophes, and hyphens are allowed in fullName field'
+  })
   readonly fullName: string;
 
   @ApiProperty({

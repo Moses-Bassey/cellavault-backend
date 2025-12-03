@@ -22,6 +22,7 @@ export declare class AuthService {
     private clientDeviceService;
     constructor(userRepository: UserRepository, mailService: MailService, tokenService: TokenService, emailEventService: EmailEventService, smsEventService: SmsEventService, countryService: CountryService, userService: UserService, clientDeviceService: ClientDeviceService);
     signUpPhoneNo(input: SignupPhone): Promise<{}>;
+    deleteUserAccount(identity: string, password: string): Promise<null>;
     signUpEmail(input: SignupEmail): Promise<null>;
     verifyOtp(input: VerifyOtpDto): Promise<VerifyOtpDto>;
     verifyPasswordResetOtp(input: VerifyOtpDto): Promise<VerifyOtpDto>;

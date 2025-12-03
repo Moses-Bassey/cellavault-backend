@@ -33,7 +33,9 @@ __decorate([
     (0, class_validator_1.MinLength)(2),
     (0, class_validator_1.MaxLength)(150),
     (0, class_validator_1.MaxLength)(150),
-    (0, class_validator_1.IsAlpha)(),
+    (0, class_validator_1.Matches)(/^[A-Za-z _'-]+$/, {
+        message: 'Only letters, spaces, underscores, apostrophes, and hyphens are allowed in fullName field'
+    }),
     __metadata("design:type", String)
 ], CreateGuarantorDto.prototype, "fullName", void 0);
 __decorate([
