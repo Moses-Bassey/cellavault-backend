@@ -244,7 +244,6 @@ export class UpdateBankAccountDto {
   })
   @IsString()
   @MaxLength(150)
-  @IsAlpha()
   accountName: string;
 
   @ApiProperty({

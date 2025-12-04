@@ -127,8 +127,8 @@ export class DriverController {
 
   @Put('license')
   @Roles(UserType.DRIVER)
-  @ApiOperation({ summary: 'Update bank account' })
-  @ApiResponse({ status: 200, description: 'Update bank account ' })
+  @ApiOperation({ summary: 'Update drivers license' })
+  @ApiResponse({ status: 200, description: 'Driver license updated' })
   async driverLicense(
     @Body() reqBody: AddDriverLicenseDto,
     @Request() req: ExpressRequest & { user: JwtAuthPayload },
@@ -137,7 +137,7 @@ export class DriverController {
     const data = await this.driverService.addDriverLicense(userId, reqBody);
     return ResponseUtil.handleResponse(
       data,
-      'Bank account updated successfully',
+      'Driver license updated',
       HttpStatus.OK,
     );
   }
