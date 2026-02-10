@@ -1,4 +1,4 @@
 export interface ITokenInterface {
-    token: string,
-    expiry
+  token: string;
+  expiry;
 }

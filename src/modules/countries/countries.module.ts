@@ -14,7 +14,21 @@ import { LgaRepository } from './repositories/lga.repository';
 @Module({
   imports: [SequelizeModule.forFeature([Country, State, LGA])],
   controllers: [CountryController],
-  providers: [CountryService, StateService, LgaService, CountryRepository, StateRepository, LgaRepository],
-  exports: [CountryService, StateService, LgaService, CountryRepository, StateRepository, LgaRepository],
+  providers: [
+    CountryService,
+    StateService,
+    LgaService,
+    CountryRepository,
+    StateRepository,
+    LgaRepository,
+  ],
+  exports: [
+    CountryService,
+    StateService,
+    LgaService,
+    CountryRepository,
+    StateRepository,
+    LgaRepository,
+  ],
 })
 export class CountriesModule {}

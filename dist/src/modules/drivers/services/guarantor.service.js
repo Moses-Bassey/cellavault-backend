@@ -56,7 +56,7 @@ let GuarantorService = class GuarantorService {
             const phone = utils_1.Utils.normalizeCountryPhone(country.phoneCode, guarantorData.phoneNo, country.phoneLength);
             const email = validators_utils_1.Validators.validateEmail(guarantorData.email);
             if (driver.email == email || driver.phoneNo == phone) {
-                throw new common_1.BadRequestException("You cannot be a guarantor");
+                throw new common_1.BadRequestException('You cannot be a guarantor');
             }
             const data = await this.guarantorRepository.create({
                 fullName: guarantorData.fullName,
@@ -103,8 +103,9 @@ let GuarantorService = class GuarantorService {
         return await this.guarantorRepository.deleteByDriverId(driverId);
     }
     canAddMoreGuarantors(driverId) {
-        return this.guarantorRepository.countByDriverId(driverId)
-            .then(count => count < this.MAX_GUARANTORS);
+        return this.guarantorRepository
+            .countByDriverId(driverId)
+            .then((count) => count < this.MAX_GUARANTORS);
     }
 };
 exports.GuarantorService = GuarantorService;

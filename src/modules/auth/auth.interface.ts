@@ -1,4 +1,5 @@
-import { UserType } from "src/enums";
+import { UserType } from 'src/enums';
+import { Request } from 'express';
 
 export interface JwtAuthPayload {
   sub: string;
@@ -15,4 +16,8 @@ export interface User {
   password: string;
   isActive: boolean;
   userType: UserType;
+}
+
+export interface AuthenticatedRequest extends Request {
+  user: JwtAuthPayload;
 }

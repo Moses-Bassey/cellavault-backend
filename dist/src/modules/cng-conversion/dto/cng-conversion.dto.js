@@ -61,13 +61,19 @@ __decorate([
     __metadata("design:type", String)
 ], CreateCngConversionDto.prototype, "contactPhone", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'National Identification Number', example: '12345678901' }),
+    (0, swagger_1.ApiProperty)({
+        description: 'National Identification Number',
+        example: '12345678901',
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.MaxLength)(11),
     __metadata("design:type", String)
 ], CreateCngConversionDto.prototype, "nin", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Vehicle registration number', example: 'ABC123456' }),
+    (0, swagger_1.ApiProperty)({
+        description: 'Vehicle registration number',
+        example: 'ABC123456',
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.MaxLength)(100),
     __metadata("design:type", String)
@@ -103,7 +109,10 @@ __decorate([
     __metadata("design:type", String)
 ], CreateCngConversionDto.prototype, "vinNumber", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Registration expiry date', example: '2025-12-31' }),
+    (0, swagger_1.ApiProperty)({
+        description: 'Registration expiry date',
+        example: '2025-12-31',
+    }),
     (0, class_validator_1.IsDateString)(),
     __metadata("design:type", String)
 ], CreateCngConversionDto.prototype, "registerationExpiryDate", void 0);
@@ -154,7 +163,10 @@ __decorate([
     __metadata("design:type", String)
 ], CreateCngConversionDto.prototype, "operatingMotorPark", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Conversion center', example: 'ABC Conversion Center' }),
+    (0, swagger_1.ApiProperty)({
+        description: 'Conversion center',
+        example: 'ABC Conversion Center',
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.MaxLength)(200),
     __metadata("design:type", String)

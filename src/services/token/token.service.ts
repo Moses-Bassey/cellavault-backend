@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { isAfter } from 'date-fns';
@@ -10,7 +14,6 @@ import { IOTPInterface } from './interface/IOTP.interface';
 import { TokenSubject, TokenType } from 'src/enums/token.enum';
 import { Token } from './entities/token.entity';
 
-
 @Injectable()
 export class TokenService {
   constructor(
@@ -19,18 +22,23 @@ export class TokenService {
     private readonly configService: ConfigService,
   ) {}
 
-
   public async validateOtp(input: IOTPInterface): Promise<{ token: string }> {
     const { token, email, phoneNo, subject: subject } = input;
-    
+
     let userToken: Token | null = null;
-    
-    switch(subject){
+
+    switch (subject) {
       case TokenSubject.SIGN_UP_EMAIL:
-        userToken = await this.tokenRepository.findByEmailToken(token, email || "");
+        userToken = await this.tokenRepository.findByEmailToken(
+          token,
+          email || '',
+        );
         break;
       case TokenSubject.SIGN_UP_PHONE:
-        userToken = await this.tokenRepository.findByPhoneToken(token, phoneNo || "");
+        userToken = await this.tokenRepository.findByPhoneToken(
+          token,
+          phoneNo || '',
+        );
         break;
       default:
         throw new BadRequestException('Invalid OTP Subject');
@@ -41,25 +49,27 @@ export class TokenService {
     const isExpired = isAfter(new Date(), userToken.expiry);
     if (isExpired) {
       await this.deleteOTPtoken(userToken.id);
-      throw new BadRequestException('Invalid or expired Token')
+      throw new BadRequestException('Invalid or expired Token');
     }
 
     return { token: userToken.token };
   }
 
-  public async validatePasswordResetOtp(input: IOTPInterface): Promise<{ token: string }> {
+  public async validatePasswordResetOtp(
+    input: IOTPInterface,
+  ): Promise<{ token: string }> {
     const { token, email, subject } = input;
-    
+
     let userToken: Token | null = null;
-    
-    userToken = await this.tokenRepository.findByEmailToken(token, email || "");
+
+    userToken = await this.tokenRepository.findByEmailToken(token, email || '');
 
     if (!userToken) throw new BadRequestException('Invalid Password Reset OTP');
 
     const isExpired = isAfter(new Date(), userToken.expiry);
     if (isExpired) {
       await this.deleteOTPtoken(userToken.id);
-      throw new BadRequestException('Invalid or expired Token')
+      throw new BadRequestException('Invalid or expired Token');
     }
 
     return { token: userToken.token };
@@ -68,18 +78,23 @@ export class TokenService {
   public async verifyOTP(input: IOTPInterface): Promise<{ token: string }> {
     console.log(input);
     const { token, email, subject: subject } = input;
-    
-    let userToken: Token | null = await this.tokenRepository.findByTokenEmailAndSubject(token, email || "", subject || TokenSubject.FORGOT_PASSWORD);
 
-    if (!userToken){
+    let userToken: Token | null =
+      await this.tokenRepository.findByTokenEmailAndSubject(
+        token,
+        email || '',
+        subject || TokenSubject.FORGOT_PASSWORD,
+      );
+
+    if (!userToken) {
       throw new BadRequestException('Invalid OTP');
-    } 
+    }
 
     const isExpired = isAfter(new Date(), userToken.expiry);
 
     if (isExpired) {
       await this.deleteOTPtoken(userToken.id);
-      throw new BadRequestException('Invalid or expired Token')
+      throw new BadRequestException('Invalid or expired Token');
     }
 
     await this.deleteOTPtoken(userToken.id);
@@ -89,18 +104,27 @@ export class TokenService {
 
   public async verifySignUpOTP(dto: IOTPInterface): Promise<{ token: string }> {
     const { token, email, phoneNo, subject: otpSubject } = dto;
-    
+
     let userToken: Token | null = null;
-    
-    switch(otpSubject){
+
+    switch (otpSubject) {
       case TokenSubject.SIGN_UP_EMAIL:
-        userToken = await this.tokenRepository.findByEmailToken(token, email || "");
+        userToken = await this.tokenRepository.findByEmailToken(
+          token,
+          email || '',
+        );
         break;
       case TokenSubject.SIGN_UP_PHONE:
-        userToken = await this.tokenRepository.findByPhoneToken(token, phoneNo || "");
+        userToken = await this.tokenRepository.findByPhoneToken(
+          token,
+          phoneNo || '',
+        );
         break;
       case TokenSubject.SIGN_UP_PHONE:
-        userToken = await this.tokenRepository.findByPhoneToken(token, phoneNo || "");
+        userToken = await this.tokenRepository.findByPhoneToken(
+          token,
+          phoneNo || '',
+        );
         break;
       default:
         throw new BadRequestException('Invalid OTP Subject');
@@ -113,20 +137,25 @@ export class TokenService {
     return { token: userToken.token };
   }
 
-  async generateOTPtoken(payload: CreateTokenDto) : Promise<ITokenInterface & { token: string }> {
+  async generateOTPtoken(
+    payload: CreateTokenDto,
+  ): Promise<ITokenInterface & { token: string }> {
     let token = '';
     if (payload.phoneNo) {
-      token = process.env.NODE_ENV === 'development' ? '123456' : randomstring.generate({
-        length: 6,
-        charset: 'numeric',
-      })
+      token =
+        process.env.NODE_ENV === 'development'
+          ? '123456'
+          : randomstring.generate({
+              length: 6,
+              charset: 'numeric',
+            });
     } else {
       token = randomstring.generate({
         length: 6,
         charset: 'numeric',
-      })
+      });
     }
-    
+
     const created = await this.tokenRepository.create({
       ...payload,
       token: token,

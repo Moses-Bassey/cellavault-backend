@@ -31,7 +31,7 @@ let EmailEventListener = EmailEventListener_1 = class EmailEventListener {
                 template: 'sign-up-otp',
                 context: {
                     otpCode: event.otpCode,
-                    expiryDate: event.expiryDate
+                    expiryDate: event.expiryDate,
                 },
             });
             this.logger.log(`Signup OTP email sent successfully to ${event.email}`);
@@ -64,7 +64,7 @@ let EmailEventListener = EmailEventListener_1 = class EmailEventListener {
                 template: 'welcome',
                 context: {
                     fullName: event.fullName,
-                    email: event.email
+                    email: event.email,
                 },
             });
             this.logger.log(`Welcome email sent successfully to ${event.email}`);

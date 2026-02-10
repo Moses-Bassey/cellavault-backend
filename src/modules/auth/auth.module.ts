@@ -27,7 +27,13 @@ import { DriverRepository } from '../drivers/repositories/driver.repository';
     UsersModule,
     ClientDevicesModule,
   ],
-  providers: [AuthService, UserRepository, PasscodeService, PasscodeRepository, DriverRepository],
+  providers: [
+    AuthService,
+    UserRepository,
+    PasscodeService,
+    PasscodeRepository,
+    DriverRepository,
+  ],
   controllers: [AuthController, PasscodeController],
   exports: [PasscodeService, PasscodeRepository],
 })

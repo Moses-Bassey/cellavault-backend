@@ -60,6 +60,7 @@ await this.smsEventService.emitForgotPasswordOtpSms(phoneNumber, otpCode);
 ## Message Format
 
 Default message:
+
 ```
 Your PeppCruise verification code is: 123456. Valid for 10 minutes.
 ```
@@ -77,4 +78,3 @@ Your PeppCruise verification code is: 123456. Valid for 10 minutes.
 3. ✅ Rate limiting on OTP generation
 4. ✅ Secure credential storage via `.env`
 5. ✅ Event-driven for loose coupling
-

@@ -12,12 +12,12 @@ import { Observable } from 'rxjs';
 export class ApiKeyInterceptor implements NestInterceptor {
   constructor(private readonly configService: ConfigService) {}
 
-  async validateAPIKey (apikey: string) {
+  async validateAPIKey(apikey: string) {
     const validApiKey = this.configService.get<string>('app.apiKey');
-    if(apikey === validApiKey){
-        return true;
+    if (apikey === validApiKey) {
+      return true;
     }
-    throw new BadRequestException('Invalid API product key')
+    throw new BadRequestException('Invalid API product key');
   }
 
   async resolveAPIKey(request: Request) {
@@ -38,11 +38,11 @@ export class ApiKeyInterceptor implements NestInterceptor {
     if (path !== '/') {
       const errorMessage = 'No x-product-key header';
       const productKey = request.headers['x-product-key'] as string;
-      
+
       if (!productKey) {
         throw new BadRequestException(errorMessage);
       }
-      
+
       // Actually validate the API key
       await this.validateAPIKey(productKey);
     }

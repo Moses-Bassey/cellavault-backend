@@ -19,4 +19,3 @@ export class SmsEventService {
     this.eventEmitter.emit('sms.forgot-password-otp', event);
   }
 }
-

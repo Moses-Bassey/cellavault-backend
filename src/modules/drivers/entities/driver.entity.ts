@@ -54,7 +54,6 @@ export class Driver extends Model<Driver> {
   })
   public phoneNo: string;
 
-    
   @Column({
     type: DataType.ENUM,
     values: Object.values(KYC_COMPLETED),
@@ -94,7 +93,6 @@ export class Driver extends Model<Driver> {
     defaultValue: UserType.DRIVER,
   })
   public userType: UserType;
-
 
   @Column(DataType.STRING(2000))
   public password: string;

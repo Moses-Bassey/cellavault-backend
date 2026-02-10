@@ -43,11 +43,6 @@ let UserController = class UserController {
         }, userId);
         return response_utils_1.ResponseUtil.handleResponse(data, 'User dashboard data retrieved successfully', common_1.HttpStatus.OK);
     }
-    async updateImageUrl(req, updateImageUrlDto) {
-        const userId = validators_utils_1.Validators.validateUuid(req.user.userId);
-        const data = await this.userService.updateImageUrl(userId, updateImageUrlDto.imageUrl);
-        return response_utils_1.ResponseUtil.handleResponse(data, 'Image URL updated successfully', common_1.HttpStatus.OK);
-    }
 };
 exports.UserController = UserController;
 __decorate([
@@ -73,18 +68,6 @@ __decorate([
     __metadata("design:paramtypes", [Object, user_dto_1.DashboardDto]),
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "dashboard", null);
-__decorate([
-    (0, common_1.Put)('profile-image'),
-    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
-    (0, swagger_1.ApiOperation)({ summary: 'Update user image URL' }),
-    (0, swagger_1.ApiResponse)({ status: 200, description: 'Image URL updated successfully' }),
-    (0, swagger_1.ApiResponse)({ status: 404, description: 'User not found' }),
-    __param(0, (0, common_1.Request)()),
-    __param(1, (0, common_1.Body)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, user_dto_1.UpdateImageUrlDto]),
-    __metadata("design:returntype", Promise)
-], UserController.prototype, "updateImageUrl", null);
 exports.UserController = UserController = __decorate([
     (0, swagger_1.ApiTags)('Users'),
     (0, swagger_1.ApiBearerAuth)(),

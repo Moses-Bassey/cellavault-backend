@@ -17,22 +17,21 @@ const sequelize = new Sequelize({
 async function runMigrations() {
   try {
     console.log('🔄 Starting database migrations...');
-    
+
     // Test connection
     await sequelize.authenticate();
     console.log('✅ Database connection established successfully.');
 
     // Run migrations
     const { execSync } = require('child_process');
-    
+
     console.log('📦 Running migrations...');
     execSync('npx sequelize-cli db:migrate', { stdio: 'inherit' });
-    
+
     console.log('🌱 Running seeders...');
     execSync('npx sequelize-cli db:seed:all', { stdio: 'inherit' });
-    
+
     console.log('✅ All migrations and seeders completed successfully!');
-    
   } catch (error) {
     console.error('❌ Migration failed:', error);
     process.exit(1);

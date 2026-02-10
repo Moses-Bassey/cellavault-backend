@@ -23,6 +23,7 @@ const drivers_module_1 = require("./modules/drivers/drivers.module");
 const countries_module_1 = require("./modules/countries/countries.module");
 const cng_conversion_module_1 = require("./modules/cng-conversion/cng-conversion.module");
 const client_devices_module_1 = require("./modules/client-devices/client-devices.module");
+const admins_module_1 = require("./modules/admins/admins.module");
 const token_module_1 = require("./services/token/token.module");
 const mail_module_1 = require("./services/mail/mail.module");
 const sms_module_1 = require("./services/sms/sms.module");
@@ -30,6 +31,7 @@ const axios_module_1 = require("./services/axios/axios.module");
 const api_key_interceptors_1 = require("./interceptors/api-key.interceptors");
 const entities_1 = require("./modules/users/entities");
 const entities_2 = require("./modules/drivers/entities");
+const admin_entity_1 = require("./modules/admins/entities/admin.entity");
 const guarantor_entity_1 = require("./modules/drivers/entities/guarantor.entity");
 const kyc1_personal_Info_entity_1 = require("./modules/drivers/entities/kyc1-personal-Info.entity");
 const kyc2_Id_Information_entity_1 = require("./modules/drivers/entities/kyc2-Id-Information.entity");
@@ -75,6 +77,7 @@ exports.AppModule = AppModule = __decorate([
                     cng_station_entity_1.CngStation,
                     client_device_entity_1.ClientDevice,
                     entities_4.Token,
+                    admin_entity_1.Admin,
                 ],
                 synchronize: process.env.NODE_ENV !== 'production',
                 logging: process.env.NODE_ENV === 'development',
@@ -94,6 +97,7 @@ exports.AppModule = AppModule = __decorate([
             countries_module_1.CountriesModule,
             cng_conversion_module_1.CngConversionModule,
             client_devices_module_1.ClientDevicesModule,
+            admins_module_1.AdminModule,
             token_module_1.TokenModule,
             mail_module_1.MailModule,
             sms_module_1.SmsModule,

@@ -1,5 +1,6 @@
 import { Driver } from '../entities/driver.entity';
 import { UserType } from '../../../enums/user-type.enum';
+import { KYC_COMPLETED } from 'src/enums/kyc.enums';
 export declare class DriverRepository {
     private driverModel;
     constructor(driverModel: typeof Driver);
@@ -9,6 +10,7 @@ export declare class DriverRepository {
     findByEmail(email: string): Promise<Driver | null>;
     findByPhone(phoneNo: string): Promise<Driver | null>;
     findByEmailAndRole(email: string, userType: UserType): Promise<Driver | null>;
+    findActiveDrivers(kycCompleted: KYC_COMPLETED): Promise<Driver[] | null>;
     create(driverData: Partial<Driver>): Promise<Driver>;
     update(id: string, driverData: Partial<Driver>): Promise<[number, Driver[]]>;
     delete(id: string): Promise<number>;

@@ -13,7 +13,6 @@ const monifyAPIRequest = axios.create({
 });
 
 export class monifyAPI {
-
   static async authenticate() {
     const errorMessage =
       'could not carry out transaction please try again later';
@@ -68,7 +67,7 @@ export class monifyAPI {
       const response = await axios.get(url, { headers });
       return response.data;
     } catch (error) {
-      console.log(error.data)
+      console.log(error.data);
       return errorMessage;
     }
   }

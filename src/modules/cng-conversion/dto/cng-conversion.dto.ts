@@ -28,12 +28,18 @@ export class CreateCngConversionDto {
   @MaxLength(15)
   contactPhone: string;
 
-  @ApiProperty({ description: 'National Identification Number', example: '12345678901' })
+  @ApiProperty({
+    description: 'National Identification Number',
+    example: '12345678901',
+  })
   @IsString()
   @MaxLength(11)
   nin: string;
 
-  @ApiProperty({ description: 'Vehicle registration number', example: 'ABC123456' })
+  @ApiProperty({
+    description: 'Vehicle registration number',
+    example: 'ABC123456',
+  })
   @IsString()
   @MaxLength(100)
   vehicleRegisterationNo: string;
@@ -63,7 +69,10 @@ export class CreateCngConversionDto {
   @MaxLength(255)
   vinNumber: string;
 
-  @ApiProperty({ description: 'Registration expiry date', example: '2025-12-31' })
+  @ApiProperty({
+    description: 'Registration expiry date',
+    example: '2025-12-31',
+  })
   @IsDateString()
   registerationExpiryDate: string;
 
@@ -105,7 +114,10 @@ export class CreateCngConversionDto {
   @MaxLength(200)
   operatingMotorPark?: string;
 
-  @ApiProperty({ description: 'Conversion center', example: 'ABC Conversion Center' })
+  @ApiProperty({
+    description: 'Conversion center',
+    example: 'ABC Conversion Center',
+  })
   @IsString()
   @MaxLength(200)
   conversionCenter: string;
@@ -130,4 +142,3 @@ export class CreateCngConversionDto {
   @IsOptional()
   additionalNote?: string;
 }
-

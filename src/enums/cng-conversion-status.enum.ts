@@ -3,5 +3,3 @@ export enum CNG_CONVERSION_STATUS {
   APPROVED = 'APPROVED',
   REJECTED = 'REJECTED',
 }
-
-

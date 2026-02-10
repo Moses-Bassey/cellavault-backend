@@ -9,12 +9,22 @@ export declare class UserService {
     private readonly configService;
     constructor(userRepository: UserRepository, clientDeviceService: ClientDeviceService, configService: ConfigService);
     fetchUser(id: string): Promise<User | null>;
-    findByIdentity(identity: string): Promise<User | null>;
-    findByEmail(email: string): Promise<User | null>;
-    findAll(options?: any): Promise<User[]>;
+    dashboard(data: IDashboardInput, userId: string): Promise<IDashboard>;
+    findAll(options: {
+        search?: string;
+        status?: boolean;
+        limit: number;
+        offset: number;
+    }): Promise<User[]>;
+    countFiltered(options: {
+        search?: string;
+        status?: boolean;
+    }): Promise<number>;
     update(id: string, userData: Partial<User>): Promise<[number, User[]]>;
     delete(id: string): Promise<number>;
     restore(id: string): Promise<void>;
-    dashboard(data: IDashboardInput, userId: string): Promise<IDashboard>;
-    updateImageUrl(userId: string, imageUrl: string): Promise<User>;
+    countActiveUsers(): Promise<number | null>;
+    countAllUsers(): Promise<number | null>;
+    countBannedUsers(): Promise<number | null>;
+    getNewUsersForMonth(): Promise<number>;
 }

@@ -23,20 +23,23 @@ export class EmailEventListener {
   async handleSignUpOtpEvent(event: SignUpOtpEmailEvent) {
     try {
       this.logger.log(`Sending signup OTP email to ${event.email}`);
-      
+
       await this.mailerService.sendMail({
         to: event.email,
         subject: MAIL_SUBJECT.SIGN_UP_OTP,
         template: 'sign-up-otp',
-        context: { 
-          otpCode: event.otpCode, 
-          expiryDate: event.expiryDate 
+        context: {
+          otpCode: event.otpCode,
+          expiryDate: event.expiryDate,
         },
       });
 
       this.logger.log(`Signup OTP email sent successfully to ${event.email}`);
     } catch (error) {
-      this.logger.error(`Failed to send signup OTP email to ${event.email}:`, error);
+      this.logger.error(
+        `Failed to send signup OTP email to ${event.email}:`,
+        error,
+      );
     }
   }
 
@@ -44,7 +47,7 @@ export class EmailEventListener {
   async handleForgetPasswordEvent(event: ForgetPasswordEmailEvent) {
     try {
       this.logger.log(`Sending forget password email to ${event.otpCode}`);
-      
+
       await this.mailerService.sendMail({
         to: event.email,
         subject: MAIL_SUBJECT.FORGET_PASSWORD,
@@ -52,9 +55,14 @@ export class EmailEventListener {
         context: { otpCode: event.otpCode },
       });
 
-      this.logger.log(`Forget password email sent successfully to ${event.email}`);
+      this.logger.log(
+        `Forget password email sent successfully to ${event.email}`,
+      );
     } catch (error) {
-      this.logger.error(`Failed to send forget password email to ${event.email}:`, error);
+      this.logger.error(
+        `Failed to send forget password email to ${event.email}:`,
+        error,
+      );
     }
   }
 
@@ -62,20 +70,23 @@ export class EmailEventListener {
   async handleWelcomeEvent(event: WelcomeEmailEvent) {
     try {
       this.logger.log(`Sending welcome email to ${event.email}`);
-      
+
       await this.mailerService.sendMail({
         to: event.email,
         subject: MAIL_SUBJECT.WELCOME,
         template: 'welcome',
-        context: { 
+        context: {
           fullName: event.fullName,
-          email: event.email 
+          email: event.email,
         },
       });
 
       this.logger.log(`Welcome email sent successfully to ${event.email}`);
     } catch (error) {
-      this.logger.error(`Failed to send welcome email to ${event.email}:`, error);
+      this.logger.error(
+        `Failed to send welcome email to ${event.email}:`,
+        error,
+      );
     }
   }
 
@@ -83,12 +94,12 @@ export class EmailEventListener {
   async handleBookingConfirmationEvent(event: BookingConfirmationEmailEvent) {
     try {
       this.logger.log(`Sending booking confirmation email to ${event.email}`);
-      
+
       await this.mailerService.sendMail({
         to: event.email,
         subject: MAIL_SUBJECT.BOOKING_CONFIRMATION,
         template: 'booking-confirmation',
-        context: { 
+        context: {
           bookingId: event.bookingId,
           driverName: event.driverName,
           pickupTime: event.pickupTime,
@@ -96,9 +107,14 @@ export class EmailEventListener {
         },
       });
 
-      this.logger.log(`Booking confirmation email sent successfully to ${event.email}`);
+      this.logger.log(
+        `Booking confirmation email sent successfully to ${event.email}`,
+      );
     } catch (error) {
-      this.logger.error(`Failed to send booking confirmation email to ${event.email}:`, error);
+      this.logger.error(
+        `Failed to send booking confirmation email to ${event.email}:`,
+        error,
+      );
     }
   }
 
@@ -106,21 +122,26 @@ export class EmailEventListener {
   async handleDriverVerificationEvent(event: DriverVerificationEmailEvent) {
     try {
       this.logger.log(`Sending driver verification email to ${event.email}`);
-      
+
       await this.mailerService.sendMail({
         to: event.email,
         subject: MAIL_SUBJECT.DRIVER_VERIFICATION,
         template: 'driver-verification',
-        context: { 
+        context: {
           fullName: event.fullName,
           verificationStatus: event.verificationStatus,
           reason: event.reason,
         },
       });
 
-      this.logger.log(`Driver verification email sent successfully to ${event.email}`);
+      this.logger.log(
+        `Driver verification email sent successfully to ${event.email}`,
+      );
     } catch (error) {
-      this.logger.error(`Failed to send driver verification email to ${event.email}:`, error);
+      this.logger.error(
+        `Failed to send driver verification email to ${event.email}:`,
+        error,
+      );
     }
   }
 
@@ -128,21 +149,26 @@ export class EmailEventListener {
   async handlePasswordChangedEvent(event: PasswordChangedEmailEvent) {
     try {
       this.logger.log(`Sending password changed email to ${event.email}`);
-      
+
       await this.mailerService.sendMail({
         to: event.email,
         subject: MAIL_SUBJECT.PASSWORD_CHANGED,
         template: 'password-changed',
-        context: { 
+        context: {
           fullName: event.fullName,
           email: event.email,
           changedAt: event.changedAt,
         },
       });
 
-      this.logger.log(`Password changed email sent successfully to ${event.email}`);
+      this.logger.log(
+        `Password changed email sent successfully to ${event.email}`,
+      );
     } catch (error) {
-      this.logger.error(`Failed to send password changed email to ${event.email}:`, error);
+      this.logger.error(
+        `Failed to send password changed email to ${event.email}:`,
+        error,
+      );
     }
   }
 
@@ -150,12 +176,12 @@ export class EmailEventListener {
   async handleNewLoginEvent(event: NewLoginEmailEvent) {
     try {
       this.logger.log(`Sending new login email to ${event.email}`);
-      
+
       await this.mailerService.sendMail({
         to: event.email,
         subject: MAIL_SUBJECT.NEW_LOGIN,
         template: 'new-login',
-        context: { 
+        context: {
           fullName: event.fullName,
           email: event.email,
           deviceInfo: event.deviceInfo,
@@ -166,7 +192,10 @@ export class EmailEventListener {
 
       this.logger.log(`New login email sent successfully to ${event.email}`);
     } catch (error) {
-      this.logger.error(`Failed to send new login email to ${event.email}:`, error);
+      this.logger.error(
+        `Failed to send new login email to ${event.email}:`,
+        error,
+      );
     }
   }
 
@@ -174,19 +203,24 @@ export class EmailEventListener {
   async handleNewDeviceLoginOtpEvent(event: NewDeviceLoginOtpEmailEvent) {
     try {
       this.logger.log(`Sending new device login OTP email to ${event.email}`);
-      
+
       await this.mailerService.sendMail({
         to: event.email,
         subject: MAIL_SUBJECT.NEW_DEVICE_LOGIN_OTP,
         template: 'new-device-login',
-        context: { 
+        context: {
           otpCode: event.otpCode,
         },
       });
 
-      this.logger.log(`New device login OTP email sent successfully to ${event.email}`);
+      this.logger.log(
+        `New device login OTP email sent successfully to ${event.email}`,
+      );
     } catch (error) {
-      this.logger.error(`Failed to send new device login OTP email to ${event.email}:`, error);
+      this.logger.error(
+        `Failed to send new device login OTP email to ${event.email}:`,
+        error,
+      );
     }
   }
 }

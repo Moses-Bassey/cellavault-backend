@@ -1,4 +1,4 @@
-import { TokenSubject } from "src/enums/token.enum";
+import { TokenSubject } from 'src/enums/token.enum';
 export interface IOTPInterface {
     email?: string;
     token: string;

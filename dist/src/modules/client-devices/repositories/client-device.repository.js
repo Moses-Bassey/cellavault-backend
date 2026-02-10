@@ -42,11 +42,14 @@ let ClientDeviceRepository = class ClientDeviceRepository {
     async findAll(options) {
         return await this.clientDeviceModel.findAll(options);
     }
-    async findByUserIdAndDeviceToken(userId, deviceFCMToken) {
-        const data = await this.clientDeviceModel.findOne({
-            where: { userId, deviceFCMToken },
+    async findByAdminIdAndDeviceToken(adminId, deviceFCMToken) {
+        return await this.clientDeviceModel.findOne({
+            where: {
+                adminId,
+                deviceFCMToken,
+                deletedAt: null,
+            },
         });
-        return data ? data.toJSON() : null;
     }
     async create(clientDeviceData) {
         return await this.clientDeviceModel.create(clientDeviceData);
@@ -97,7 +100,7 @@ let ClientDeviceRepository = class ClientDeviceRepository {
         if (existingDevice) {
             await this.update(existingDevice.id, deviceData);
             const data = await this.clientDeviceModel.findOne({
-                where: { id: existingDevice.id }
+                where: { id: existingDevice.id },
             });
             if (data != null)
                 return data;

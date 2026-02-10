@@ -75,7 +75,10 @@ __decorate([
     (0, roles_decorator_1.Roles)(user_type_enum_1.UserType.DRIVER),
     (0, common_1.HttpCode)(common_1.HttpStatus.CREATED),
     (0, swagger_1.ApiOperation)({ summary: 'Create or update KYC1 personal information' }),
-    (0, swagger_1.ApiResponse)({ status: 201, description: 'KYC1 personal information created/updated successfully' }),
+    (0, swagger_1.ApiResponse)({
+        status: 201,
+        description: 'KYC1 personal information created/updated successfully',
+    }),
     __param(0, (0, common_1.Body)()),
     __param(1, (0, common_1.Req)()),
     __metadata("design:type", Function),

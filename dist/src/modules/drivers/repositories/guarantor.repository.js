@@ -27,16 +27,19 @@ let GuarantorRepository = class GuarantorRepository {
     async findByDriverId(driverId) {
         return await this.guarantorModel.findAll({
             where: { driverId },
-            raw: true
+            raw: true,
         });
     }
     async countByDriverId(driverId) {
         return await this.guarantorModel.count({
-            where: { driverId }
+            where: { driverId },
         });
     }
     async create(guarantorData) {
-        const guarantor = await this.guarantorModel.create(guarantorData, { raw: true, returning: true });
+        const guarantor = await this.guarantorModel.create(guarantorData, {
+            raw: true,
+            returning: true,
+        });
         return guarantor.toJSON();
     }
     async update(id, guarantorData) {

@@ -105,7 +105,7 @@ __decorate([
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.BOOLEAN,
         allowNull: false,
-        defaultValue: false
+        defaultValue: false,
     }),
     __metadata("design:type", Boolean)
 ], Vehicle.prototype, "isPeppcruiseVehicle", void 0);

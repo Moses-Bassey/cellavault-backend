@@ -64,10 +64,10 @@ let TokenService = class TokenService {
         let userToken = null;
         switch (subject) {
             case token_enum_1.TokenSubject.SIGN_UP_EMAIL:
-                userToken = await this.tokenRepository.findByEmailToken(token, email || "");
+                userToken = await this.tokenRepository.findByEmailToken(token, email || '');
                 break;
             case token_enum_1.TokenSubject.SIGN_UP_PHONE:
-                userToken = await this.tokenRepository.findByPhoneToken(token, phoneNo || "");
+                userToken = await this.tokenRepository.findByPhoneToken(token, phoneNo || '');
                 break;
             default:
                 throw new common_1.BadRequestException('Invalid OTP Subject');
@@ -84,7 +84,7 @@ let TokenService = class TokenService {
     async validatePasswordResetOtp(input) {
         const { token, email, subject } = input;
         let userToken = null;
-        userToken = await this.tokenRepository.findByEmailToken(token, email || "");
+        userToken = await this.tokenRepository.findByEmailToken(token, email || '');
         if (!userToken)
             throw new common_1.BadRequestException('Invalid Password Reset OTP');
         const isExpired = (0, date_fns_1.isAfter)(new Date(), userToken.expiry);
@@ -97,7 +97,7 @@ let TokenService = class TokenService {
     async verifyOTP(input) {
         console.log(input);
         const { token, email, subject: subject } = input;
-        let userToken = await this.tokenRepository.findByTokenEmailAndSubject(token, email || "", subject || token_enum_1.TokenSubject.FORGOT_PASSWORD);
+        let userToken = await this.tokenRepository.findByTokenEmailAndSubject(token, email || '', subject || token_enum_1.TokenSubject.FORGOT_PASSWORD);
         if (!userToken) {
             throw new common_1.BadRequestException('Invalid OTP');
         }
@@ -114,13 +114,13 @@ let TokenService = class TokenService {
         let userToken = null;
         switch (otpSubject) {
             case token_enum_1.TokenSubject.SIGN_UP_EMAIL:
-                userToken = await this.tokenRepository.findByEmailToken(token, email || "");
+                userToken = await this.tokenRepository.findByEmailToken(token, email || '');
                 break;
             case token_enum_1.TokenSubject.SIGN_UP_PHONE:
-                userToken = await this.tokenRepository.findByPhoneToken(token, phoneNo || "");
+                userToken = await this.tokenRepository.findByPhoneToken(token, phoneNo || '');
                 break;
             case token_enum_1.TokenSubject.SIGN_UP_PHONE:
-                userToken = await this.tokenRepository.findByPhoneToken(token, phoneNo || "");
+                userToken = await this.tokenRepository.findByPhoneToken(token, phoneNo || '');
                 break;
             default:
                 throw new common_1.BadRequestException('Invalid OTP Subject');
@@ -133,10 +133,13 @@ let TokenService = class TokenService {
     async generateOTPtoken(payload) {
         let token = '';
         if (payload.phoneNo) {
-            token = process.env.NODE_ENV === 'development' ? '123456' : randomstring.generate({
-                length: 6,
-                charset: 'numeric',
-            });
+            token =
+                process.env.NODE_ENV === 'development'
+                    ? '123456'
+                    : randomstring.generate({
+                        length: 6,
+                        charset: 'numeric',
+                    });
         }
         else {
             token = randomstring.generate({

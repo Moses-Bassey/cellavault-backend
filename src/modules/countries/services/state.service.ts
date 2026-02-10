@@ -24,7 +24,10 @@ export class StateService {
     return await this.stateRepository.create(stateData);
   }
 
-  async update(id: string, stateData: Partial<State>): Promise<[number, State[]]> {
+  async update(
+    id: string,
+    stateData: Partial<State>,
+  ): Promise<[number, State[]]> {
     return await this.stateRepository.update(id, stateData);
   }
 
@@ -36,4 +39,3 @@ export class StateService {
     await this.stateRepository.restore(id);
   }
 }
-

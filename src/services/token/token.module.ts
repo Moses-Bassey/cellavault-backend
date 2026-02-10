@@ -6,7 +6,6 @@ import { TokenService } from './token.service';
 import { TokenRepository } from './repositories/token.repository';
 import { ConfigService } from '@nestjs/config';
 
-
 @Global()
 @Module({
   imports: [
@@ -16,7 +15,8 @@ import { ConfigService } from '@nestjs/config';
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
         return {
-          secret: configService.get<string>('app.jwtSecret') || 'default-secret',
+          secret:
+            configService.get<string>('app.jwtSecret') || 'default-secret',
           signOptions: {
             // No expiresIn means the token will not expire
           },

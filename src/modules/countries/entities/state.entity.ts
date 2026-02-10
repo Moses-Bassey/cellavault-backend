@@ -27,28 +27,27 @@ export class State extends Model<State> {
   @PrimaryKey
   @Default(DataType.UUIDV4)
   @Column(DataType.UUID)
-  public declare id: string;
+  declare public id: string;
 
   @Column(DataType.STRING(100))
-  public declare name: string;
+  declare public name: string;
 
   @ForeignKey(() => Country)
   @Column({
     type: DataType.UUID,
     allowNull: false,
   })
-  public declare countryId: string;
+  declare public countryId: string;
 
   @BelongsTo(() => Country)
   public country: Country;
 
   @CreatedAt
-  public declare createdAt: Date;
+  declare public createdAt: Date;
 
   @UpdatedAt
-  public declare updatedAt: Date;
+  declare public updatedAt: Date;
 
   @DeletedAt
-  public declare deletedAt: Date | null;
+  declare public deletedAt: Date | null;
 }
-

@@ -13,4 +13,3 @@ import { SmsEventListener } from './listeners/sms.listener';
   imports: [EventEmitterModule.forRoot()],
 })
 export class SmsModule {}
-

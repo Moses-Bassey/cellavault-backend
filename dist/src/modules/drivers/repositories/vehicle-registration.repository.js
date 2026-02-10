@@ -27,7 +27,7 @@ let VehicleRegistrationRepository = class VehicleRegistrationRepository {
     async findByDriverId(driverId) {
         return await this.vehicleRegistrationModel.findAll({
             where: { driverId },
-            raw: true
+            raw: true,
         });
     }
     async create(vehicleRegistrationData) {

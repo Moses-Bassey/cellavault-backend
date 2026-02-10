@@ -5,5 +5,3 @@ export enum FUEL_TYPE {
   HYBRID = 'HYBRID',
   ELECTRIC = 'ELECTRIC',
 }
-
-

@@ -23,46 +23,47 @@ let TokenRepository = class TokenRepository {
         this.tokenModel = tokenModel;
     }
     async create(tokenData) {
-        const token = await this.tokenModel.create(tokenData, { raw: true, returning: true });
+        const token = await this.tokenModel.create(tokenData, {
+            raw: true,
+            returning: true,
+        });
         return token.toJSON();
     }
     async findByToken(token) {
         return await this.tokenModel.findOne({
             where: { token },
             attributes: ['id', 'expiry', 'email'],
-            raw: true
+            raw: true,
         });
     }
     async findByPhoneOrEmailToken(token, phoneNo, email) {
         return await this.tokenModel.findOne({
-            where: { [sequelize_2.Op.or]: [
-                    { email: email },
-                    { phoneNo: phoneNo },
-                    { token: token }
-                ], },
+            where: {
+                [sequelize_2.Op.or]: [{ email: email }, { phoneNo: phoneNo }, { token: token }],
+            },
             attributes: ['id', 'expiry', 'email', 'phoneNo', 'token'],
-            raw: true
+            raw: true,
         });
     }
     async findByEmailToken(token, email) {
         return await this.tokenModel.findOne({
             where: { email, token },
             attributes: ['id', 'expiry', 'email', 'phoneNo', 'token'],
-            raw: true
+            raw: true,
         });
     }
     async findByTokenEmailAndSubject(token, email, subject) {
         return await this.tokenModel.findOne({
             where: { email, token, subject },
             attributes: ['id', 'expiry', 'email', 'phoneNo', 'token'],
-            raw: true
+            raw: true,
         });
     }
     async findByPhoneToken(token, phoneNo) {
         return await this.tokenModel.findOne({
             where: { phoneNo, token },
             attributes: ['id', 'expiry', 'email', 'phoneNo', 'token'],
-            raw: true
+            raw: true,
         });
     }
     async delete(id) {

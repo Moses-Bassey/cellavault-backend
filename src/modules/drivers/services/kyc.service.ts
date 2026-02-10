@@ -1,4 +1,9 @@
-import { ConflictException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { kyc1PersonalInfo } from '../entities/kyc1-personal-Info.entity';
 import { kyc2IdInformation } from '../entities/kyc2-Id-Information.entity';
 import { kyc3ResidentialInformation } from '../entities/kyc3-residential-Information.entity';
@@ -39,7 +44,7 @@ export class KycService {
     if (existingKyc1) {
       return existingKyc1;
     }
-    
+
     const kyc1 = await this.kyc1Repository.create({
       ...kycData,
       driverId,
@@ -49,23 +54,28 @@ export class KycService {
 
     if (kyc1.id) {
       await this.driverRepository.update(driverId, {
-        kycCompleted: KYC_COMPLETED.PERSONAL_INFORMATION
+        kycCompleted: KYC_COMPLETED.PERSONAL_INFORMATION,
       });
     }
-    
+
     return kyc1;
   }
 
-
-  async fetchKyc1ByDriverId(driverId: string): Promise<kyc1PersonalInfo | null> {
+  async fetchKyc1ByDriverId(
+    driverId: string,
+  ): Promise<kyc1PersonalInfo | null> {
     return await this.kyc1Repository.findByDriverId(driverId);
   }
 
-  async fetchKyc2ByDriverId(driverId: string): Promise<kyc2IdInformation | null> {
+  async fetchKyc2ByDriverId(
+    driverId: string,
+  ): Promise<kyc2IdInformation | null> {
     return await this.kyc2Repository.findByDriverId(driverId);
   }
 
-  async fetchKyc3ByDriverId(driverId: string): Promise<kyc3ResidentialInformation | null> {
+  async fetchKyc3ByDriverId(
+    driverId: string,
+  ): Promise<kyc3ResidentialInformation | null> {
     return await this.kyc3Repository.findByDriverId(driverId);
   }
 
@@ -91,13 +101,12 @@ export class KycService {
 
     if (kyc2.id) {
       await this.driverRepository.update(driverId, {
-        kycCompleted: KYC_COMPLETED.IDENTITY_INFORMATION
+        kycCompleted: KYC_COMPLETED.IDENTITY_INFORMATION,
       });
     }
 
     return kyc2;
   }
-
 
   async createKyc3(
     driverId: string,
@@ -125,13 +134,12 @@ export class KycService {
 
     if (kyc3.id) {
       await this.driverRepository.update(driverId, {
-        kycCompleted: KYC_COMPLETED.RESIDENTIAL_INFORMATION
+        kycCompleted: KYC_COMPLETED.RESIDENTIAL_INFORMATION,
       });
     }
 
     return kyc3;
   }
-
 
   async getAllKycByDriverId(driverId: string): Promise<{
     kyc1: kyc1PersonalInfo | null;
@@ -151,4 +159,3 @@ export class KycService {
     };
   }
 }
-

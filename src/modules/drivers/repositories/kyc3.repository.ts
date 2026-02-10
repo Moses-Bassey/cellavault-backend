@@ -10,9 +10,7 @@ export class Kyc3Repository {
     private kyc3Model: typeof kyc3ResidentialInformation,
   ) {}
 
-  async findById(
-    id: string,
-  ): Promise<kyc3ResidentialInformation | null> {
+  async findById(id: string): Promise<kyc3ResidentialInformation | null> {
     return await this.kyc3Model.findByPk(id, { raw: true });
   }
 
@@ -67,4 +65,3 @@ export class Kyc3Repository {
     });
   }
 }
-

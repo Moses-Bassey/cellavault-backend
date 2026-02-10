@@ -26,12 +26,9 @@ let UserRepository = class UserRepository {
     async findByIdentity(identity) {
         return await this.userModel.findOne({
             where: {
-                [sequelize_2.Op.or]: [
-                    { email: identity },
-                    { phoneNo: identity },
-                ],
+                [sequelize_2.Op.or]: [{ email: identity }, { phoneNo: identity }],
             },
-            raw: true
+            raw: true,
         });
     }
     async findById(id) {
@@ -44,7 +41,7 @@ let UserRepository = class UserRepository {
             },
             include: [
                 {
-                    model: entities_1.Country
+                    model: entities_1.Country,
                 },
             ],
         });
@@ -58,18 +55,26 @@ let UserRepository = class UserRepository {
     }
     async findByPhone(phoneNo) {
         const user = await this.userModel.findOne({
-            where: { phoneNo }
+            where: { phoneNo },
         });
         return user ? user.toJSON() : null;
     }
     async findByEmailAndRole(email, userType) {
         return await this.userModel.findOne({
             where: { email, userType },
-            raw: true
+            raw: true,
+        });
+    }
+    async findActiveUsers(isDisabled) {
+        return await this.userModel.findAll({
+            where: { isDisabled },
         });
     }
     async create(userData) {
-        const user = await this.userModel.create(userData, { raw: true, returning: true });
+        const user = await this.userModel.create(userData, {
+            raw: true,
+            returning: true,
+        });
         return user.toJSON();
     }
     async update(id, userData) {
@@ -95,7 +100,59 @@ let UserRepository = class UserRepository {
         });
     }
     async findAll(options) {
-        return await this.userModel.findAll(options);
+        const { search, status, limit, offset } = options;
+        console.log('Status: ', status);
+        const where = {
+            ...(typeof status === 'boolean' && { isActive: status }),
+            ...(search && {
+                [sequelize_2.Op.or]: [
+                    { fullName: { [sequelize_2.Op.like]: `%${search}%` } },
+                    { phoneNo: { [sequelize_2.Op.like]: `%${search}%` } },
+                    { email: { [sequelize_2.Op.like]: `%${search}%` } },
+                ],
+            }),
+        };
+        return this.userModel.findAll({
+            where,
+            order: [['createdAt', 'DESC']],
+            limit,
+            offset,
+        });
+    }
+    async countAll() {
+        return await this.userModel.findAll();
+    }
+    async countFiltered(options) {
+        const { search, status } = options;
+        const where = {};
+        if (search) {
+            where[sequelize_2.Op.or] = [
+                { fullName: { [sequelize_2.Op.like]: `%${search}%` } },
+                { phoneNo: { [sequelize_2.Op.like]: `%${search}%` } },
+                { email: { [sequelize_2.Op.like]: `%${search}%` } },
+            ];
+        }
+        if (status) {
+            where.isActive = status;
+        }
+        return this.userModel.count({ where });
+    }
+    async findAllBanned(isDisabled) {
+        return await this.userModel.findAll({
+            where: { isDisabled },
+        });
+    }
+    async getNewUsersForMonth(year, month) {
+        const startDate = new Date(year, month - 1, 1);
+        const endDate = new Date(year, month, 0, 23, 59, 59);
+        return this.userModel.findAll({
+            where: {
+                createdAt: {
+                    [sequelize_2.Op.gte]: startDate,
+                    [sequelize_2.Op.lte]: endDate,
+                },
+            },
+        });
     }
 };
 exports.UserRepository = UserRepository;

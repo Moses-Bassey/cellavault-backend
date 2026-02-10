@@ -19,10 +19,7 @@ let UsersModule = class UsersModule {
 exports.UsersModule = UsersModule;
 exports.UsersModule = UsersModule = __decorate([
     (0, common_1.Module)({
-        imports: [
-            sequelize_1.SequelizeModule.forFeature([user_entity_1.User]),
-            client_devices_module_1.ClientDevicesModule,
-        ],
+        imports: [sequelize_1.SequelizeModule.forFeature([user_entity_1.User]), client_devices_module_1.ClientDevicesModule],
         controllers: [user_controller_1.UserController],
         providers: [user_service_1.UserService, user_repository_1.UserRepository],
         exports: [user_service_1.UserService, user_repository_1.UserRepository],

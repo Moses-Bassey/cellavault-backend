@@ -37,7 +37,13 @@ exports.AuthModule = AuthModule = __decorate([
             users_module_1.UsersModule,
             client_devices_module_1.ClientDevicesModule,
         ],
-        providers: [auth_service_1.AuthService, user_repository_1.UserRepository, passcode_service_1.PasscodeService, passcode_repository_1.PasscodeRepository, driver_repository_1.DriverRepository],
+        providers: [
+            auth_service_1.AuthService,
+            user_repository_1.UserRepository,
+            passcode_service_1.PasscodeService,
+            passcode_repository_1.PasscodeRepository,
+            driver_repository_1.DriverRepository,
+        ],
         controllers: [auth_controller_1.AuthController, passcode_controller_1.PasscodeController],
         exports: [passcode_service_1.PasscodeService, passcode_repository_1.PasscodeRepository],
     })

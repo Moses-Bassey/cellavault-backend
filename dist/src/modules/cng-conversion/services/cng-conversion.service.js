@@ -32,7 +32,7 @@ let CngConversionService = class CngConversionService {
         return {
             transmissions,
             fuelTypes,
-            engine_condition
+            engine_condition,
         };
     }
     async fetchUserCngConversions(userId, page, limit) {
@@ -48,7 +48,7 @@ let CngConversionService = class CngConversionService {
             });
             return {
                 fetchTransmission: await this.fetchTransmission(),
-                conversions
+                conversions,
             };
         }
         catch (error) {
@@ -71,7 +71,7 @@ let CngConversionService = class CngConversionService {
             });
             return {
                 pending: pending,
-                completed: completed
+                completed: completed,
             };
         }
         catch (error) {

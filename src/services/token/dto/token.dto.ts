@@ -15,7 +15,6 @@ export class CreateTokenDto {
 
   @IsString()
   subject: TokenSubject;
-
 }
 
 export class VerifyCustomTokenDto {

@@ -100,7 +100,7 @@ module.exports = {
         state: 'Enugu',
         country: 'Nigeria',
         longitude: 7.4947,
-        latitude: 6.4520,
+        latitude: 6.452,
         createdAt: new Date(),
         updatedAt: new Date(),
       },
@@ -110,9 +110,9 @@ module.exports = {
     for (const station of stations) {
       const results = await queryInterface.sequelize.query(
         `SELECT id FROM cng_stations WHERE name = '${station.name}' LIMIT 1`,
-        { type: queryInterface.sequelize.QueryTypes.SELECT }
+        { type: queryInterface.sequelize.QueryTypes.SELECT },
       );
-      
+
       if (!results || results.length === 0) {
         stationsToInsert.push(station);
       }
@@ -130,4 +130,3 @@ module.exports = {
     await queryInterface.bulkDelete('cng_stations', null, {});
   },
 };
-

@@ -44,7 +44,10 @@ __decorate([
     (0, common_1.Get)(),
     (0, roles_decorator_1.Roles)(user_type_enum_1.UserType.SUPER_ADMIN, user_type_enum_1.UserType.PEPP_ADMIN),
     (0, swagger_1.ApiOperation)({ summary: 'Get all client devices (Admin only)' }),
-    (0, swagger_1.ApiResponse)({ status: 200, description: 'Client devices retrieved successfully' }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Client devices retrieved successfully',
+    }),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
@@ -52,7 +55,10 @@ __decorate([
 __decorate([
     (0, common_1.Get)('my-devices'),
     (0, swagger_1.ApiOperation)({ summary: 'Get current user devices' }),
-    (0, swagger_1.ApiResponse)({ status: 200, description: 'User devices retrieved successfully' }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'User devices retrieved successfully',
+    }),
     __param(0, (0, common_1.Request)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),

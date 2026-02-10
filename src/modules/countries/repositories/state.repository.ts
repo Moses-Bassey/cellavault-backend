@@ -29,7 +29,10 @@ export class StateRepository {
     return await this.stateModel.create(stateData as any);
   }
 
-  async update(id: string, stateData: Partial<State>): Promise<[number, State[]]> {
+  async update(
+    id: string,
+    stateData: Partial<State>,
+  ): Promise<[number, State[]]> {
     return await this.stateModel.update(stateData, {
       where: { id },
       returning: true,
@@ -48,4 +51,3 @@ export class StateRepository {
     });
   }
 }
-

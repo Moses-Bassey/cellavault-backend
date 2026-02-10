@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Validators = void 0;
 const common_1 = require("@nestjs/common");
 const enums_1 = require("../enums");
+const uuid_1 = require("uuid");
 class Validators {
     static validateEmail(email) {
         if (!email) {
@@ -10,8 +11,8 @@ class Validators {
         }
         email = email.toLowerCase();
         const invalidEmailDomains = ['mailinator.com'];
-        const emailDomain = email.split("@")[1];
-        invalidEmailDomains.forEach(domain => {
+        const emailDomain = email.split('@')[1];
+        invalidEmailDomains.forEach((domain) => {
             if (domain == emailDomain) {
                 throw new common_1.BadRequestException('Invalid email domain');
             }
@@ -20,9 +21,9 @@ class Validators {
     }
     static getLoginIdentity(identity) {
         if (!identity) {
-            throw new common_1.BadRequestException("Invalid identity");
+            throw new common_1.BadRequestException('Invalid identity');
         }
-        if (identity.includes("@")) {
+        if (identity.includes('@')) {
             return enums_1.UserLoginIdentityType.EMAIL;
         }
         return enums_1.UserLoginIdentityType.PHONE_NO;
@@ -33,6 +34,12 @@ class Validators {
             throw new common_1.BadRequestException('Invalid UUID format');
         }
         return value;
+    }
+    static validateUuidV4(id) {
+        if (!id || typeof id !== 'string' || !(0, uuid_1.validate)(id) || (0, uuid_1.version)(id) !== 4) {
+            throw new common_1.BadRequestException(`Invalid UUID v4 provided: ${id}`);
+        }
+        return id;
     }
 }
 exports.Validators = Validators;

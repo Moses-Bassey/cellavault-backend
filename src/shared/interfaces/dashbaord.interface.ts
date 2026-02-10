@@ -1,22 +1,21 @@
-import { IsString } from "class-validator";
-import { PAYMENT_TYPE } from "src/enums/payment.enums";
+import { IsString } from 'class-validator';
+import { PAYMENT_TYPE } from 'src/enums/payment.enums';
 
 export interface IDashboard {
-    userId: string;
-    email: string;
-    fullName: string;
-    phoneNo: string;
-    // paymentType: [];
-  }
-
+  userId: string;
+  email: string;
+  fullName: string;
+  phoneNo: string;
+  // paymentType: [];
+}
 
 export class IDashboardInput {
-    @IsString()
-    deviceFCMToken: string;
+  @IsString()
+  deviceFCMToken: string;
 
-    @IsString()
-    ipAddress: string;
+  @IsString()
+  ipAddress: string;
 
-    @IsString()
-    name: string;
+  @IsString()
+  name: string;
 }

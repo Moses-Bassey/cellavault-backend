@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CngConversion } from '../entities/cng-conversion.entity';
 import { CngConversionRepository } from '../repositories/cng-conversion.repository';
 import { CreateCngConversionDto } from '../dto/cng-conversion.dto';
@@ -11,7 +15,6 @@ import { UserType } from 'src/enums/user-type.enum';
 
 @Injectable()
 export class CngConversionService {
-
   constructor(
     private readonly cngConversionRepository: CngConversionRepository,
     private readonly userService: UserService,
@@ -20,13 +23,12 @@ export class CngConversionService {
   fetchTransmission() {
     const transmissions = Object.values(TRANSMISSION);
     const fuelTypes = Object.values(FUEL_TYPE);
-    const engine_condition = Object.values(ENGINE_CONDITION)
+    const engine_condition = Object.values(ENGINE_CONDITION);
     return {
       transmissions,
       fuelTypes,
-      engine_condition
-    }
-
+      engine_condition,
+    };
   }
 
   async fetchUserCngConversions(userId: string, page: number, limit: number) {
@@ -42,7 +44,7 @@ export class CngConversionService {
       });
       return {
         fetchTransmission: await this.fetchTransmission(),
-        conversions
+        conversions,
       };
     } catch (error) {
       throw new BadRequestException(error.message);
@@ -50,25 +52,25 @@ export class CngConversionService {
   }
 
   async fetchUserCngConversionsStats(userId: string) {
-    try{
-        const pending = await this.cngConversionRepository.count({
-            where: {
-              userId: userId,
-              status: CNG_CONVERSION_STATUS.PENDING,
-            },
-          });
-          
-        const completed = await this.cngConversionRepository.count({
-            where: {
-            userId: userId,
-            status: CNG_CONVERSION_STATUS.APPROVED,
-            },
-        });
+    try {
+      const pending = await this.cngConversionRepository.count({
+        where: {
+          userId: userId,
+          status: CNG_CONVERSION_STATUS.PENDING,
+        },
+      });
 
-        return {
-            pending: pending,
-            completed: completed
-        }
+      const completed = await this.cngConversionRepository.count({
+        where: {
+          userId: userId,
+          status: CNG_CONVERSION_STATUS.APPROVED,
+        },
+      });
+
+      return {
+        pending: pending,
+        completed: completed,
+      };
     } catch (error) {
       throw new BadRequestException(error.message);
     }
@@ -82,10 +84,14 @@ export class CngConversionService {
     return await this.cngConversionRepository.findAll();
   }
 
-  async create(userId: string, userType: UserType, cngConversionData: CreateCngConversionDto): Promise<CreateCngConversionDto> {
-    try{
-        let validUserId: string | undefined = undefined;
-    
+  async create(
+    userId: string,
+    userType: UserType,
+    cngConversionData: CreateCngConversionDto,
+  ): Promise<CreateCngConversionDto> {
+    try {
+      let validUserId: string | undefined = undefined;
+
       if (userType === UserType.USER) {
         // Validate that the user exists
         const user = await this.userService.fetchUser(userId);
@@ -108,7 +114,9 @@ export class CngConversionService {
         makeOfVehicle: cngConversionData.makeOfVehicle,
         yearOfManufacture: cngConversionData.yearOfManufacture,
         vinNumber: cngConversionData.vinNumber,
-        registerationExpiryDate: new Date(cngConversionData.registerationExpiryDate),
+        registerationExpiryDate: new Date(
+          cngConversionData.registerationExpiryDate,
+        ),
         engineCapacity: cngConversionData.engineCapacity,
         cylinder: cngConversionData.cylinder,
         engineCondition: cngConversionData.engineCondition,
@@ -125,14 +133,15 @@ export class CngConversionService {
       });
 
       return cngConversionData;
-      } catch (error) {
-        throw new BadRequestException(error.message);
-      }
-    
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
   }
 
-  async update(id: string, cngConversionData: Partial<CngConversion>): Promise<[number, CngConversion[]]> {
+  async update(
+    id: string,
+    cngConversionData: Partial<CngConversion>,
+  ): Promise<[number, CngConversion[]]> {
     return await this.cngConversionRepository.update(id, cngConversionData);
   }
 }
-

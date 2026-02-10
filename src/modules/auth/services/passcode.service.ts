@@ -7,7 +7,12 @@ import {
 import { PasscodeRepository } from '../repositories/passcode.repository';
 import { PasswordUtil } from 'src/utils/password.util';
 import { UserType } from 'src/enums/user-type.enum';
-import { CreatePasscodeDto, VerifyPasscodeDto, ResetPasscodeDto, ChangePasscodeDto } from '../dto/passcode.dto';
+import {
+  CreatePasscodeDto,
+  VerifyPasscodeDto,
+  ResetPasscodeDto,
+  ChangePasscodeDto,
+} from '../dto/passcode.dto';
 import { Passcode } from '../entities/passcode.entity';
 import { UserRepository } from '../../users/repositories/user.repository';
 import { DriverRepository } from '../../drivers/repositories/driver.repository';
@@ -37,7 +42,9 @@ export class PasscodeService {
     );
 
     if (existingPasscode) {
-      throw new ConflictException('Passcode already exists. Change passcode or reset code.');
+      throw new ConflictException(
+        'Passcode already exists. Change passcode or reset code.',
+      );
     }
 
     const hashedCode = await PasswordUtil.hashPassword(input.code);
@@ -62,18 +69,21 @@ export class PasscodeService {
     userType: UserType,
     input: ChangePasscodeDto,
   ) {
-
-
     const existingPasscode = await this.passcodeRepository.findByUserId(
       userId,
       userType,
     );
 
     if (!existingPasscode) {
-      throw new NotFoundException('Passcode not found. Please create a passcode first.');
+      throw new NotFoundException(
+        'Passcode not found. Please create a passcode first.',
+      );
     }
 
-    const isValid = await PasswordUtil.verifyPassword(input.oldPasscode, existingPasscode.code);
+    const isValid = await PasswordUtil.verifyPassword(
+      input.oldPasscode,
+      existingPasscode.code,
+    );
     if (!isValid) {
       throw new BadRequestException('Invalid old passcode');
     }
@@ -90,11 +100,13 @@ export class PasscodeService {
       await this.userRepository.update(userId, { hasPasscode: true });
     }
 
-
     return null;
   }
 
-  async getPasscode(userId: string, userType: UserType): Promise<Passcode | null> {
+  async getPasscode(
+    userId: string,
+    userType: UserType,
+  ): Promise<Passcode | null> {
     return await this.passcodeRepository.findByUserId(userId, userType);
   }
 
@@ -103,13 +115,21 @@ export class PasscodeService {
     userType: UserType,
     input: VerifyPasscodeDto,
   ): Promise<boolean> {
-    const passcode = await this.passcodeRepository.findByUserId(userId, userType);
+    const passcode = await this.passcodeRepository.findByUserId(
+      userId,
+      userType,
+    );
 
     if (!passcode) {
-      throw new NotFoundException('Passcode not found. Please set a passcode first.');
+      throw new NotFoundException(
+        'Passcode not found. Please set a passcode first.',
+      );
     }
 
-    const isValid = await PasswordUtil.verifyPassword(input.code, passcode.code);
+    const isValid = await PasswordUtil.verifyPassword(
+      input.code,
+      passcode.code,
+    );
 
     if (!isValid) {
       throw new BadRequestException('Invalid passcode');
@@ -122,14 +142,18 @@ export class PasscodeService {
     userId: string,
     userType: UserType,
   ): Promise<null> {
-
-    const passcode = await this.passcodeRepository.findByUserId(userId, userType);
+    const passcode = await this.passcodeRepository.findByUserId(
+      userId,
+      userType,
+    );
 
     if (!passcode) {
-      throw new NotFoundException('Passcode not found. Please create a passcode first.');
+      throw new NotFoundException(
+        'Passcode not found. Please create a passcode first.',
+      );
     }
 
-    let email
+    let email;
 
     if (userType === UserType.DRIVER) {
       const driver = await this.driverRepository.findById(userId);
@@ -165,15 +189,21 @@ export class PasscodeService {
     email: string,
     input: ResetPasscodeDto,
   ): Promise<Passcode> {
-
-    if(input.newCode !== input.confirmCode) {
-      throw new BadRequestException('New passcode and confirm passcode do not match');
+    if (input.newCode !== input.confirmCode) {
+      throw new BadRequestException(
+        'New passcode and confirm passcode do not match',
+      );
     }
 
-    const passcode = await this.passcodeRepository.findByUserId(userId, userType);
+    const passcode = await this.passcodeRepository.findByUserId(
+      userId,
+      userType,
+    );
 
     if (!passcode) {
-      throw new NotFoundException('Passcode not found. Please create a passcode first.');
+      throw new NotFoundException(
+        'Passcode not found. Please create a passcode first.',
+      );
     }
 
     const tokenResult = await this.tokenService.verifyOTP({
@@ -191,7 +221,10 @@ export class PasscodeService {
       code: hashedCode,
     });
 
-    const updatedPasscode = await this.passcodeRepository.findByUserId(userId, userType);
+    const updatedPasscode = await this.passcodeRepository.findByUserId(
+      userId,
+      userType,
+    );
     if (!updatedPasscode) {
       throw new NotFoundException('Passcode not found after reset.');
     }
@@ -199,4 +232,3 @@ export class PasscodeService {
     return updatedPasscode;
   }
 }
-

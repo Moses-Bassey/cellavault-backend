@@ -13,6 +13,7 @@ exports.DriverService = void 0;
 const common_1 = require("@nestjs/common");
 const driver_repository_1 = require("../repositories/driver.repository");
 const client_device_service_1 = require("../../client-devices/services/client-device.service");
+const kyc_enums_1 = require("../../../enums/kyc.enums");
 let DriverService = class DriverService {
     driverRepository;
     clientDeviceService;
@@ -52,7 +53,9 @@ let DriverService = class DriverService {
         }
     }
     async setDriverType(userId, isPeppcruiseDriver) {
-        const driver = await this.driverRepository.update(userId, { isPeppcruiseDriver });
+        const driver = await this.driverRepository.update(userId, {
+            isPeppcruiseDriver,
+        });
         if (!driver) {
             throw new common_1.NotFoundException('Driver not found!');
         }
@@ -72,7 +75,7 @@ let DriverService = class DriverService {
                     deviceFCMToken: deviceFCMToken,
                     ipAddress: ipAddress,
                     name: name,
-                    userType: user.userType
+                    userType: user.userType,
                 });
             }
             else {
@@ -82,7 +85,7 @@ let DriverService = class DriverService {
                 fullName: user.fullName,
                 email: user.email,
                 phoneNo: user.phoneNo,
-                userId: user.id
+                userId: user.id,
             };
             return dashboardRes;
         }
@@ -105,6 +108,11 @@ let DriverService = class DriverService {
     }
     async findByEmail(email) {
         return await this.driverRepository.findByEmail(email);
+    }
+    async countActiveDrivers() {
+        const kycStatus = kyc_enums_1.KYC_COMPLETED.ALL_COMPLETED;
+        const drivers = await this.driverRepository.findActiveDrivers(kycStatus);
+        return drivers?.length ?? null;
     }
     async findAll(options) {
         return await this.driverRepository.findAll(options);

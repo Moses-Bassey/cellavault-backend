@@ -12,6 +12,7 @@ import { DriversModule } from './modules/drivers/drivers.module';
 import { CountriesModule } from './modules/countries/countries.module';
 import { CngConversionModule } from './modules/cng-conversion/cng-conversion.module';
 import { ClientDevicesModule } from './modules/client-devices/client-devices.module';
+import { AdminModule } from './modules/admins/admins.module';
 import { TokenModule } from './services/token/token.module';
 import { MailModule } from './services/mail/mail.module';
 import { SmsModule } from './services/sms/sms.module';
@@ -20,6 +21,7 @@ import { ApiKeyInterceptor } from './interceptors/api-key.interceptors';
 
 import { User } from './modules/users/entities';
 import { Driver } from './modules/drivers/entities';
+import { Admin } from './modules/admins/entities/admin.entity';
 import { Guarantor } from './modules/drivers/entities/guarantor.entity';
 import { kyc1PersonalInfo } from './modules/drivers/entities/kyc1-personal-Info.entity';
 import { kyc2IdInformation } from './modules/drivers/entities/kyc2-Id-Information.entity';
@@ -31,7 +33,6 @@ import { CngConversion } from './modules/cng-conversion/entities/cng-conversion.
 import { CngStation } from './modules/cng-conversion/entities/cng-station.entity';
 import { ClientDevice } from './modules/client-devices/entities/client-device.entity';
 import { Token } from './services/token/entities';
-
 
 @Module({
   imports: [
@@ -63,6 +64,7 @@ import { Token } from './services/token/entities';
         CngStation,
         ClientDevice,
         Token,
+        Admin,
       ],
       synchronize: process.env.NODE_ENV !== 'production', // Disable in production
       logging: process.env.NODE_ENV === 'development',
@@ -82,6 +84,7 @@ import { Token } from './services/token/entities';
     CountriesModule,
     CngConversionModule,
     ClientDevicesModule,
+    AdminModule,
     TokenModule,
     MailModule,
     SmsModule,

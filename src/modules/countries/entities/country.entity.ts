@@ -11,7 +11,6 @@ import {
   Unique,
 } from 'sequelize-typescript';
 
-
 @Table({
   tableName: 'countries',
   timestamps: true,
@@ -26,30 +25,30 @@ export class Country extends Model<Country> {
   @PrimaryKey
   @Default(DataType.UUIDV4)
   @Column(DataType.UUID)
-  public declare id: string;
+  declare public id: string;
 
   @Unique
   @Column(DataType.STRING(100))
-  public declare name: string;
+  declare public name: string;
 
   @Column(DataType.STRING(10))
-  public declare phoneCode: string;
+  declare public phoneCode: string;
 
   @Column(DataType.STRING(10))
-  public declare flag: string;
+  declare public flag: string;
 
   @Column(DataType.STRING(10))
-  public declare currency: string;
+  declare public currency: string;
 
   @Column(DataType.INTEGER)
-  public declare phoneLength: number;
+  declare public phoneLength: number;
 
   @CreatedAt
-  public declare createdAt: Date;
+  declare public createdAt: Date;
 
   @UpdatedAt
-  public declare updatedAt: Date;
+  declare public updatedAt: Date;
 
   @DeletedAt
-  public declare deletedAt: Date | null;
+  declare public deletedAt: Date | null;
 }

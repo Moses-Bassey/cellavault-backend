@@ -4,4 +4,3 @@ export enum ENGINE_CONDITION {
   FAIR = 'FAIR',
   POOR = 'POOR',
 }
-

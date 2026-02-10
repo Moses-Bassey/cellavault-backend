@@ -26,7 +26,9 @@ export class ClientDeviceRepository {
     });
   }
 
-  async findByDeviceToken(deviceFCMToken: string): Promise<ClientDevice | null> {
+  async findByDeviceToken(
+    deviceFCMToken: string,
+  ): Promise<ClientDevice | null> {
     return await this.clientDeviceModel.findOne({
       where: { deviceFCMToken },
     });
@@ -36,18 +38,27 @@ export class ClientDeviceRepository {
     return await this.clientDeviceModel.findAll(options);
   }
 
-  async findByUserIdAndDeviceToken(userId: string, deviceFCMToken: string): Promise<ClientDevice | null> {
-    const data = await this.clientDeviceModel.findOne({
-      where: { userId, deviceFCMToken },
+  async findByAdminIdAndDeviceToken(
+    adminId: string,
+    deviceFCMToken: string,
+  ): Promise<ClientDevice | null> {
+    return await this.clientDeviceModel.findOne({
+      where: {
+        adminId,
+        deviceFCMToken,
+        deletedAt: null,
+      },
     });
-    return data ? (data.toJSON() as ClientDevice) : null;
-  } 
+  }
 
   async create(clientDeviceData: Partial<ClientDevice>): Promise<ClientDevice> {
     return await this.clientDeviceModel.create(clientDeviceData as any);
   }
 
-  async update(id: string, clientDeviceData: Partial<ClientDevice>): Promise<[number, ClientDevice[]]> {
+  async update(
+    id: string,
+    clientDeviceData: Partial<ClientDevice>,
+  ): Promise<[number, ClientDevice[]]> {
     return await this.clientDeviceModel.update(clientDeviceData, {
       where: { id },
       returning: true,
@@ -66,27 +77,35 @@ export class ClientDeviceRepository {
     });
   }
 
-  async findByUserAndDevice(userId: string, deviceFCMToken: string): Promise<ClientDevice | null> {
+  async findByUserAndDevice(
+    userId: string,
+    deviceFCMToken: string,
+  ): Promise<ClientDevice | null> {
     return await this.clientDeviceModel.findOne({
-      where: { 
+      where: {
         userId,
         deviceFCMToken,
       },
     });
   }
 
-  async findByDriverAndDevice(driverId: string, deviceFCMToken: string): Promise<ClientDevice | null> {
+  async findByDriverAndDevice(
+    driverId: string,
+    deviceFCMToken: string,
+  ): Promise<ClientDevice | null> {
     return await this.clientDeviceModel.findOne({
-      where: { 
+      where: {
         driverId,
         deviceFCMToken,
       },
     });
   }
 
-  async updateOrCreateDevice(deviceData: Partial<ClientDevice>): Promise<ClientDevice> {
+  async updateOrCreateDevice(
+    deviceData: Partial<ClientDevice>,
+  ): Promise<ClientDevice> {
     const { userId, driverId, deviceFCMToken, ipAddress } = deviceData;
-    
+
     if (!deviceFCMToken || !ipAddress) {
       throw new Error('deviceFCMToken and ipAddress are required');
     }
@@ -96,17 +115,16 @@ export class ClientDeviceRepository {
     }
 
     // Find existing device by userId or driverId and device token
-    const existingDevice = userId 
+    const existingDevice = userId
       ? await this.findByUserAndDevice(userId, deviceFCMToken)
       : await this.findByDriverAndDevice(driverId!, deviceFCMToken);
-    
+
     if (existingDevice) {
       await this.update(existingDevice.id, deviceData);
       const data = await this.clientDeviceModel.findOne({
-        where: {id: existingDevice.id}
-      })
-      if (data != null)
-        return data;
+        where: { id: existingDevice.id },
+      });
+      if (data != null) return data;
       return existingDevice;
     } else {
       return await this.create(deviceData);

@@ -1,7 +1,9 @@
 import { SequelizeModuleOptions } from '@nestjs/sequelize';
 import { ConfigService } from '@nestjs/config';
 
-export const getSequelizeConfig = (configService: ConfigService): SequelizeModuleOptions => ({
+export const getSequelizeConfig = (
+  configService: ConfigService,
+): SequelizeModuleOptions => ({
   dialect: 'postgres',
   host: configService.get<string>('database.host') || 'localhost',
   port: configService.get<number>('database.port') || 5432,
@@ -11,5 +13,5 @@ export const getSequelizeConfig = (configService: ConfigService): SequelizeModul
   autoLoadModels: true,
   synchronize: configService.get<boolean>('database.synchronize') || false,
   logging: configService.get<boolean>('database.logging') || false,
-//   models: Object.values(models),
+  //   models: Object.values(models),
 });

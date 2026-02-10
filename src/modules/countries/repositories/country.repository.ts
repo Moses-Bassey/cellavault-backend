@@ -28,7 +28,10 @@ export class CountryRepository {
     return await this.countryModel.create(countryData as any);
   }
 
-  async update(id: string, countryData: Partial<Country>): Promise<[number, Country[]]> {
+  async update(
+    id: string,
+    countryData: Partial<Country>,
+  ): Promise<[number, Country[]]> {
     return await this.countryModel.update(countryData, {
       where: { id },
       returning: true,

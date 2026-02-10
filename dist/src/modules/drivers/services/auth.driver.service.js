@@ -56,7 +56,10 @@ let AuthDriverService = class AuthDriverService {
             }
             const newEmail = `${user.email}-${user.id}`;
             const newPhoneNo = `${user.phoneNo}-${user.id}`;
-            const updatedDriver = await this.driverRepository.update(user.id, { email: newEmail, phoneNo: newPhoneNo });
+            const updatedDriver = await this.driverRepository.update(user.id, {
+                email: newEmail,
+                phoneNo: newPhoneNo,
+            });
             if (!updatedDriver) {
                 throw new common_1.NotFoundException('User not found after deletion');
             }
@@ -64,7 +67,8 @@ let AuthDriverService = class AuthDriverService {
             return null;
         }
         catch (error) {
-            if (error instanceof common_1.NotFoundException || error instanceof common_1.UnauthorizedException) {
+            if (error instanceof common_1.NotFoundException ||
+                error instanceof common_1.UnauthorizedException) {
                 throw error;
             }
             throw new common_1.NotFoundException('Failed to delete driver account');
@@ -109,7 +113,12 @@ let AuthDriverService = class AuthDriverService {
         let data;
         if (subject === token_enum_1.TokenSubject.SIGN_UP_EMAIL) {
             input.email = validators_utils_1.Validators.validateEmail(input.email);
-            data = await this.tokenService.validateOtp({ token, subject, email, phoneNo });
+            data = await this.tokenService.validateOtp({
+                token,
+                subject,
+                email,
+                phoneNo,
+            });
         }
         else {
             if (!country) {
@@ -121,7 +130,9 @@ let AuthDriverService = class AuthDriverService {
             }
             const phone = utils_1.Utils.normalizeCountryPhone(existingCountry.phoneCode, phoneNo, existingCountry.phoneLength);
             data = await this.tokenService.validateOtp({
-                token, subject, phoneNo: phone
+                token,
+                subject,
+                phoneNo: phone,
             });
         }
         if (!data) {
@@ -137,7 +148,7 @@ let AuthDriverService = class AuthDriverService {
         }
         const emailUser = await this.checkEmailExist(input.email);
         if (emailUser) {
-            throw new common_1.ConflictException("User with email already exist");
+            throw new common_1.ConflictException('User with email already exist');
         }
         const phone = utils_1.Utils.normalizeCountryPhone(country.phoneCode, input.phoneNo, country.phoneLength);
         const verifyPhoneOtp = await this.tokenService.verifySignUpOTP({
@@ -177,7 +188,7 @@ let AuthDriverService = class AuthDriverService {
             sub: user.id,
             userType: user_type_enum_1.UserType.DRIVER,
             userId: user.id,
-            email: input.email
+            email: input.email,
         };
         const token = await this.tokenService.generateJWTtoken(payload);
         await this.emailEventService.emitWelcomeEmail(user.email, user.fullName);
@@ -243,7 +254,7 @@ let AuthDriverService = class AuthDriverService {
             sub: driver.id,
             userType: driver.userType,
             userId: driver.id,
-            email: driver.email
+            email: driver.email,
         };
         const token = await this.tokenService.generateJWTtoken(payload);
         const { password, ...rest } = driver;
@@ -254,7 +265,7 @@ let AuthDriverService = class AuthDriverService {
             userId: driver.id,
             email: driver.email,
             kycCompleted: driver.kycCompleted,
-            isGuarantorCompleted: driver.isGuarantorCompleted ? true : false
+            isGuarantorCompleted: driver.isGuarantorCompleted ? true : false,
         };
         return data;
     }
@@ -307,7 +318,7 @@ let AuthDriverService = class AuthDriverService {
             sub: user.id,
             userType: user_type_enum_1.UserType.USER,
             userId: user.id,
-            email: user.email
+            email: user.email,
         };
         const token = await this.tokenService.generateJWTtoken(payload);
         const loginTime = (0, moment_1.default)().format('MMMM Do YYYY, h:mm A');
@@ -316,7 +327,7 @@ let AuthDriverService = class AuthDriverService {
             email: user.email,
             userType: user_type_enum_1.UserType.USER,
             id: user.id,
-            token: token
+            token: token,
         };
     }
     async forgotPassword(input) {
@@ -358,7 +369,9 @@ let AuthDriverService = class AuthDriverService {
         if (user.loginType !== login_type_enum_1.LoginType.NORMAL) {
             throw new common_1.BadRequestException('Only normal login type is allowed to reset password');
         }
-        await this.driverRepository.update(user.id, { password: await password_util_1.PasswordUtil.hashPassword(password) });
+        await this.driverRepository.update(user.id, {
+            password: await password_util_1.PasswordUtil.hashPassword(password),
+        });
         return null;
     }
     async changePassword(input, authUser) {

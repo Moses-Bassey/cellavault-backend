@@ -62,7 +62,11 @@ export class EmailEventService {
     this.eventEmitter.emit('email.driver-verification', event);
   }
 
-  async emitPasswordChangedEmail(email: string, fullName: string, changedAt: string) {
+  async emitPasswordChangedEmail(
+    email: string,
+    fullName: string,
+    changedAt: string,
+  ) {
     const event = new PasswordChangedEmailEvent(email, fullName, changedAt);
     this.eventEmitter.emit('email.password-changed', event);
   }
@@ -74,7 +78,13 @@ export class EmailEventService {
     loginTime: string,
     ipAddress?: string,
   ) {
-    const event = new NewLoginEmailEvent(email, fullName, deviceInfo, loginTime, ipAddress);
+    const event = new NewLoginEmailEvent(
+      email,
+      fullName,
+      deviceInfo,
+      loginTime,
+      ipAddress,
+    );
     this.eventEmitter.emit('email.new-login', event);
   }
 

@@ -15,6 +15,7 @@ export declare class DriverService {
     findById(id: string): Promise<Driver | null>;
     findByIdentity(identity: string): Promise<Driver | null>;
     findByEmail(email: string): Promise<Driver | null>;
+    countActiveDrivers(): Promise<number | null>;
     findAll(options?: any): Promise<Driver[]>;
     update(id: string, driverData: Partial<Driver>): Promise<[number, Driver[]]>;
     delete(id: string): Promise<number>;

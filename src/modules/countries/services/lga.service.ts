@@ -10,7 +10,7 @@ export class LgaService {
     return await this.lgaRepository.findById(id);
   }
 
-  async findByStateId(stateId: string) : Promise<LGA[]>{
+  async findByStateId(stateId: string): Promise<LGA[]> {
     const lgas = await this.lgaRepository.findByStateId(stateId);
     return lgas;
   }
@@ -36,4 +36,3 @@ export class LgaService {
     return await this.lgaRepository.restore(id);
   }
 }
-

@@ -37,7 +37,7 @@ __decorate([
     (0, class_validator_1.MinLength)(2),
     (0, class_validator_1.MaxLength)(255),
     (0, class_validator_1.Matches)(/^[A-Za-z _'-]+$/, {
-        message: 'Only letters, spaces, underscores, apostrophes, and hyphens are allowed in fullName field'
+        message: 'Only letters, spaces, underscores, apostrophes, and hyphens are allowed in fullName field',
     }),
     __metadata("design:type", String)
 ], CreateKyc1Dto.prototype, "fullName", void 0);

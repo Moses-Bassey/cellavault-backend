@@ -11,28 +11,34 @@ export class GuarantorRepository {
   ) {}
 
   async findById(id: string): Promise<Guarantor | null> {
-    return await this.guarantorModel.findByPk(id, {raw: true});
+    return await this.guarantorModel.findByPk(id, { raw: true });
   }
 
   async findByDriverId(driverId: string): Promise<Guarantor[]> {
     return await this.guarantorModel.findAll({
       where: { driverId },
-      raw: true
+      raw: true,
     });
   }
 
   async countByDriverId(driverId: string): Promise<number> {
     return await this.guarantorModel.count({
-      where: { driverId }
+      where: { driverId },
     });
   }
 
   async create(guarantorData: Partial<Guarantor>): Promise<Guarantor> {
-    const guarantor =  await this.guarantorModel.create(guarantorData as any, {raw: true, returning: true});
-    return guarantor.toJSON() as Guarantor
+    const guarantor = await this.guarantorModel.create(guarantorData as any, {
+      raw: true,
+      returning: true,
+    });
+    return guarantor.toJSON() as Guarantor;
   }
 
-  async update(id: string, guarantorData: Partial<Guarantor>): Promise<[number, Guarantor[]]> {
+  async update(
+    id: string,
+    guarantorData: Partial<Guarantor>,
+  ): Promise<[number, Guarantor[]]> {
     return await this.guarantorModel.update(guarantorData, {
       where: { id },
       returning: true,
@@ -57,4 +63,3 @@ export class GuarantorRepository {
     });
   }
 }
-

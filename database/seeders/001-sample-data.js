@@ -31,9 +31,9 @@ module.exports = {
     for (const country of countriesToInsert) {
       const results = await queryInterface.sequelize.query(
         `SELECT id FROM countries WHERE id = '${country.id}' OR name = '${country.name}' LIMIT 1`,
-        { type: queryInterface.sequelize.QueryTypes.SELECT }
+        { type: queryInterface.sequelize.QueryTypes.SELECT },
       );
-      
+
       // If no results found, add to filtered list
       if (!results || results.length === 0) {
         filteredCountries.push(country);
@@ -64,7 +64,7 @@ module.exports = {
 
     const existingUser = await queryInterface.sequelize.query(
       `SELECT id FROM users WHERE id = '${userToInsert.id}' OR email = '${userToInsert.email}' OR phoneNo = '${userToInsert.phoneNo}' LIMIT 1`,
-      { type: queryInterface.sequelize.QueryTypes.SELECT }
+      { type: queryInterface.sequelize.QueryTypes.SELECT },
     );
 
     if (!existingUser || existingUser.length === 0) {

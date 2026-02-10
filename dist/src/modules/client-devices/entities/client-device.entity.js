@@ -13,6 +13,7 @@ exports.ClientDevice = void 0;
 const sequelize_typescript_1 = require("sequelize-typescript");
 const user_entity_1 = require("../../users/entities/user.entity");
 const driver_entity_1 = require("../../drivers/entities/driver.entity");
+const admin_entity_1 = require("../../admins/entities/admin.entity");
 const enums_1 = require("../../../enums");
 let ClientDevice = class ClientDevice extends sequelize_typescript_1.Model {
 };
@@ -61,8 +62,16 @@ __decorate([
     __metadata("design:type", Object)
 ], ClientDevice.prototype, "driverId", void 0);
 __decorate([
+    (0, sequelize_typescript_1.ForeignKey)(() => admin_entity_1.Admin),
     (0, sequelize_typescript_1.Column)({
-        type: sequelize_typescript_1.DataType.ENUM('DRIVER', 'USER'),
+        type: sequelize_typescript_1.DataType.UUID,
+        allowNull: true,
+    }),
+    __metadata("design:type", Object)
+], ClientDevice.prototype, "adminId", void 0);
+__decorate([
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.ENUM('DRIVER', 'USER', 'SUPER_ADMIN', 'PEPP_ADMIN', 'PEPP_MANAGER'),
         allowNull: true,
     }),
     __metadata("design:type", String)
@@ -75,6 +84,10 @@ __decorate([
     (0, sequelize_typescript_1.BelongsTo)(() => driver_entity_1.Driver),
     __metadata("design:type", driver_entity_1.Driver)
 ], ClientDevice.prototype, "driver", void 0);
+__decorate([
+    (0, sequelize_typescript_1.BelongsTo)(() => admin_entity_1.Admin),
+    __metadata("design:type", admin_entity_1.Admin)
+], ClientDevice.prototype, "admin", void 0);
 __decorate([
     sequelize_typescript_1.CreatedAt,
     __metadata("design:type", Date)

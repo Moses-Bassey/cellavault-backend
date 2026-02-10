@@ -25,7 +25,8 @@ export class CreateGuarantorDto {
   @MaxLength(150)
   @MaxLength(150)
   @Matches(/^[A-Za-z _'-]+$/, {
-    message: 'Only letters, spaces, underscores, apostrophes, and hyphens are allowed in fullName field'
+    message:
+      'Only letters, spaces, underscores, apostrophes, and hyphens are allowed in fullName field',
   })
   fullName: string;
 
@@ -124,4 +125,3 @@ export class CreateGuarantorsDto {
   @Type(() => CreateGuarantorDto)
   guarantors: CreateGuarantorDto[];
 }
-

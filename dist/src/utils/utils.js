@@ -6,15 +6,17 @@ const enums_1 = require("../enums");
 class Utils {
     static getLoginIdentityType(identity) {
         if (!identity) {
-            throw new common_1.BadRequestException("Invalid identity");
+            throw new common_1.BadRequestException('Invalid identity');
         }
-        if (identity.includes("@")) {
+        if (identity.includes('@')) {
             return enums_1.UserLoginIdentityType.EMAIL;
         }
         return enums_1.UserLoginIdentityType.PHONE_NO;
     }
     static normalizeCountryPhone(countryCode, phoneNo, phoneNoLength) {
-        const normalizedCountryCode = countryCode.startsWith('+') ? countryCode.slice(1) : countryCode;
+        const normalizedCountryCode = countryCode.startsWith('+')
+            ? countryCode.slice(1)
+            : countryCode;
         let normalizedPhoneNo = phoneNo;
         if (normalizedPhoneNo.startsWith(normalizedCountryCode)) {
             normalizedPhoneNo = normalizedPhoneNo.slice(normalizedCountryCode.length);
@@ -29,7 +31,7 @@ class Utils {
         if (!phone) {
             throw new common_1.BadRequestException('Invalid phone number');
         }
-        return "+" + phone;
+        return '+' + phone;
     }
 }
 exports.Utils = Utils;

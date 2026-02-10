@@ -6,7 +6,6 @@ import { CreateVehicleRegistrationDto } from '../dto/vehicle-registration.dto';
 
 @Injectable()
 export class VehicleRegistrationService {
-  
   constructor(
     private readonly vehicleRegistrationRepository: VehicleRegistrationRepository,
     private readonly driverService: DriverService,
@@ -20,16 +19,21 @@ export class VehicleRegistrationService {
     return await this.vehicleRegistrationRepository.findByDriverId(driverId);
   }
 
-  async create(driverId: string, vehicleRegistrationData: CreateVehicleRegistrationDto): Promise<CreateVehicleRegistrationDto> {
-
+  async create(
+    driverId: string,
+    vehicleRegistrationData: CreateVehicleRegistrationDto,
+  ): Promise<CreateVehicleRegistrationDto> {
     const driver = await this.driverService.findById(driverId);
     if (!driver) {
       throw new BadRequestException('Driver not found');
     }
 
-    const existingVehicleRegistration = await this.vehicleRegistrationRepository.findByDriverId(driverId);
+    const existingVehicleRegistration =
+      await this.vehicleRegistrationRepository.findByDriverId(driverId);
     if (existingVehicleRegistration.length > 0) {
-      throw new BadRequestException('You can only have 1 vehicle registrations');
+      throw new BadRequestException(
+        'You can only have 1 vehicle registrations',
+      );
     }
 
     const data = await this.vehicleRegistrationRepository.create({
@@ -38,7 +42,9 @@ export class VehicleRegistrationService {
       color: vehicleRegistrationData.color,
       makeOfVehicle: vehicleRegistrationData.makeOfVehicle,
       vinNumber: vehicleRegistrationData.vinNumber,
-      registerationExpiryDate: new Date(vehicleRegistrationData.registerationExpiryDate), 
+      registerationExpiryDate: new Date(
+        vehicleRegistrationData.registerationExpiryDate,
+      ),
       plateNumberUrl: vehicleRegistrationData.plateNumberUrl,
       plateNo: vehicleRegistrationData.plateNo,
       driverId,
@@ -47,12 +53,19 @@ export class VehicleRegistrationService {
     return vehicleRegistrationData;
   }
 
-  async update(id: string, vehicleRegistrationData: Partial<VehicleRegistration>): Promise<[number, VehicleRegistration[]]> {
-    return await this.vehicleRegistrationRepository.update(id, vehicleRegistrationData);
+  async update(
+    id: string,
+    vehicleRegistrationData: Partial<VehicleRegistration>,
+  ): Promise<[number, VehicleRegistration[]]> {
+    return await this.vehicleRegistrationRepository.update(
+      id,
+      vehicleRegistrationData,
+    );
   }
 
-  async deleteVehicleRegistration(id: string, driverId: string){
-    const vehicleRegistration = await this.vehicleRegistrationRepository.findById(id);
+  async deleteVehicleRegistration(id: string, driverId: string) {
+    const vehicleRegistration =
+      await this.vehicleRegistrationRepository.findById(id);
     if (!vehicleRegistration) {
       throw new BadRequestException('Vehicle registration not found');
     }
@@ -60,7 +73,11 @@ export class VehicleRegistrationService {
       throw new BadRequestException('Vehicle registration not found');
     }
 
-    const data = await this.vehicleRegistrationRepository.deleteVehicleRegistration(id, driverId);
+    const data =
+      await this.vehicleRegistrationRepository.deleteVehicleRegistration(
+        id,
+        driverId,
+      );
     return data;
   }
 
@@ -68,4 +85,3 @@ export class VehicleRegistrationService {
     return await this.vehicleRegistrationRepository.deleteByDriverId(driverId);
   }
 }
-

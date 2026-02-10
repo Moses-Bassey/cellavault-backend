@@ -30,10 +30,7 @@ let DriverRepository = class DriverRepository {
     async findByIdentity(identity) {
         const driver = await this.driverModel.findOne({
             where: {
-                [sequelize_2.Op.or]: [
-                    { email: identity },
-                    { phoneNo: identity },
-                ],
+                [sequelize_2.Op.or]: [{ email: identity }, { phoneNo: identity }],
             },
         });
         return driver ? driver.toJSON() : null;
@@ -84,8 +81,16 @@ let DriverRepository = class DriverRepository {
         });
         return driver ? driver.toJSON() : null;
     }
+    async findActiveDrivers(kycCompleted) {
+        return await this.driverModel.findAll({
+            where: { kycCompleted },
+        });
+    }
     async create(driverData) {
-        const driver = await this.driverModel.create(driverData, { raw: true, returning: true });
+        const driver = await this.driverModel.create(driverData, {
+            raw: true,
+            returning: true,
+        });
         return driver.toJSON();
     }
     async update(id, driverData) {

@@ -23,7 +23,8 @@ let SmsService = SmsService_1 = class SmsService {
         this.configService = configService;
         const accountSid = this.configService.get('app.twilioAccountSid');
         const authToken = this.configService.get('app.twilioAuthToken');
-        this.fromNumber = this.configService.get('app.twilioFromNumber') || '';
+        this.fromNumber =
+            this.configService.get('app.twilioFromNumber') || '';
         if (!accountSid || !authToken) {
             this.logger.warn('Twilio credentials not configured. SMS functionality will be limited.');
             this.client = null;
@@ -38,7 +39,8 @@ let SmsService = SmsService_1 = class SmsService {
             this.logger.error('Twilio client not initialized. Cannot send SMS.');
             throw new Error('SMS service not configured');
         }
-        const smsMessage = message || `Your PeppCruise verification code is: ${otpCode}. Valid for 10 minutes.`;
+        const smsMessage = message ||
+            `Your PeppCruise verification code is: ${otpCode}. Valid for 10 minutes.`;
         try {
             const result = await this.client.messages.create({
                 body: smsMessage,

@@ -1,6 +1,24 @@
-import { Controller, Get, Param, Put, Delete, Body, UseGuards, Request, HttpCode, HttpStatus, NotFoundException, Post } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  Put,
+  Delete,
+  Body,
+  UseGuards,
+  Request,
+  HttpCode,
+  HttpStatus,
+  NotFoundException,
+  Post,
+} from '@nestjs/common';
 import type { Request as ExpressRequest } from 'express';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { User } from '../entities/user.entity';
 import { UserService } from '../services/user.service';
 import { AuthGuard } from '../../auth/guards/auth.guard';
@@ -24,9 +42,7 @@ export class UserController {
   @ApiOperation({ summary: 'Get current user info' })
   @ApiResponse({ status: 200, description: 'User info retrieved successfully' })
   @ApiResponse({ status: 404, description: 'User not found' })
-  async fetchuser(
-    @Request() req: ExpressRequest & { user: JwtAuthPayload },
-  ) {
+  async fetchuser(@Request() req: ExpressRequest & { user: JwtAuthPayload }) {
     const userId = Validators.validateUuid(req.user.userId);
     const data = await this.userService.fetchUser(userId);
     return ResponseUtil.handleResponse(
@@ -44,14 +60,17 @@ export class UserController {
   async dashboard(
     @Request() req: ExpressRequest & { user: JwtAuthPayload },
     @Body() userData: DashboardDto,
-  ){
+  ) {
     const userId = Validators.validateUuid(req.user.userId);
     const ipAddress = req.ip;
-    const data = await this.userService.dashboard({
-      deviceFCMToken: userData.deviceFCMToken,
-      ipAddress: ipAddress || '',
-      name: userData.name || '',
-    }, userId);
+    const data = await this.userService.dashboard(
+      {
+        deviceFCMToken: userData.deviceFCMToken,
+        ipAddress: ipAddress || '',
+        name: userData.name || '',
+      },
+      userId,
+    );
     return ResponseUtil.handleResponse(
       data,
       'User dashboard data retrieved successfully',
@@ -59,21 +78,24 @@ export class UserController {
     );
   }
 
-  @Put('profile-image')
-  @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Update user image URL' })
-  @ApiResponse({ status: 200, description: 'Image URL updated successfully' })
-  @ApiResponse({ status: 404, description: 'User not found' })
-  async updateImageUrl(
-    @Request() req: ExpressRequest & { user: JwtAuthPayload },
-    @Body() updateImageUrlDto: UpdateImageUrlDto,
-  ) {
-    const userId = Validators.validateUuid(req.user.userId);
-    const data = await this.userService.updateImageUrl(userId, updateImageUrlDto.imageUrl);
-    return ResponseUtil.handleResponse(
-      data,
-      'Image URL updated successfully',
-      HttpStatus.OK,
-    );
-  }
+  // @Put('profile-image')
+  // @HttpCode(HttpStatus.OK)
+  // @ApiOperation({ summary: 'Update user image URL' })
+  // @ApiResponse({ status: 200, description: 'Image URL updated successfully' })
+  // @ApiResponse({ status: 404, description: 'User not found' })
+  // async updateImageUrl(
+  //   @Request() req: ExpressRequest & { user: JwtAuthPayload },
+  //   @Body() updateImageUrlDto: UpdateImageUrlDto,
+  // ) {
+  //   const userId = Validators.validateUuid(req.user.userId);
+  //   const data = await this.userService.updateImageUrl(
+  //     userId,
+  //     updateImageUrlDto.imageUrl,
+  //   );
+  //   return ResponseUtil.handleResponse(
+  //     data,
+  //     'Image URL updated successfully',
+  //     HttpStatus.OK,
+  //   );
+  // }
 }

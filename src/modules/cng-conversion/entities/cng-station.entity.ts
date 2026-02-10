@@ -24,7 +24,7 @@ export class CngStation extends Model<CngStation> {
   @PrimaryKey
   @Default(DataType.UUIDV4)
   @Column(DataType.UUID)
-  public declare id: string;
+  declare public id: string;
 
   @Column(DataType.STRING(100))
   public name: string;
@@ -52,21 +52,19 @@ export class CngStation extends Model<CngStation> {
     type: DataType.DATE,
     allowNull: false,
   })
-  public declare createdAt: Date;
+  declare public createdAt: Date;
 
   @UpdatedAt
   @Column({
     type: DataType.DATE,
     allowNull: false,
   })
-  public declare updatedAt: Date;
+  declare public updatedAt: Date;
 
   @DeletedAt
   @Column({
     type: DataType.DATE,
     allowNull: true,
   })
-  public declare deletedAt: Date | null;
+  declare public deletedAt: Date | null;
 }
-
-

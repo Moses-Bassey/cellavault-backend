@@ -10,7 +10,6 @@ import { Validators } from 'src/utils/validators.utils';
 
 @Injectable()
 export class GuarantorService {
-  
   private readonly MAX_GUARANTORS = 2;
 
   constructor(
@@ -31,18 +30,22 @@ export class GuarantorService {
     return await this.guarantorRepository.countByDriverId(driverId);
   }
 
-  async create(driverId: string, guarantorData: CreateGuarantorDto): Promise<Guarantor> {
-
+  async create(
+    driverId: string,
+    guarantorData: CreateGuarantorDto,
+  ): Promise<Guarantor> {
     try {
       const count = await this.guarantorRepository.countByDriverId(driverId);
-    
+
       const driver = await this.driverService.findById(driverId);
       if (!driver) {
         throw new BadRequestException('Driver not found');
       }
 
       if (count > this.MAX_GUARANTORS) {
-        throw new BadRequestException(`Maximum of ${this.MAX_GUARANTORS} guarantors allowed per driver`);
+        throw new BadRequestException(
+          `Maximum of ${this.MAX_GUARANTORS} guarantors allowed per driver`,
+        );
       }
 
       const country = await this.countryService.findById(guarantorData.country);
@@ -51,14 +54,20 @@ export class GuarantorService {
       }
 
       if (guarantorData.phoneNo.length !== country.phoneLength) {
-        throw new BadRequestException(`Phone number must be exactly ${country.phoneLength} digits`);
+        throw new BadRequestException(
+          `Phone number must be exactly ${country.phoneLength} digits`,
+        );
       }
 
-      const phone = Utils.normalizeCountryPhone(country.phoneCode, guarantorData.phoneNo, country.phoneLength);
+      const phone = Utils.normalizeCountryPhone(
+        country.phoneCode,
+        guarantorData.phoneNo,
+        country.phoneLength,
+      );
       const email = Validators.validateEmail(guarantorData.email);
 
-      if(driver.email == email || driver.phoneNo == phone){
-        throw new BadRequestException("You cannot be a guarantor")
+      if (driver.email == email || driver.phoneNo == phone) {
+        throw new BadRequestException('You cannot be a guarantor');
       }
 
       const data = await this.guarantorRepository.create({
@@ -73,7 +82,7 @@ export class GuarantorService {
         driverId,
       });
 
-      if(count >= 1) {
+      if (count >= 1) {
         if (data.id) {
           await this.driverService.update(driverId, {
             isGuarantorCompleted: true,
@@ -87,11 +96,14 @@ export class GuarantorService {
     }
   }
 
-  async update(id: string, guarantorData: Partial<Guarantor>): Promise<[number, Guarantor[]]> {
+  async update(
+    id: string,
+    guarantorData: Partial<Guarantor>,
+  ): Promise<[number, Guarantor[]]> {
     return await this.guarantorRepository.update(id, guarantorData);
   }
 
-  async deleteGuarantor(id: string, driverId: string){
+  async deleteGuarantor(id: string, driverId: string) {
     const guarantor = await this.guarantorRepository.findById(id);
     if (!guarantor) {
       throw new BadRequestException('Guarantor not found');
@@ -112,10 +124,9 @@ export class GuarantorService {
     return await this.guarantorRepository.deleteByDriverId(driverId);
   }
 
-
   canAddMoreGuarantors(driverId: string): Promise<boolean> {
-    return this.guarantorRepository.countByDriverId(driverId)
-      .then(count => count < this.MAX_GUARANTORS);
+    return this.guarantorRepository
+      .countByDriverId(driverId)
+      .then((count) => count < this.MAX_GUARANTORS);
   }
 }
-

@@ -13,7 +13,7 @@ async function bootstrap() {
     const logger = new common_1.Logger('Bootstrap');
     const configService = app.get(config_1.ConfigService);
     app.enableCors({
-        origin: "*",
+        origin: '*',
         credentials: true,
         methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
         allowedHeaders: [
@@ -36,7 +36,7 @@ async function bootstrap() {
         forbidNonWhitelisted: true,
         transform: true,
         transformOptions: {
-            enableImplicitConversion: true,
+            enableImplicitConversion: false,
         },
         errorHttpStatusCode: 422,
     }));

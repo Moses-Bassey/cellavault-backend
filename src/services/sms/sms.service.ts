@@ -11,10 +11,13 @@ export class SmsService {
   constructor(private readonly configService: ConfigService) {
     const accountSid = this.configService.get<string>('app.twilioAccountSid');
     const authToken = this.configService.get<string>('app.twilioAuthToken');
-    this.fromNumber = this.configService.get<string>('app.twilioFromNumber') || '';
+    this.fromNumber =
+      this.configService.get<string>('app.twilioFromNumber') || '';
 
     if (!accountSid || !authToken) {
-      this.logger.warn('Twilio credentials not configured. SMS functionality will be limited.');
+      this.logger.warn(
+        'Twilio credentials not configured. SMS functionality will be limited.',
+      );
       this.client = null;
     } else {
       this.client = new Twilio(accountSid, authToken);
@@ -22,13 +25,19 @@ export class SmsService {
     }
   }
 
-  async sendOtp(phoneNumber: string, otpCode: string, message?: string): Promise<void> {
+  async sendOtp(
+    phoneNumber: string,
+    otpCode: string,
+    message?: string,
+  ): Promise<void> {
     if (!this.client) {
       this.logger.error('Twilio client not initialized. Cannot send SMS.');
       throw new Error('SMS service not configured');
     }
 
-    const smsMessage = message || `Your PeppCruise verification code is: ${otpCode}. Valid for 10 minutes.`;
+    const smsMessage =
+      message ||
+      `Your PeppCruise verification code is: ${otpCode}. Valid for 10 minutes.`;
 
     try {
       const result = await this.client.messages.create({
@@ -37,11 +46,12 @@ export class SmsService {
         to: phoneNumber,
       });
 
-      this.logger.log(`SMS sent successfully to ${phoneNumber}. SID: ${result.sid}`);
+      this.logger.log(
+        `SMS sent successfully to ${phoneNumber}. SID: ${result.sid}`,
+      );
     } catch (error) {
       this.logger.error(`Failed to send SMS to ${phoneNumber}:`, error);
       throw error;
     }
   }
 }
-

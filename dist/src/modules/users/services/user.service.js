@@ -35,33 +35,6 @@ let UserService = class UserService {
             throw new common_1.NotFoundException('User not found!');
         }
     }
-    async findByIdentity(identity) {
-        try {
-            const user = await this.userRepository.findByIdentity(identity);
-            if (!user) {
-                throw new common_1.NotFoundException('User not found!');
-            }
-            return user;
-        }
-        catch (error) {
-            throw new common_1.NotFoundException('User not found!');
-        }
-    }
-    async findByEmail(email) {
-        return await this.userRepository.findByEmail(email);
-    }
-    async findAll(options) {
-        return await this.userRepository.findAll(options);
-    }
-    async update(id, userData) {
-        return await this.userRepository.update(id, userData);
-    }
-    async delete(id) {
-        return await this.userRepository.delete(id);
-    }
-    async restore(id) {
-        await this.userRepository.restore(id);
-    }
     async dashboard(data, userId) {
         try {
             const { deviceFCMToken, ipAddress, name } = data;
@@ -76,7 +49,7 @@ let UserService = class UserService {
                     deviceFCMToken: deviceFCMToken,
                     ipAddress: ipAddress,
                     name: name,
-                    userType: user.userType
+                    userType: user.userType,
                 });
             }
             else {
@@ -86,7 +59,7 @@ let UserService = class UserService {
                 fullName: user.fullName,
                 email: user.email,
                 phoneNo: user.phoneNo,
-                userId: user.id
+                userId: user.id,
             };
             return dashboardRes;
         }
@@ -94,28 +67,41 @@ let UserService = class UserService {
             throw new common_1.NotFoundException('User not found!');
         }
     }
-    async updateImageUrl(userId, imageUrl) {
-        try {
-            const user = await this.userRepository.fetchUser(userId);
-            if (!user) {
-                throw new common_1.NotFoundException('User not found!');
-            }
-            const [affectedCount, updatedUsers] = await this.userRepository.update(userId, { imageUrl });
-            if (affectedCount === 0) {
-                throw new common_1.NotFoundException('User not found!');
-            }
-            const updatedUser = await this.userRepository.fetchUser(userId);
-            if (!updatedUser) {
-                throw new common_1.NotFoundException('User not found!');
-            }
-            return updatedUser;
-        }
-        catch (error) {
-            if (error instanceof common_1.NotFoundException) {
-                throw error;
-            }
-            throw new common_1.NotFoundException('Failed to update image URL');
-        }
+    async findAll(options) {
+        return await this.userRepository.findAll(options);
+    }
+    async countFiltered(options) {
+        return this.userRepository.countFiltered(options);
+    }
+    async update(id, userData) {
+        return await this.userRepository.update(id, userData);
+    }
+    async delete(id) {
+        return await this.userRepository.delete(id);
+    }
+    async restore(id) {
+        await this.userRepository.restore(id);
+    }
+    async countActiveUsers() {
+        const isDisabled = false;
+        const users = await this.userRepository.findActiveUsers(isDisabled);
+        return users?.length ?? null;
+    }
+    async countAllUsers() {
+        const users = await this.userRepository.countAll();
+        return users?.length ?? null;
+    }
+    async countBannedUsers() {
+        const isDisabled = true;
+        const users = await this.userRepository.findAllBanned(isDisabled);
+        return users?.length ?? null;
+    }
+    async getNewUsersForMonth() {
+        const currentDate = new Date();
+        const currentMonth = currentDate.getMonth() + 1;
+        const currentYear = currentDate.getFullYear();
+        const currentMonthUsers = await this.userRepository.getNewUsersForMonth(currentYear, currentMonth);
+        return currentMonthUsers?.length ?? null;
     }
 };
 exports.UserService = UserService;

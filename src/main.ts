@@ -15,7 +15,7 @@ async function bootstrap() {
 
   // CORS configuration
   app.enableCors({
-    origin: "*",
+    origin: '*',
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: [
@@ -45,7 +45,7 @@ async function bootstrap() {
       forbidNonWhitelisted: true,
       transform: true,
       transformOptions: {
-        enableImplicitConversion: true,
+        enableImplicitConversion: false,
       },
       errorHttpStatusCode: 422,
     }),
@@ -78,7 +78,6 @@ async function bootstrap() {
       },
     });
   }
-
 
   // Start server
   const port = configService.get<number>('app.port');

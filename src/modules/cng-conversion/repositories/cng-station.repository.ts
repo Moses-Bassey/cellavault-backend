@@ -15,8 +15,10 @@ export class CngStationRepository {
   }
 
   async create(cngStationData: Partial<CngStation>): Promise<CngStation> {
-    const cngStation = await this.cngStationModel.create(cngStationData as any, {raw: true, returning: true});
+    const cngStation = await this.cngStationModel.create(
+      cngStationData as any,
+      { raw: true, returning: true },
+    );
     return cngStation.toJSON() as CngStation;
   }
 }
-

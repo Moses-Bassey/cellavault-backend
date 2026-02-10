@@ -81,4 +81,3 @@ export class CreateVehicleRegistrationDto {
   @MaxLength(50)
   plateNo: string;
 }
-

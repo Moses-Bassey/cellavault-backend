@@ -55,7 +55,10 @@ let DriverController = class DriverController {
         return response_utils_1.ResponseUtil.handleResponse(data, 'Banks retrieved successfully', common_1.HttpStatus.OK);
     }
     async validateBankAccount(reqBody, req) {
-        const data = await monnify_1.monifyAPI.validateAccount({ bankCode: reqBody.bankCode, accountNumber: reqBody.accountNo });
+        const data = await monnify_1.monifyAPI.validateAccount({
+            bankCode: reqBody.bankCode,
+            accountNumber: reqBody.accountNo,
+        });
         return response_utils_1.ResponseUtil.handleResponse(data, 'Bank account validated successfully', common_1.HttpStatus.OK);
     }
     async createBankAccount(reqBody, req) {
@@ -118,7 +121,10 @@ __decorate([
     (0, common_1.Post)('bank-account-validation'),
     (0, roles_decorator_1.Roles)(user_type_enum_1.UserType.DRIVER),
     (0, swagger_1.ApiOperation)({ summary: 'Validate bank account' }),
-    (0, swagger_1.ApiResponse)({ status: 200, description: 'Bank account validated successfully' }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Bank account validated successfully',
+    }),
     __param(0, (0, common_1.Body)()),
     __param(1, (0, common_1.Request)()),
     __metadata("design:type", Function),

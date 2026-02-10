@@ -29,7 +29,7 @@ let ClientDeviceService = class ClientDeviceService {
         return devices;
     }
     async findByUserIdAndDeviceToken(userId, deviceFCMToken) {
-        return await this.clientDeviceRepository.findByUserIdAndDeviceToken(userId, deviceFCMToken);
+        return await this.clientDeviceRepository.findByAdminIdAndDeviceToken(userId, deviceFCMToken);
     }
     async findByDriverIdAndDeviceToken(driverId, deviceFCMToken) {
         return await this.clientDeviceRepository.findByDriverAndDevice(driverId, deviceFCMToken);

@@ -26,8 +26,22 @@ exports.CountriesModule = CountriesModule = __decorate([
     (0, common_1.Module)({
         imports: [sequelize_1.SequelizeModule.forFeature([country_entity_1.Country, state_entity_1.State, lga_entity_1.LGA])],
         controllers: [country_controller_1.CountryController],
-        providers: [country_service_1.CountryService, state_service_1.StateService, lga_service_1.LgaService, country_repository_1.CountryRepository, state_repository_1.StateRepository, lga_repository_1.LgaRepository],
-        exports: [country_service_1.CountryService, state_service_1.StateService, lga_service_1.LgaService, country_repository_1.CountryRepository, state_repository_1.StateRepository, lga_repository_1.LgaRepository],
+        providers: [
+            country_service_1.CountryService,
+            state_service_1.StateService,
+            lga_service_1.LgaService,
+            country_repository_1.CountryRepository,
+            state_repository_1.StateRepository,
+            lga_repository_1.LgaRepository,
+        ],
+        exports: [
+            country_service_1.CountryService,
+            state_service_1.StateService,
+            lga_service_1.LgaService,
+            country_repository_1.CountryRepository,
+            state_repository_1.StateRepository,
+            lga_repository_1.LgaRepository,
+        ],
     })
 ], CountriesModule);
 //# sourceMappingURL=countries.module.js.map

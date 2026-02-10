@@ -58,7 +58,10 @@ exports.CngConversionController = CngConversionController;
 __decorate([
     (0, common_1.Post)(),
     (0, swagger_1.ApiOperation)({ summary: 'Create a CNG conversion request' }),
-    (0, swagger_1.ApiResponse)({ status: 201, description: 'CNG conversion request created successfully' }),
+    (0, swagger_1.ApiResponse)({
+        status: 201,
+        description: 'CNG conversion request created successfully',
+    }),
     __param(0, (0, common_1.Body)()),
     __param(1, (0, common_1.Request)()),
     __metadata("design:type", Function),
@@ -68,7 +71,10 @@ __decorate([
 __decorate([
     (0, common_1.Get)('vehicle-transmissions'),
     (0, swagger_1.ApiOperation)({ summary: 'Get list of transmission types' }),
-    (0, swagger_1.ApiResponse)({ status: 200, description: 'Transmission types retrieved successfully' }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Transmission types retrieved successfully',
+    }),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
@@ -76,7 +82,10 @@ __decorate([
 __decorate([
     (0, common_1.Get)('stations'),
     (0, swagger_1.ApiOperation)({ summary: 'Get list of CNG stations' }),
-    (0, swagger_1.ApiResponse)({ status: 200, description: 'CNG stations retrieved successfully' }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'CNG stations retrieved successfully',
+    }),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
@@ -84,7 +93,10 @@ __decorate([
 __decorate([
     (0, common_1.Get)(),
     (0, swagger_1.ApiOperation)({ summary: 'Get list of CNG stations' }),
-    (0, swagger_1.ApiResponse)({ status: 200, description: 'CNG stations retrieved successfully' }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'CNG stations retrieved successfully',
+    }),
     __param(0, (0, common_1.Request)()),
     __param(1, (0, common_1.Query)('page')),
     __param(2, (0, common_1.Query)('limit')),
@@ -95,7 +107,10 @@ __decorate([
 __decorate([
     (0, common_1.Get)('/stats'),
     (0, swagger_1.ApiOperation)({ summary: 'Get list of CNG stations' }),
-    (0, swagger_1.ApiResponse)({ status: 200, description: 'CNG stations retrieved successfully' }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'CNG stations retrieved successfully',
+    }),
     __param(0, (0, common_1.Request)()),
     __param(1, (0, common_1.Query)('page')),
     __param(2, (0, common_1.Query)('limit')),

@@ -9,6 +9,7 @@ import { Guarantor } from '../entities/guarantor.entity';
 import { kyc1PersonalInfo } from '../entities/kyc1-personal-Info.entity';
 import { kyc2IdInformation } from '../entities/kyc2-Id-Information.entity';
 import { kyc3ResidentialInformation } from '../entities/kyc3-residential-Information.entity';
+import { KYC_COMPLETED } from 'src/enums/kyc.enums';
 
 @Injectable()
 export class DriverRepository {
@@ -20,17 +21,14 @@ export class DriverRepository {
   async findByIdentity(identity: string): Promise<Driver | null> {
     const driver = await this.driverModel.findOne({
       where: {
-        [Op.or]: [
-          { email: identity },
-          { phoneNo: identity },
-        ],
+        [Op.or]: [{ email: identity }, { phoneNo: identity }],
       },
     });
     return driver ? (driver.toJSON() as Driver) : null;
   }
 
   async findById(id: string): Promise<Driver | null> {
-    return await this.driverModel.findByPk(id, {raw: true});
+    return await this.driverModel.findByPk(id, { raw: true });
   }
 
   async fetchDriver(id: string): Promise<Driver | null> {
@@ -73,19 +71,36 @@ export class DriverRepository {
     return driver ? (driver.toJSON() as Driver) : null;
   }
 
-  async findByEmailAndRole(email: string, userType: UserType): Promise<Driver | null> {
+  async findByEmailAndRole(
+    email: string,
+    userType: UserType,
+  ): Promise<Driver | null> {
     const driver = await this.driverModel.findOne({
       where: { email, userType },
     });
     return driver ? (driver.toJSON() as Driver) : null;
   }
 
-  async create(driverData: Partial<Driver>): Promise<Driver> {
-    const driver =  await this.driverModel.create(driverData as any, {raw: true, returning: true});
-    return driver.toJSON() as Driver
+  async findActiveDrivers(
+    kycCompleted: KYC_COMPLETED,
+  ): Promise<Driver[] | null> {
+    return await this.driverModel.findAll({
+      where: { kycCompleted },
+    });
   }
 
-  async update(id: string, driverData: Partial<Driver>): Promise<[number, Driver[]]> {
+  async create(driverData: Partial<Driver>): Promise<Driver> {
+    const driver = await this.driverModel.create(driverData as any, {
+      raw: true,
+      returning: true,
+    });
+    return driver.toJSON() as Driver;
+  }
+
+  async update(
+    id: string,
+    driverData: Partial<Driver>,
+  ): Promise<[number, Driver[]]> {
     return await this.driverModel.update(driverData, {
       where: { id },
       returning: true,
@@ -104,7 +119,10 @@ export class DriverRepository {
     });
   }
 
-  async findWithCountry(email: string, userType: UserType): Promise<Driver | null> {
+  async findWithCountry(
+    email: string,
+    userType: UserType,
+  ): Promise<Driver | null> {
     return await this.driverModel.findOne({
       where: { email, userType },
       include: ['country'],
@@ -115,4 +133,3 @@ export class DriverRepository {
     return await this.driverModel.findAll(options);
   }
 }
-

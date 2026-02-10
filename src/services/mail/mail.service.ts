@@ -30,5 +30,4 @@ export class MailService {
       context: { otpCode, expiryDate },
     });
   }
-
 }

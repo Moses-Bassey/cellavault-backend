@@ -1,13 +1,22 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsAlpha, IsEmail, IsEnum, IsOptional, IsPhoneNumber, IsString, IsUUID, Matches, MaxLength, MinLength } from 'class-validator';
+import {
+  IsAlpha,
+  IsEmail,
+  IsEnum,
+  IsOptional,
+  IsPhoneNumber,
+  IsString,
+  IsUUID,
+  Matches,
+  MaxLength,
+  MinLength,
+} from 'class-validator';
 import { min } from 'date-fns';
 import { GENDER } from 'src/enums/gender.enum';
 import { LoginType } from 'src/enums/login-type.enum';
 import { TokenSubject } from 'src/enums/token.enum';
 
-
 export class CreateAccountDto {
-
   @ApiProperty({
     description: 'User gender',
     example: 'MALE | FEMALE | OTHER',
@@ -63,10 +72,11 @@ export class CreateAccountDto {
   @MinLength(4)
   @MaxLength(150)
   @Matches(/^[A-Za-z _'-]+$/, {
-    message: 'Only letters, spaces, underscores, apostrophes, and hyphens are allowed in fullName field'
+    message:
+      'Only letters, spaces, underscores, apostrophes, and hyphens are allowed in fullName field',
   })
   readonly fullName: string;
-  
+
   @ApiProperty({
     description: 'Referal code',
     example: '123456',
@@ -98,8 +108,6 @@ export class LoginDriverDto {
     description: 'Device information',
     example: 'Web Browser',
   })
-
-
   @IsOptional()
   readonly deviceInfo: string;
 
@@ -109,7 +117,6 @@ export class LoginDriverDto {
   })
   @IsOptional()
   readonly country: string;
-
 }
 
 export class LoginOtpDto {
@@ -148,7 +155,6 @@ export class LoginOtpDto {
   })
   @IsOptional()
   readonly country?: string;
-
 }
 
 export class ForgotPasswordDto {
@@ -275,7 +281,6 @@ export class VerifyOtpDto {
   @IsOptional()
   readonly subject: TokenSubject;
 
-
   @ApiProperty({
     description: 'Country',
     example: 'Country',
@@ -286,14 +291,14 @@ export class VerifyOtpDto {
 }
 
 export class SignUserDto {
-
   @ApiProperty({
     description: 'User Name',
     example: 'John Doe',
   })
   @IsString()
   @Matches(/^[A-Za-z _'-]+$/, {
-    message: 'Only letters, spaces, underscores, apostrophes, and hyphens are allowed in fullName field'
+    message:
+      'Only letters, spaces, underscores, apostrophes, and hyphens are allowed in fullName field',
   })
   readonly fullName: string;
 

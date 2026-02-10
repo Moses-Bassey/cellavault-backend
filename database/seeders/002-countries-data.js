@@ -189,9 +189,9 @@ module.exports = {
     for (const country of countries) {
       const results = await queryInterface.sequelize.query(
         `SELECT id FROM countries WHERE id = '${country.id}' OR name = '${country.name}' LIMIT 1`,
-        { type: queryInterface.sequelize.QueryTypes.SELECT }
+        { type: queryInterface.sequelize.QueryTypes.SELECT },
       );
-      
+
       if (!results || results.length === 0) {
         countriesToInsert.push(country);
       }

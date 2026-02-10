@@ -4,13 +4,9 @@ import { CngStationRepository } from '../repositories/cng-station.repository';
 
 @Injectable()
 export class CngStationService {
- 
-  constructor(
-    private readonly cngStationRepository: CngStationRepository,
-  ) {}
+  constructor(private readonly cngStationRepository: CngStationRepository) {}
 
   async findAll(): Promise<CngStation[]> {
     return await this.cngStationRepository.findAll();
   }
 }
-

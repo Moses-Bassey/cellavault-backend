@@ -61,7 +61,7 @@ export class kyc1PersonalInfo extends Model<kyc1PersonalInfo> {
   @Unique
   @Column({
     type: DataType.STRING(15),
-    allowNull: false
+    allowNull: false,
   })
   public phoneNo: string;
 
@@ -117,7 +117,6 @@ export class kyc1PersonalInfo extends Model<kyc1PersonalInfo> {
     allowNull: true,
   })
   public utilityBillImageUrl: string;
-
 
   @CreatedAt
   @Column({

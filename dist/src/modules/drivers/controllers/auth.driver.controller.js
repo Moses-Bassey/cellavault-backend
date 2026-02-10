@@ -152,7 +152,7 @@ __decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Delete user account' }),
     (0, swagger_1.ApiResponse)({
         status: 200,
-        description: 'User account deleted successfully'
+        description: 'User account deleted successfully',
     }),
     (0, swagger_1.ApiResponse)({ status: 404, description: 'User not found' }),
     __param(0, (0, common_1.Body)()),

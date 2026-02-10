@@ -54,7 +54,7 @@ let KycService = class KycService {
         });
         if (kyc1.id) {
             await this.driverRepository.update(driverId, {
-                kycCompleted: kyc_enums_1.KYC_COMPLETED.PERSONAL_INFORMATION
+                kycCompleted: kyc_enums_1.KYC_COMPLETED.PERSONAL_INFORMATION,
             });
         }
         return kyc1;
@@ -83,7 +83,7 @@ let KycService = class KycService {
         });
         if (kyc2.id) {
             await this.driverRepository.update(driverId, {
-                kycCompleted: kyc_enums_1.KYC_COMPLETED.IDENTITY_INFORMATION
+                kycCompleted: kyc_enums_1.KYC_COMPLETED.IDENTITY_INFORMATION,
             });
         }
         return kyc2;
@@ -107,7 +107,7 @@ let KycService = class KycService {
         });
         if (kyc3.id) {
             await this.driverRepository.update(driverId, {
-                kycCompleted: kyc_enums_1.KYC_COMPLETED.RESIDENTIAL_INFORMATION
+                kycCompleted: kyc_enums_1.KYC_COMPLETED.RESIDENTIAL_INFORMATION,
             });
         }
         return kyc3;

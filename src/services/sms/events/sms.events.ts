@@ -11,4 +11,3 @@ export class ForgotPasswordOtpSmsEvent {
     public readonly otpCode: string,
   ) {}
 }
-

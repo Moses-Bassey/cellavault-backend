@@ -6,7 +6,6 @@ import { CNG_CONVERSION_STATUS } from 'src/enums/cng-conversion-status.enum';
 
 @Injectable()
 export class CngConversionRepository {
-  
   constructor(
     @InjectModel(CngConversion)
     private cngConversionModel: typeof CngConversion,
@@ -18,19 +17,27 @@ export class CngConversionRepository {
   }
 
   async findById(id: string): Promise<CngConversion | null> {
-    return await this.cngConversionModel.findByPk(id, {raw: true});
+    return await this.cngConversionModel.findByPk(id, { raw: true });
   }
 
   async findAll(options?: any): Promise<CngConversion[]> {
     return await this.cngConversionModel.findAll(options);
   }
 
-  async create(cngConversionData: Partial<CngConversion>): Promise<CngConversion> {
-    const cngConversion = await this.cngConversionModel.create(cngConversionData as any, {raw: true, returning: true});
+  async create(
+    cngConversionData: Partial<CngConversion>,
+  ): Promise<CngConversion> {
+    const cngConversion = await this.cngConversionModel.create(
+      cngConversionData as any,
+      { raw: true, returning: true },
+    );
     return cngConversion.toJSON() as CngConversion;
   }
 
-  async update(id: string, cngConversionData: Partial<CngConversion>): Promise<[number, CngConversion[]]> {
+  async update(
+    id: string,
+    cngConversionData: Partial<CngConversion>,
+  ): Promise<[number, CngConversion[]]> {
     return await this.cngConversionModel.update(cngConversionData, {
       where: { id },
       returning: true,
@@ -43,4 +50,3 @@ export class CngConversionRepository {
     });
   }
 }
-

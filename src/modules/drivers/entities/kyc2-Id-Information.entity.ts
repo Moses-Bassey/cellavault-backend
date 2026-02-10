@@ -63,7 +63,6 @@ export class kyc2IdInformation extends Model<kyc2IdInformation> {
   })
   public isVerified: boolean;
 
-
   @CreatedAt
   @Column({
     type: DataType.DATE,

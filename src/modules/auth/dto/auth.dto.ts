@@ -1,11 +1,21 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsAlpha, IsEmail, IsEnum, IsOptional, IsPhoneNumber, IsString, IsUUID, Matches, MaxLength, MinLength } from 'class-validator';
+import {
+  IsAlpha,
+  IsEmail,
+  IsEnum,
+  IsOptional,
+  IsPhoneNumber,
+  IsString,
+  IsUUID,
+  Matches,
+  MaxLength,
+  MinLength,
+} from 'class-validator';
 import { min } from 'date-fns';
 import { NotNull } from 'sequelize-typescript';
 import { GENDER } from 'src/enums/gender.enum';
 import { LoginType } from 'src/enums/login-type.enum';
 import { TokenSubject } from 'src/enums/token.enum';
-
 
 export class SignUpUserDto {
   // @ApiProperty({
@@ -63,10 +73,11 @@ export class SignUpUserDto {
   @MinLength(4)
   @MaxLength(150)
   @Matches(/^[A-Za-z _'-]+$/, {
-    message: 'Only letters, spaces, underscores, apostrophes, and hyphens are allowed in fullName field'
+    message:
+      'Only letters, spaces, underscores, apostrophes, and hyphens are allowed in fullName field',
   })
   readonly fullName: string;
-  
+
   @ApiProperty({
     description: 'Referal code',
     example: '123456',
@@ -133,10 +144,11 @@ export class SignUpSocialUserDto {
   @MinLength(4)
   @MaxLength(150)
   @Matches(/^[A-Za-z _'-]+$/, {
-    message: 'Only letters, spaces, underscores, apostrophes, and hyphens are allowed in fullName field'
+    message:
+      'Only letters, spaces, underscores, apostrophes, and hyphens are allowed in fullName field',
   })
   readonly fullName: string;
-  
+
   @ApiProperty({
     description: 'Referal code',
     example: '123456',
@@ -185,7 +197,6 @@ export class LoginUserSocialDto {
   @MaxLength(100)
   readonly identity: string;
 
-
   @ApiProperty({
     description: 'Login type',
     example: 'NORMAL',
@@ -226,7 +237,6 @@ export class LoginOtpDto {
 
   @IsOptional()
   readonly country: string;
-
 }
 
 export class ForgotPasswordDto {
@@ -354,17 +364,17 @@ export class VerifyOtpDto {
 }
 
 export class SignUserDto {
-
   @ApiProperty({
     description: 'User Name',
     example: 'John Doe',
   })
   @IsString()
   @Matches(/^[A-Za-z _'-]+$/, {
-    message: 'Only letters, spaces, underscores, apostrophes, and hyphens are allowed in fullName field'
+    message:
+      'Only letters, spaces, underscores, apostrophes, and hyphens are allowed in fullName field',
   })
   readonly fullName: string;
-  
+
   @ApiProperty({
     description: 'User email address',
     example: 'user@example.com',

@@ -11,7 +11,10 @@ export class PasscodeRepository {
     private passcodeModel: typeof Passcode,
   ) {}
 
-  async findByUserId(userId: string, userType: UserType): Promise<Passcode | null> {
+  async findByUserId(
+    userId: string,
+    userType: UserType,
+  ): Promise<Passcode | null> {
     return await this.passcodeModel.findOne({
       where: { userId, userType },
       raw: true,
@@ -26,7 +29,11 @@ export class PasscodeRepository {
     return passcode.toJSON() as Passcode;
   }
 
-  async update(userId: string, userType: UserType, passcodeData: Partial<Passcode>): Promise<[number, Passcode[]]> {
+  async update(
+    userId: string,
+    userType: UserType,
+    passcodeData: Partial<Passcode>,
+  ): Promise<[number, Passcode[]]> {
     return await this.passcodeModel.update(passcodeData, {
       where: { userId, userType },
       returning: true,
@@ -39,4 +46,3 @@ export class PasscodeRepository {
     });
   }
 }
-

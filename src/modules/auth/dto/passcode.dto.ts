@@ -71,4 +71,3 @@ export class ResetPasscodeDto {
   @MaxLength(6)
   confirmCode: string;
 }
-

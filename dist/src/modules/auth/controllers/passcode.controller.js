@@ -95,7 +95,10 @@ __decorate([
     (0, common_1.Post)('reset-request'),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     (0, swagger_1.ApiOperation)({ summary: 'Request passcode reset OTP' }),
-    (0, swagger_1.ApiResponse)({ status: 200, description: 'Reset OTP has been sent to your email' }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Reset OTP has been sent to your email',
+    }),
     (0, swagger_1.ApiResponse)({ status: 404, description: 'Passcode not found' }),
     __param(0, (0, common_1.Request)()),
     __metadata("design:type", Function),

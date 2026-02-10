@@ -26,7 +26,8 @@ export class CreateKyc1Dto {
   @MinLength(2)
   @MaxLength(255)
   @Matches(/^[A-Za-z _'-]+$/, {
-    message: 'Only letters, spaces, underscores, apostrophes, and hyphens are allowed in fullName field'
+    message:
+      'Only letters, spaces, underscores, apostrophes, and hyphens are allowed in fullName field',
   })
   fullName: string;
 
@@ -201,7 +202,6 @@ export class CreateKyc3Dto {
   proofOfAddressImage?: string;
 }
 
-
 export class ValidateBankAccountDto {
   @ApiProperty({
     description: 'Bank code',
@@ -219,7 +219,6 @@ export class ValidateBankAccountDto {
   @MaxLength(10)
   accountNo: string;
 }
-
 
 export class UpdateBankAccountDto {
   @ApiProperty({
@@ -256,7 +255,6 @@ export class UpdateBankAccountDto {
 }
 
 export class AddDriverLicenseDto {
-
   @ApiProperty({
     description: 'License image URL',
     example: 'https://example.com/license.jpg',

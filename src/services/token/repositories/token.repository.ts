@@ -7,14 +7,16 @@ import { TokenSubject } from 'src/enums/token.enum';
 
 @Injectable()
 export class TokenRepository {
-
   constructor(
     @InjectModel(Token)
     private tokenModel: typeof Token,
   ) {}
 
   async create(tokenData: Partial<Token>): Promise<Token> {
-    const token = await this.tokenModel.create(tokenData as any, {raw: true, returning: true});
+    const token = await this.tokenModel.create(tokenData as any, {
+      raw: true,
+      returning: true,
+    });
     return token.toJSON() as Token;
   }
 
@@ -22,19 +24,21 @@ export class TokenRepository {
     return await this.tokenModel.findOne({
       where: { token },
       attributes: ['id', 'expiry', 'email'],
-      raw: true
+      raw: true,
     });
   }
 
-  async findByPhoneOrEmailToken(token: string, phoneNo: string, email: string): Promise<Token | null> {
+  async findByPhoneOrEmailToken(
+    token: string,
+    phoneNo: string,
+    email: string,
+  ): Promise<Token | null> {
     return await this.tokenModel.findOne({
-      where: { [Op.or]: [
-        { email: email },
-        { phoneNo: phoneNo },
-        { token: token }
-        ], },
+      where: {
+        [Op.or]: [{ email: email }, { phoneNo: phoneNo }, { token: token }],
+      },
       attributes: ['id', 'expiry', 'email', 'phoneNo', 'token'],
-      raw: true
+      raw: true,
     });
   }
 
@@ -42,23 +46,30 @@ export class TokenRepository {
     return await this.tokenModel.findOne({
       where: { email, token },
       attributes: ['id', 'expiry', 'email', 'phoneNo', 'token'],
-      raw: true
+      raw: true,
     });
   }
 
-  async findByTokenEmailAndSubject(token: string, email: string, subject: TokenSubject): Promise<Token | null> {
+  async findByTokenEmailAndSubject(
+    token: string,
+    email: string,
+    subject: TokenSubject,
+  ): Promise<Token | null> {
     return await this.tokenModel.findOne({
       where: { email, token, subject },
       attributes: ['id', 'expiry', 'email', 'phoneNo', 'token'],
-      raw: true
+      raw: true,
     });
   }
 
-  async findByPhoneToken(token: string, phoneNo: string): Promise<Token | null> {
+  async findByPhoneToken(
+    token: string,
+    phoneNo: string,
+  ): Promise<Token | null> {
     return await this.tokenModel.findOne({
       where: { phoneNo, token },
       attributes: ['id', 'expiry', 'email', 'phoneNo', 'token'],
-      raw: true
+      raw: true,
     });
   }
 

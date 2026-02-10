@@ -64,5 +64,4 @@ export class Token extends Model<Token> {
 
   @UpdatedAt
   declare updatedAt: Date;
-
 }

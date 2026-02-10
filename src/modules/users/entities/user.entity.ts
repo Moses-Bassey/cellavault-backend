@@ -28,11 +28,10 @@ import { LoginType } from 'src/enums/login-type.enum';
   },
 })
 export class User extends Model<User> {
-  
   @PrimaryKey
   @Default(DataType.UUIDV4)
   @Column(DataType.UUID)
-  public declare id: string;
+  declare public id: string;
 
   @Column(DataType.STRING(150))
   public fullName: string;
@@ -126,19 +125,19 @@ export class User extends Model<User> {
     type: DataType.DATE,
     allowNull: false,
   })
-  public declare createdAt: Date;
+  declare public createdAt: Date;
 
   @UpdatedAt
   @Column({
     type: DataType.DATE,
     allowNull: false,
   })
-  public declare updatedAt: Date;
+  declare public updatedAt: Date;
 
   @DeletedAt
   @Column({
     type: DataType.DATE,
     allowNull: true,
   })
-  public declare deletedAt: Date | null;
+  declare public deletedAt: Date | null;
 }

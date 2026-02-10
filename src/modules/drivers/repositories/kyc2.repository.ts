@@ -21,7 +21,9 @@ export class Kyc2Repository {
     });
   }
 
-  async create(kycData: Partial<kyc2IdInformation>): Promise<kyc2IdInformation> {
+  async create(
+    kycData: Partial<kyc2IdInformation>,
+  ): Promise<kyc2IdInformation> {
     const kyc = await this.kyc2Model.create(kycData as any, {
       raw: true,
       returning: true,
