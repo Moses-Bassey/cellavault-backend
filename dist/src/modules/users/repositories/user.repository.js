@@ -78,10 +78,12 @@ let UserRepository = class UserRepository {
         return user.toJSON();
     }
     async update(id, userData) {
-        return await this.userModel.update(userData, {
+        const [affectedRows] = await this.userModel.update(userData, {
             where: { id },
-            returning: true,
         });
+        if (affectedRows === 0)
+            return null;
+        return affectedRows;
     }
     async delete(id) {
         return await this.userModel.destroy({

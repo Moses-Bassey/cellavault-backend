@@ -16,7 +16,7 @@ interface RepositoryParams {
 export class UserRepository {
   constructor(
     @InjectModel(User)
-    private userModel: typeof User,
+    private readonly userModel: typeof User,
   ) {}
 
   async findByIdentity(identity: string): Promise<User | null> {
@@ -84,11 +84,13 @@ export class UserRepository {
     return user.toJSON() as User;
   }
 
-  async update(id: string, userData: Partial<User>): Promise<[number, User[]]> {
-    return await this.userModel.update(userData, {
+  async update(id: string, userData: Partial<User>): Promise<number | null> {
+    const [affectedRows] = await this.userModel.update(userData, {
       where: { id },
-      returning: true,
     });
+
+    if (affectedRows === 0) return null;
+    return affectedRows;
   }
 
   async delete(id: string): Promise<number> {

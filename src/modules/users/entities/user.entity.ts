@@ -31,14 +31,14 @@ export class User extends Model<User> {
   @PrimaryKey
   @Default(DataType.UUIDV4)
   @Column(DataType.UUID)
-  declare public id: string;
+  declare id: string;
 
   @Column(DataType.STRING(150))
-  public fullName: string;
+  declare fullName: string;
 
   @Unique
   @Column(DataType.STRING(300))
-  public phoneNo: string;
+  declare phoneNo: string;
 
   @Unique
   @Column({
@@ -48,59 +48,59 @@ export class User extends Model<User> {
       isEmail: true,
     },
   })
-  public email: string;
+  declare email: string;
 
   @Column({
     type: DataType.ENUM,
     values: Object.values(UserType),
     allowNull: false,
   })
-  public userType: UserType;
+  declare userType: UserType;
 
   @Column(DataType.STRING(1000))
-  public password: string;
+  declare password: string;
 
   @Column({
     type: DataType.ENUM,
     values: Object.values(LoginType),
     allowNull: false,
   })
-  public loginType: LoginType;
+  declare loginType: LoginType;
 
   @Default(false)
   @Column({
     type: DataType.BOOLEAN,
     allowNull: false,
   })
-  public isEmailVerified: boolean;
+  declare isEmailVerified: boolean;
 
   @Default(false)
   @Column({
     type: DataType.BOOLEAN,
     allowNull: false,
   })
-  public isPhoneVerified: boolean;
+  declare isPhoneVerified: boolean;
 
   @Default(true)
   @Column({
     type: DataType.BOOLEAN,
     allowNull: false,
   })
-  public isActive: boolean;
+  declare isActive: boolean;
 
   @Default(false)
   @Column({
     type: DataType.BOOLEAN,
     allowNull: false,
   })
-  public isDisabled: boolean;
+  declare isDisabled: boolean;
 
   @Default(false)
   @Column({
     type: DataType.BOOLEAN,
     allowNull: false,
   })
-  public hasPasscode: boolean;
+  declare hasPasscode: boolean;
 
   @AllowNull
   @ForeignKey(() => Country)
@@ -108,36 +108,36 @@ export class User extends Model<User> {
     type: DataType.UUID,
     allowNull: true,
   })
-  public countryId: string;
+  declare countryId: string;
 
   @BelongsTo(() => Country)
-  public country: Country;
+  declare country: Country;
 
   @AllowNull
   @Column({
     type: DataType.STRING(1000),
     allowNull: true,
   })
-  public imageUrl: string;
+  declare imageUrl: string;
 
   @CreatedAt
   @Column({
     type: DataType.DATE,
     allowNull: false,
   })
-  declare public createdAt: Date;
+  declare createdAt: Date;
 
   @UpdatedAt
   @Column({
     type: DataType.DATE,
     allowNull: false,
   })
-  declare public updatedAt: Date;
+  declare updatedAt: Date;
 
   @DeletedAt
   @Column({
     type: DataType.DATE,
     allowNull: true,
   })
-  declare public deletedAt: Date | null;
+  declare deletedAt: Date | null;
 }

@@ -15,20 +15,6 @@ const user_type_enum_1 = require("../../../enums/user-type.enum");
 const country_entity_1 = require("../../countries/entities/country.entity");
 const login_type_enum_1 = require("../../../enums/login-type.enum");
 let User = class User extends sequelize_typescript_1.Model {
-    fullName;
-    phoneNo;
-    email;
-    userType;
-    password;
-    loginType;
-    isEmailVerified;
-    isPhoneVerified;
-    isActive;
-    isDisabled;
-    hasPasscode;
-    countryId;
-    country;
-    imageUrl;
 };
 exports.User = User;
 __decorate([

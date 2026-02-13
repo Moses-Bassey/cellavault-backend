@@ -1,15 +1,25 @@
-import type { Request as ExpressRequest } from 'express';
-import { User } from '../entities/user.entity';
 import { UserService } from '../services/user.service';
-import { JwtAuthPayload } from '../../auth/auth.interface';
-import { DashboardDto } from '../dto/user.dto';
+import { TripStatus } from '../../trips/entities/trip.entity';
 export declare class UserController {
     private readonly userService;
     constructor(userService: UserService);
-    fetchuser(req: ExpressRequest & {
-        user: JwtAuthPayload;
-    }): Promise<import("src/utils/response.utils").ApiResponse<User>>;
-    dashboard(req: ExpressRequest & {
-        user: JwtAuthPayload;
-    }, userData: DashboardDto): Promise<import("src/utils/response.utils").ApiResponse<import("../../../shared/interfaces/dashbaord.interface").IDashboard>>;
+    getPassenger(passengerId: string): Promise<import("src/utils/response.utils").ApiResponse<import("../../../shared/dto/user.dto").PassengerAccountDto>>;
+    updatePassenger(passengerId: string, body: {
+        fullName?: string;
+        email?: string;
+        phoneNo?: string;
+        imageUrl?: string;
+        shortDescription?: string;
+    }): Promise<import("src/utils/response.utils").ApiResponse<import("../../../shared/dto/user.dto").PassengerAccountDto>>;
+    suspendPassenger(passengerId: string, body: {
+        reason?: string;
+    }): Promise<import("src/utils/response.utils").ApiResponse<{
+        ok: boolean;
+    }>>;
+    unsuspendPassenger(passengerId: string): Promise<import("src/utils/response.utils").ApiResponse<{
+        ok: boolean;
+    }>>;
+    getActivitySummary(passengerId: string, from?: string, to?: string): Promise<import("src/utils/response.utils").ApiResponse<import("../../../shared/dto/user.dto").PassengerActivitySummaryDto>>;
+    listRides(passengerId: string, from?: string, to?: string, status?: TripStatus, limit?: string, cursor?: string): Promise<import("src/utils/response.utils").ApiResponse<import("../../../shared/dto/user.dto").CursorPageDto<import("../../../shared/dto/user.dto").PassengerRideRowDto>>>;
+    getRideDetails(passengerId: string, rideId: string): Promise<import("src/utils/response.utils").ApiResponse<import("../../trips/entities/trip.entity").Trip>>;
 }
