@@ -56,7 +56,7 @@ export class PasscodeService {
 
     // Update hasPasscode flag in user/driver entity
     if (userType === UserType.DRIVER) {
-      await this.driverRepository.update(userId, { hasPasscode: true });
+      // await this.driverRepository.update(userId, { hasPasscode: true });
     } else {
       await this.userRepository.update(userId, { hasPasscode: true });
     }
@@ -95,7 +95,7 @@ export class PasscodeService {
 
     // Ensure hasPasscode flag is set to true
     if (userType === UserType.DRIVER) {
-      await this.driverRepository.update(userId, { hasPasscode: true });
+      // await this.driverRepository.update(userId, { hasPasscode: true });
     } else {
       await this.userRepository.update(userId, { hasPasscode: true });
     }

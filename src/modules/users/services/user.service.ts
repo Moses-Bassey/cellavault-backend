@@ -27,6 +27,7 @@ import {
 } from 'src/shared/interfaces/dashbaord.interface';
 import { PasswordUtil } from 'src/utils/password.util';
 import { PAYMENT_TYPE } from 'src/enums/payment.enums';
+import { decodeCursor } from '../../../utils/cursor.util';
 
 function parseISODateOrUndefined(value?: string): Date | undefined {
   if (!value) return undefined;
@@ -35,17 +36,17 @@ function parseISODateOrUndefined(value?: string): Date | undefined {
   return d;
 }
 
-function decodeCursor(
-  cursor?: string,
-): { createdAt: Date; id: string } | undefined {
-  if (!cursor) return undefined;
-  try {
-    const decoded = JSON.parse(Buffer.from(cursor, 'base64').toString('utf8'));
-    return { createdAt: new Date(decoded.createdAt), id: decoded.id };
-  } catch {
-    throw new BadRequestException('Invalid cursor');
-  }
-}
+// function decodeCursor(
+//   cursor?: string,
+// ): { createdAt: Date; id: string } | undefined {
+//   if (!cursor) return undefined;
+//   try {
+//     const decoded = JSON.parse(Buffer.from(cursor, 'base64').toString('utf8'));
+//     return { createdAt: new Date(decoded.createdAt), id: decoded.id };
+//   } catch {
+//     throw new BadRequestException('Invalid cursor');
+//   }
+// }
 
 @Injectable()
 export class UserService {

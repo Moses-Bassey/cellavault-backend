@@ -23,7 +23,7 @@ const passcode_repository_1 = require("./repositories/passcode.repository");
 const passcode_service_1 = require("./services/passcode.service");
 const passcode_controller_1 = require("./controllers/passcode.controller");
 const driver_entity_1 = require("../drivers/entities/driver.entity");
-const driver_repository_1 = require("../drivers/repositories/driver.repository");
+const drivers_module_1 = require("../drivers/drivers.module");
 let AuthModule = class AuthModule {
 };
 exports.AuthModule = AuthModule;
@@ -36,13 +36,13 @@ exports.AuthModule = AuthModule = __decorate([
             countries_module_1.CountriesModule,
             users_module_1.UsersModule,
             client_devices_module_1.ClientDevicesModule,
+            drivers_module_1.DriversModule,
         ],
         providers: [
             auth_service_1.AuthService,
             user_repository_1.UserRepository,
             passcode_service_1.PasscodeService,
             passcode_repository_1.PasscodeRepository,
-            driver_repository_1.DriverRepository,
         ],
         controllers: [auth_controller_1.AuthController, passcode_controller_1.PasscodeController],
         exports: [passcode_service_1.PasscodeService, passcode_repository_1.PasscodeRepository],

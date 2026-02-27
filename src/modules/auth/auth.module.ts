@@ -16,7 +16,8 @@ import { PasscodeRepository } from './repositories/passcode.repository';
 import { PasscodeService } from './services/passcode.service';
 import { PasscodeController } from './controllers/passcode.controller';
 import { Driver } from '../drivers/entities/driver.entity';
-import { DriverRepository } from '../drivers/repositories/driver.repository';
+// import { DriverRepository } from '../drivers/repositories/driver.repository';
+import { DriversModule } from '../drivers/drivers.module';
 
 @Module({
   imports: [
@@ -26,13 +27,14 @@ import { DriverRepository } from '../drivers/repositories/driver.repository';
     CountriesModule,
     UsersModule,
     ClientDevicesModule,
+    DriversModule,
   ],
   providers: [
     AuthService,
     UserRepository,
     PasscodeService,
     PasscodeRepository,
-    DriverRepository,
+    // DriverRepository,
   ],
   controllers: [AuthController, PasscodeController],
   exports: [PasscodeService, PasscodeRepository],

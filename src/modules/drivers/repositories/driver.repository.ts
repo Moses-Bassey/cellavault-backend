@@ -1,84 +1,214 @@
+// import { Injectable } from '@nestjs/common';
+// import { InjectModel } from '@nestjs/sequelize';
+// import { Model } from 'sequelize-typescript';
+// import { Driver } from '../entities/driver.entity';
+// import { UserType } from '../../../enums/user-type.enum';
+// import { Op } from 'sequelize';
+// import { Country } from 'src/modules/countries/entities';
+// import { Guarantor } from '../entities/guarantor.entity';
+// import { kyc1PersonalInfo } from '../entities/kyc1-personal-Info.entity';
+// import { kyc2IdInformation } from '../entities/kyc2-Id-Information.entity';
+// import { kyc3ResidentialInformation } from '../entities/kyc3-residential-Information.entity';
+
+// @Injectable()
+// export class DriverRepository {
+//   constructor(
+//     @InjectModel(Driver)
+//     private driverModel: typeof Driver,
+//   ) {}
+
+//   async findByIdentity(identity: string): Promise<Driver | null> {
+//     const driver = await this.driverModel.findOne({
+//       where: {
+//         [Op.or]: [{ email: identity }, { phoneNo: identity }],
+//       },
+//     });
+//     return driver ? (driver.toJSON() as Driver) : null;
+//   }
+
+//   async findById(id: string): Promise<Driver | null> {
+//     return await this.driverModel.findByPk(id, { raw: true });
+//   }
+
+//   async fetchDriver(id: string): Promise<Driver | null> {
+//     const driver = await this.driverModel.findByPk(id, {
+//       attributes: {
+//         exclude: ['password', 'deletedAt', 'isDisabled'],
+//       },
+//       include: [
+//         {
+//           model: Country,
+//         },
+//         {
+//           model: Guarantor,
+//         },
+//         {
+//           model: kyc1PersonalInfo,
+//         },
+//         {
+//           model: kyc2IdInformation,
+//         },
+//         {
+//           model: kyc3ResidentialInformation,
+//         },
+//       ],
+//     });
+//     return driver ? (driver.toJSON() as Driver) : null;
+//   }
+
+//   async findByEmail(email: string): Promise<Driver | null> {
+//     const driver = await this.driverModel.findOne({
+//       where: { email },
+//     });
+//     return driver ? (driver.toJSON() as Driver) : null;
+//   }
+
+//   async findByPhone(phoneNo: string): Promise<Driver | null> {
+//     const driver = await this.driverModel.findOne({
+//       where: { phoneNo },
+//     });
+//     return driver ? (driver.toJSON() as Driver) : null;
+//   }
+
+//   async findByEmailAndRole(
+//     email: string,
+//     userType: UserType,
+//   ): Promise<Driver | null> {
+//     const driver = await this.driverModel.findOne({
+//       where: { email, userType },
+//     });
+//     return driver ? (driver.toJSON() as Driver) : null;
+//   }
+
+//   async create(driverData: Partial<Driver>): Promise<Driver> {
+//     const driver = await this.driverModel.create(driverData as any, {
+//       raw: true,
+//       returning: true,
+//     });
+//     return driver.toJSON() as Driver;
+//   }
+
+//   async update(
+//     id: string,
+//     driverData: Partial<Driver>,
+//   ): Promise<[number, Driver[]]> {
+//     return await this.driverModel.update(driverData, {
+//       where: { id },
+//       returning: true,
+//     });
+//   }
+
+//   async delete(id: string): Promise<number> {
+//     return await this.driverModel.destroy({
+//       where: { id },
+//     });
+//   }
+
+//   async restore(id: string): Promise<void> {
+//     await this.driverModel.restore({
+//       where: { id },
+//     });
+//   }
+
+//   async findWithCountry(
+//     email: string,
+//     userType: UserType,
+//   ): Promise<Driver | null> {
+//     return await this.driverModel.findOne({
+//       where: { email, userType },
+//       include: ['country'],
+//     });
+//   }
+
+//   async findAll(options?: any): Promise<Driver[]> {
+//     return await this.driverModel.findAll(options);
+//   }
+// }
+
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { Model } from 'sequelize-typescript';
+import { Op, WhereOptions, fn, col, literal } from 'sequelize';
 import { Driver } from '../entities/driver.entity';
-import { UserType } from '../../../enums/user-type.enum';
-import { Op } from 'sequelize';
-import { Country } from 'src/modules/countries/entities';
-import { Guarantor } from '../entities/guarantor.entity';
-import { kyc1PersonalInfo } from '../entities/kyc1-personal-Info.entity';
-import { kyc2IdInformation } from '../entities/kyc2-Id-Information.entity';
-import { kyc3ResidentialInformation } from '../entities/kyc3-residential-Information.entity';
+import { Vehicle } from '../entities/vehicle.entity';
+import { Trip } from '../../trips/entities/trip.entity'; // adjust path if needed
 import { KYC_COMPLETED } from 'src/enums/kyc.enums';
+
+type DriverStatus =
+  | 'ACTIVE'
+  | 'SUSPENDED'
+  | 'INACTIVE'
+  | 'PENDING'
+  | 'IN_PROGRESS'
+  | 'VERIFIED'
+  | 'REJECTED';
+type KycStatus =
+  | 'APPROVED'
+  | 'PENDING'
+  | 'REJECTED'
+  | 'PERSONAL_INFORMATION'
+  | 'IDENTITY_INFORMATION'
+  | 'RESIDENTIAL_INFORMATION'
+  | 'ALL_COMPLETED'
+  | 'NOT_COMPLETED';
+
+// normalize driver and kyc status enums
 
 @Injectable()
 export class DriverRepository {
   constructor(
-    @InjectModel(Driver)
-    private driverModel: typeof Driver,
+    @InjectModel(Driver) private readonly driverModel: typeof Driver,
+    @InjectModel(Vehicle) private readonly vehicleModel: typeof Vehicle,
+    @InjectModel(Trip) private readonly tripModel: typeof Trip,
   ) {}
 
-  async findByIdentity(identity: string): Promise<Driver | null> {
-    const driver = await this.driverModel.findOne({
-      where: {
-        [Op.or]: [{ email: identity }, { phoneNo: identity }],
-      },
-    });
-    return driver ? (driver.toJSON() as Driver) : null;
-  }
-
-  async findById(id: string): Promise<Driver | null> {
-    return await this.driverModel.findByPk(id, { raw: true });
-  }
-
-  async fetchDriver(id: string): Promise<Driver | null> {
-    const driver = await this.driverModel.findByPk(id, {
-      attributes: {
-        exclude: ['password', 'deletedAt', 'isDisabled'],
-      },
-      include: [
-        {
-          model: Country,
-        },
-        {
-          model: Guarantor,
-        },
-        {
-          model: kyc1PersonalInfo,
-        },
-        {
-          model: kyc2IdInformation,
-        },
-        {
-          model: kyc3ResidentialInformation,
-        },
+  async getSummary(): Promise<{
+    totalDrivers: number;
+    activeDrivers: number;
+    suspendedDrivers: number;
+    pendingKycApprovals: number;
+    driversWithPendingPayouts: number;
+  }> {
+    // One query with conditional counts (works on MySQL)
+    const row = await this.driverModel.findOne({
+      attributes: [
+        [fn('COUNT', col('id')), 'totalDrivers'],
+        [
+          fn(
+            'SUM',
+            literal(
+              `CASE WHEN verificationStatus = 'VERIFIED' THEN 1 ELSE 0 END`,
+            ),
+          ),
+          'activeDrivers',
+        ],
+        [
+          fn('SUM', literal(`CASE WHEN isDisabled = true THEN 1 ELSE 0 END`)),
+          'suspendedDrivers',
+        ],
+        [
+          fn(
+            'SUM',
+            literal(
+              `CASE WHEN kycCompleted != 'ALL_COMPLETED' THEN 1 ELSE 0 END`,
+            ),
+          ),
+          'pendingKycApprovals',
+        ],
+        // Placeholder: replace with actual payout logic/table when available
+        [literal('0'), 'driversWithPendingPayouts'],
       ],
+      raw: true,
     });
-    return driver ? (driver.toJSON() as Driver) : null;
-  }
 
-  async findByEmail(email: string): Promise<Driver | null> {
-    const driver = await this.driverModel.findOne({
-      where: { email },
-    });
-    return driver ? (driver.toJSON() as Driver) : null;
-  }
-
-  async findByPhone(phoneNo: string): Promise<Driver | null> {
-    const driver = await this.driverModel.findOne({
-      where: { phoneNo },
-    });
-    return driver ? (driver.toJSON() as Driver) : null;
-  }
-
-  async findByEmailAndRole(
-    email: string,
-    userType: UserType,
-  ): Promise<Driver | null> {
-    const driver = await this.driverModel.findOne({
-      where: { email, userType },
-    });
-    return driver ? (driver.toJSON() as Driver) : null;
+    return {
+      totalDrivers: Number(row?.['totalDrivers'] ?? 0),
+      activeDrivers: Number(row?.['activeDrivers'] ?? 0),
+      suspendedDrivers: Number(row?.['suspendedDrivers'] ?? 0),
+      pendingKycApprovals: Number(row?.['pendingKycApprovals'] ?? 0),
+      driversWithPendingPayouts: Number(
+        row?.['driversWithPendingPayouts'] ?? 0,
+      ),
+    };
   }
 
   async findActiveDrivers(
@@ -89,47 +219,239 @@ export class DriverRepository {
     });
   }
 
-  async create(driverData: Partial<Driver>): Promise<Driver> {
-    const driver = await this.driverModel.create(driverData as any, {
+  async findById(driverId: string) {
+    return this.driverModel.findByPk(driverId);
+  }
+
+  async updateById(driverId: string, patch: Partial<Driver>) {
+    // MySQL doesn't support returning updated row from update()
+    const [affected] = await this.driverModel.update(patch, {
+      where: { id: driverId },
+    });
+    if (!affected) return null;
+    return this.findById(driverId);
+  }
+
+  async listDrivers(params: {
+    search?: string;
+    status?: DriverStatus;
+    kycStatus?: KycStatus;
+    limit: number;
+    cursor?: { createdAt: Date; id: string };
+  }): Promise<{ drivers: any[]; nextCursor: string | null }> {
+    const { search, status, kycStatus, limit, cursor } = params;
+
+    const q = search?.trim() ? `%${search.trim()}%` : undefined;
+
+    const where: WhereOptions<Driver> = {
+      ...(status ? { verificationStatus: status } : {}),
+      ...(kycStatus ? { kycCompleted: kycStatus } : {}),
+      ...(q
+        ? {
+            [Op.or]: [
+              { fullName: { [Op.like]: q } },
+              { email: { [Op.like]: q } },
+              { phoneNo: { [Op.like]: q } },
+            ],
+          }
+        : {}),
+
+      ...(cursor
+        ? {
+            [Op.and]: [
+              {
+                [Op.or]: [
+                  { createdAt: { [Op.lt]: cursor.createdAt } },
+                  { createdAt: cursor.createdAt, id: { [Op.lt]: cursor.id } },
+                ],
+              },
+            ],
+          }
+        : {}),
+    };
+
+    const rows = await this.driverModel.findAll({
+      where,
+      order: [
+        ['createdAt', 'DESC'],
+        ['id', 'DESC'],
+      ],
+      limit,
+      attributes: [
+        'id',
+        'fullName',
+        'email',
+        'phoneNo',
+        'profileImageUrl',
+        'verificationStatus',
+        'kycCompleted',
+        'createdAt',
+      ],
       raw: true,
-      returning: true,
     });
-    return driver.toJSON() as Driver;
+
+    const last = rows[rows.length - 1];
+    const nextCursor =
+      rows.length === limit && last
+        ? Buffer.from(
+            JSON.stringify({ createdAt: last.createdAt, id: last.id }),
+          ).toString('base64')
+        : null;
+
+    return { drivers: rows, nextCursor };
+  }
+  /**
+   * Fetch the latest vehicle for each driverId (by createdAt desc, id desc),
+   * then map by driverId.
+   *
+   * This is 1 query, no N+1.
+   * Note: This uses a "max createdAt per driver" approach.
+   */
+  async getLatestVehiclesForDrivers(
+    driverIds: string[],
+  ): Promise<
+    Map<string, { plateNumber: string; brand: string; color: string } | null>
+  > {
+    const map = new Map<
+      string,
+      { plateNumber: string; brand: string; color: string } | null
+    >();
+    driverIds.forEach((id) => map.set(id, null));
+    if (driverIds.length === 0) return map;
+
+    // fetch vehicles ordered by driverId, createdAt desc, id desc,
+    // then keep first per driverId in JS. This avoids complex window functions.
+    const vehicles = await this.vehicleModel.findAll({
+      where: { driverId: { [Op.in]: driverIds } },
+      attributes: [
+        'driverId',
+        'plateNumber',
+        'brand',
+        'color',
+        'createdAt',
+        'id',
+      ],
+      order: [
+        ['driverId', 'ASC'],
+        ['createdAt', 'DESC'],
+        ['id', 'DESC'],
+      ],
+      raw: true,
+    });
+
+    // Keep first record per driverId (latest due to ordering)
+    for (const v of vehicles as any[]) {
+      if (!map.get(v.driverId)) {
+        map.set(v.driverId, {
+          plateNumber: v.plateNumber,
+          brand: v.brand,
+          color: v.color,
+        });
+      }
+    }
+
+    return map;
   }
 
-  async update(
-    id: string,
-    driverData: Partial<Driver>,
-  ): Promise<[number, Driver[]]> {
-    return await this.driverModel.update(driverData, {
-      where: { id },
-      returning: true,
+  async getLatestVehiclesForDriver(
+    driverId: string,
+  ): Promise<
+    Map<string, { plateNumber: string; brand: string; color: string } | null>
+  > {
+    const map = new Map<
+      string,
+      { plateNumber: string; brand: string; color: string } | null
+    >();
+    map.set(driverId, null);
+    if (!driverId) return map;
+
+    // fetch vehicles ordered by driverId, createdAt desc, id desc,
+    // then keep first per driverId in JS. This avoids complex window functions.
+    const vehicles = await this.vehicleModel.findAll({
+      where: { driverId },
+      attributes: [
+        'driverId',
+        'plateNumber',
+        'brand',
+        'color',
+        'createdAt',
+        'id',
+      ],
+      order: [
+        ['driverId', 'ASC'],
+        ['createdAt', 'DESC'],
+        ['id', 'DESC'],
+      ],
+      raw: true,
     });
+
+    // Keep first record per driverId (latest due to ordering)
+    for (const v of vehicles as any[]) {
+      if (!map.get(v.driverId)) {
+        map.set(v.driverId, {
+          plateNumber: v.plateNumber,
+          brand: v.brand,
+          color: v.color,
+        });
+      }
+    }
+    console.log('map: ', map);
+
+    return map;
   }
 
-  async delete(id: string): Promise<number> {
-    return await this.driverModel.destroy({
-      where: { id },
-    });
-  }
+  async getTripAggregatesForDrivers(
+    driverIds: string[],
+  ): Promise<
+    Map<
+      string,
+      { totalTrips: number; earningsMinor: number; lastActiveAt: Date | null }
+    >
+  > {
+    if (driverIds.length === 0) return new Map();
 
-  async restore(id: string): Promise<void> {
-    await this.driverModel.restore({
-      where: { id },
+    // Aggregate per driver in ONE query
+    // - totalTrips: count trips
+    // - earnings: sum estimatedFee for COMPLETED trips (convert DECIMAL to minor units in app layer is tricky)
+    // We'll return earnings as "naira decimal" then convert in service. For testing, treat estimatedFee * 100 safely.
+    const rows = await this.tripModel.findAll({
+      where: { driverId: { [Op.in]: driverIds } },
+      attributes: [
+        'driverId',
+        [fn('COUNT', col('id')), 'totalTrips'],
+        [fn('MAX', col('updatedAt')), 'lastActiveAt'],
+        [
+          fn(
+            'COALESCE',
+            fn(
+              'SUM',
+              literal(
+                `CASE WHEN status = 'COMPLETED' THEN estimatedFee ELSE 0 END`,
+              ),
+            ),
+            0,
+          ),
+          'earningsNaira',
+        ],
+      ],
+      group: ['driverId'],
+      raw: true,
     });
-  }
 
-  async findWithCountry(
-    email: string,
-    userType: UserType,
-  ): Promise<Driver | null> {
-    return await this.driverModel.findOne({
-      where: { email, userType },
-      include: ['country'],
-    });
-  }
+    const map = new Map<
+      string,
+      { totalTrips: number; earningsMinor: number; lastActiveAt: Date | null }
+    >();
 
-  async findAll(options?: any): Promise<Driver[]> {
-    return await this.driverModel.findAll(options);
+    for (const r of rows as any[]) {
+      const earningsNaira = Number(r.earningsNaira ?? 0); // may be string in MySQL
+      map.set(r.driverId, {
+        totalTrips: Number(r.totalTrips ?? 0),
+        earningsMinor: Math.round(earningsNaira * 100), // convert to minor units
+        lastActiveAt: r.lastActiveAt ? new Date(r.lastActiveAt) : null,
+      });
+    }
+
+    return map;
   }
 }

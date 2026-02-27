@@ -18,28 +18,20 @@ const vehicle_entity_1 = require("./entities/vehicle.entity");
 const pepp_driver_vehicles_entity_1 = require("./entities/pepp-driver-vehicles.entity");
 const vehicle_registration_entity_1 = require("./entities/vehicle-registration.entity");
 const driver_controller_1 = require("./controllers/driver.controller");
-const guarantor_controller_1 = require("./controllers/guarantor.controller");
-const kyc_controller_1 = require("./controllers/kyc.controller");
-const vehicle_registration_controller_1 = require("./controllers/vehicle-registration.controller");
 const driver_service_1 = require("./services/driver.service");
-const guarantor_service_1 = require("./services/guarantor.service");
-const kyc_service_1 = require("./services/kyc.service");
-const vehicle_registration_service_1 = require("./services/vehicle-registration.service");
 const driver_repository_1 = require("./repositories/driver.repository");
 const guarantor_repository_1 = require("./repositories/guarantor.repository");
 const kyc1_repository_1 = require("./repositories/kyc1.repository");
 const kyc2_repository_1 = require("./repositories/kyc2.repository");
 const kyc3_repository_1 = require("./repositories/kyc3.repository");
 const vehicle_registration_repository_1 = require("./repositories/vehicle-registration.repository");
-const auth_driver_controller_1 = require("./controllers/auth.driver.controller");
-const auth_driver_service_1 = require("./services/auth.driver.service");
 const countries_module_1 = require("../countries/countries.module");
 const country_entity_1 = require("../countries/entities/country.entity");
 const client_devices_module_1 = require("../client-devices/client-devices.module");
 const mail_module_1 = require("../../services/mail/mail.module");
 const token_module_1 = require("../../services/token/token.module");
 const sms_module_1 = require("../../services/sms/sms.module");
-const auth_module_1 = require("../auth/auth.module");
+const trips_module_1 = require("../trips/trips.module");
 const client_device_service_1 = require("../client-devices/services/client-device.service");
 let DriversModule = class DriversModule {
 };
@@ -63,21 +55,11 @@ exports.DriversModule = DriversModule = __decorate([
             token_module_1.TokenModule,
             mail_module_1.MailModule,
             sms_module_1.SmsModule,
-            auth_module_1.AuthModule,
+            trips_module_1.TripsModule,
         ],
-        controllers: [
-            driver_controller_1.DriverController,
-            guarantor_controller_1.GuarantorController,
-            kyc_controller_1.KycController,
-            auth_driver_controller_1.AuthDriverController,
-            vehicle_registration_controller_1.VehicleRegistrationController,
-        ],
+        controllers: [driver_controller_1.DriverController],
         providers: [
             driver_service_1.DriverService,
-            auth_driver_service_1.AuthDriverService,
-            guarantor_service_1.GuarantorService,
-            kyc_service_1.KycService,
-            vehicle_registration_service_1.VehicleRegistrationService,
             driver_repository_1.DriverRepository,
             guarantor_repository_1.GuarantorRepository,
             kyc1_repository_1.Kyc1Repository,
@@ -88,9 +70,6 @@ exports.DriversModule = DriversModule = __decorate([
         ],
         exports: [
             driver_service_1.DriverService,
-            guarantor_service_1.GuarantorService,
-            kyc_service_1.KycService,
-            vehicle_registration_service_1.VehicleRegistrationService,
             driver_repository_1.DriverRepository,
             guarantor_repository_1.GuarantorRepository,
             kyc1_repository_1.Kyc1Repository,

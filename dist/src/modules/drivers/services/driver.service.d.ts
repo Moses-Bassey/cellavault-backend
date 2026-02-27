@@ -1,23 +1,51 @@
-import { Driver } from '../entities/driver.entity';
 import { DriverRepository } from '../repositories/driver.repository';
-import { IDashboard, IDashboardInput } from 'src/shared/interfaces/dashbaord.interface';
-import { ClientDeviceService } from 'src/modules/client-devices/services/client-device.service';
-import { AddDriverLicenseDto, UpdateBankAccountDto } from '../dto/kyc.dto';
+import { DriverAccountDto, DriverSummaryDto } from '../dto/driver.dto';
+import { KYC_COMPLETED } from 'src/enums/kyc.enums';
 export declare class DriverService {
     private readonly driverRepository;
-    private readonly clientDeviceService;
-    constructor(driverRepository: DriverRepository, clientDeviceService: ClientDeviceService);
-    addDriverLicense(userId: string, reqBody: AddDriverLicenseDto): Promise<AddDriverLicenseDto>;
-    updateBankAccount(userId: string, reqBody: UpdateBankAccountDto): Promise<UpdateBankAccountDto>;
-    setDriverType(userId: string, isPeppcruiseDriver: boolean): Promise<[number, Driver[]]>;
-    dashboard(data: IDashboardInput, userId: string): Promise<IDashboard>;
-    fetchDriver(id: string): Promise<Driver | null>;
-    findById(id: string): Promise<Driver | null>;
-    findByIdentity(identity: string): Promise<Driver | null>;
-    findByEmail(email: string): Promise<Driver | null>;
+    constructor(driverRepository: DriverRepository);
+    private toAccountDto;
+    getSummary(): Promise<DriverSummaryDto>;
     countActiveDrivers(): Promise<number | null>;
-    findAll(options?: any): Promise<Driver[]>;
-    update(id: string, driverData: Partial<Driver>): Promise<[number, Driver[]]>;
-    delete(id: string): Promise<number>;
-    restore(id: string): Promise<void>;
+    listDrivers(params: {
+        search?: string;
+        status?: 'ACTIVE' | 'SUSPENDED' | 'INACTIVE' | 'PENDING' | 'IN_PROGRESS' | 'VERIFIED' | 'REJECTED';
+        kycStatus?: 'APPROVED' | 'PENDING' | 'REJECTED' | 'PERSONAL_INFORMATION' | 'IDENTITY_INFORMATION' | 'RESIDENTIAL_INFORMATION' | 'ALL_COMPLETED' | 'NOT_COMPLETED';
+        limit?: number;
+        cursor?: string;
+    }): Promise<{
+        items: {
+            id: string;
+            fullName: string;
+            email: string;
+            phoneNo: string;
+            imageUrl: string;
+            vehicleName: string | null;
+            vehiclePlate: string | null;
+            status: import("../../../enums/driver-verification-status.enum").DRIVER_VERIFICATION_STATUS;
+            kycStatus: KYC_COMPLETED;
+            totalTrips: number;
+            earningsMinor: number;
+            lastActiveAt: string | null;
+        }[];
+        nextCursor: string | null;
+    }>;
+    getDriverAccount(driverId: string): Promise<DriverAccountDto>;
+    updateDriverAccount(driverId: string, patch: {
+        fullName?: string;
+        email?: string;
+        phoneNo?: string;
+        imageUrl?: string;
+        vehicleName?: string;
+        vehiclePlate?: string;
+        shortDescription?: string;
+    }): Promise<DriverAccountDto>;
+    suspendDriver(driverId: string, body: {
+        reason?: string;
+    }): Promise<{
+        ok: boolean;
+    }>;
+    unsuspendDriver(driverId: string): Promise<{
+        ok: boolean;
+    }>;
 }

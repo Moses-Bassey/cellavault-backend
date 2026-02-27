@@ -48,7 +48,6 @@ let PasscodeService = class PasscodeService {
             code: hashedCode,
         });
         if (userType === user_type_enum_1.UserType.DRIVER) {
-            await this.driverRepository.update(userId, { hasPasscode: true });
         }
         else {
             await this.userRepository.update(userId, { hasPasscode: true });
@@ -69,7 +68,6 @@ let PasscodeService = class PasscodeService {
             code: hashedCode,
         });
         if (userType === user_type_enum_1.UserType.DRIVER) {
-            await this.driverRepository.update(userId, { hasPasscode: true });
         }
         else {
             await this.userRepository.update(userId, { hasPasscode: true });

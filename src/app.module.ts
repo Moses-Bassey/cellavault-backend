@@ -13,6 +13,9 @@ import { CountriesModule } from './modules/countries/countries.module';
 import { CngConversionModule } from './modules/cng-conversion/cng-conversion.module';
 import { ClientDevicesModule } from './modules/client-devices/client-devices.module';
 import { AdminModule } from './modules/admins/admins.module';
+import { TripsModule } from './modules/trips/trips.module';
+import { StationsModule } from './modules/stations/station.module';
+// import { DriversModule } from './modules/drivers/drivers.module';
 import { TokenModule } from './services/token/token.module';
 import { MailModule } from './services/mail/mail.module';
 import { SmsModule } from './services/sms/sms.module';
@@ -27,6 +30,7 @@ import { kyc1PersonalInfo } from './modules/drivers/entities/kyc1-personal-Info.
 import { kyc2IdInformation } from './modules/drivers/entities/kyc2-Id-Information.entity';
 import { kyc3ResidentialInformation } from './modules/drivers/entities/kyc3-residential-Information.entity';
 import { Vehicle } from './modules/drivers/entities/vehicle.entity';
+import { VehicleRegistration } from './modules/drivers/entities/vehicle-registration.entity';
 import { PeppDriverVehicles } from './modules/drivers/entities/pepp-driver-vehicles.entity';
 import { Country, State, LGA } from './modules/countries/entities';
 import { CngConversion } from './modules/cng-conversion/entities/cng-conversion.entity';
@@ -56,6 +60,7 @@ import { Token } from './services/token/entities';
         kyc2IdInformation,
         kyc3ResidentialInformation,
         Vehicle,
+        VehicleRegistration,
         PeppDriverVehicles,
         Country,
         State,
@@ -85,10 +90,13 @@ import { Token } from './services/token/entities';
     CngConversionModule,
     ClientDevicesModule,
     AdminModule,
+    TripsModule,
+    StationsModule,
     TokenModule,
     MailModule,
     SmsModule,
     AxiosModule,
+    // DriversModule,
   ],
   controllers: [AppController],
   providers: [AppService, ApiKeyInterceptor],

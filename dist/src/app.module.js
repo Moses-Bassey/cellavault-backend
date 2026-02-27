@@ -24,6 +24,8 @@ const countries_module_1 = require("./modules/countries/countries.module");
 const cng_conversion_module_1 = require("./modules/cng-conversion/cng-conversion.module");
 const client_devices_module_1 = require("./modules/client-devices/client-devices.module");
 const admins_module_1 = require("./modules/admins/admins.module");
+const trips_module_1 = require("./modules/trips/trips.module");
+const station_module_1 = require("./modules/stations/station.module");
 const token_module_1 = require("./services/token/token.module");
 const mail_module_1 = require("./services/mail/mail.module");
 const sms_module_1 = require("./services/sms/sms.module");
@@ -37,6 +39,7 @@ const kyc1_personal_Info_entity_1 = require("./modules/drivers/entities/kyc1-per
 const kyc2_Id_Information_entity_1 = require("./modules/drivers/entities/kyc2-Id-Information.entity");
 const kyc3_residential_Information_entity_1 = require("./modules/drivers/entities/kyc3-residential-Information.entity");
 const vehicle_entity_1 = require("./modules/drivers/entities/vehicle.entity");
+const vehicle_registration_entity_1 = require("./modules/drivers/entities/vehicle-registration.entity");
 const pepp_driver_vehicles_entity_1 = require("./modules/drivers/entities/pepp-driver-vehicles.entity");
 const entities_3 = require("./modules/countries/entities");
 const cng_conversion_entity_1 = require("./modules/cng-conversion/entities/cng-conversion.entity");
@@ -69,6 +72,7 @@ exports.AppModule = AppModule = __decorate([
                     kyc2_Id_Information_entity_1.kyc2IdInformation,
                     kyc3_residential_Information_entity_1.kyc3ResidentialInformation,
                     vehicle_entity_1.Vehicle,
+                    vehicle_registration_entity_1.VehicleRegistration,
                     pepp_driver_vehicles_entity_1.PeppDriverVehicles,
                     entities_3.Country,
                     entities_3.State,
@@ -98,6 +102,8 @@ exports.AppModule = AppModule = __decorate([
             cng_conversion_module_1.CngConversionModule,
             client_devices_module_1.ClientDevicesModule,
             admins_module_1.AdminModule,
+            trips_module_1.TripsModule,
+            station_module_1.StationsModule,
             token_module_1.TokenModule,
             mail_module_1.MailModule,
             sms_module_1.SmsModule,

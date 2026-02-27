@@ -17,6 +17,7 @@ const client_device_service_1 = require("../../client-devices/services/client-de
 const trip_repository_1 = require("../../trips/repositories/trip.repository");
 const payment_repository_1 = require("../../payment/repositories/payment.repository");
 const coin_repository_1 = require("../../payment/repositories/coin.repository");
+const cursor_util_1 = require("../../../utils/cursor.util");
 function parseISODateOrUndefined(value) {
     if (!value)
         return undefined;
@@ -24,17 +25,6 @@ function parseISODateOrUndefined(value) {
     if (Number.isNaN(d.getTime()))
         throw new common_1.BadRequestException('Invalid date');
     return d;
-}
-function decodeCursor(cursor) {
-    if (!cursor)
-        return undefined;
-    try {
-        const decoded = JSON.parse(Buffer.from(cursor, 'base64').toString('utf8'));
-        return { createdAt: new Date(decoded.createdAt), id: decoded.id };
-    }
-    catch {
-        throw new common_1.BadRequestException('Invalid cursor');
-    }
 }
 let UserService = class UserService {
     userRepository;
@@ -222,7 +212,7 @@ let UserService = class UserService {
         const from = parseISODateOrUndefined(params.from);
         const to = parseISODateOrUndefined(params.to);
         const limit = Math.min(Math.max(Number(params.limit ?? 20), 1), 50);
-        const cursor = decodeCursor(params.cursor);
+        const cursor = (0, cursor_util_1.decodeCursor)(params.cursor);
         const { rows, nextCursor } = await this.rides.listPassengerRides({
             userId: params.passengerId,
             from,

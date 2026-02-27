@@ -118,7 +118,6 @@
 //   declare updatedAt: Date;
 // }
 
-
 import {
   Table,
   Column,

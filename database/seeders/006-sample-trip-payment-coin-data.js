@@ -47,7 +47,9 @@ module.exports = {
     if (DIALECT !== 'mysql' && DIALECT !== 'mariadb') {
       // Still works in many cases, but FK disabling below is MySQL-specific.
       // You can remove the FK disable bits if you aren't using FK constraints.
-      console.warn(`[Seeder] Dialect is ${DIALECT}. FK disable is MySQL-specific.`);
+      console.warn(
+        `[Seeder] Dialect is ${DIALECT}. FK disable is MySQL-specific.`,
+      );
     }
 
     const N_TRIPS = Number(process.env.SEED_TRIPS ?? 200);
@@ -88,9 +90,13 @@ module.exports = {
     // MySQL: optionally disable FK checks if your trips.userId has FK constraint
     // and you generated random userIds (no corresponding user records).
     const usingGeneratedUsers = userIds.length === N_USERS && N_USERS > 0;
-    const usingGeneratedDrivers = driverIds.length === N_DRIVERS && N_DRIVERS > 0;
+    const usingGeneratedDrivers =
+      driverIds.length === N_DRIVERS && N_DRIVERS > 0;
 
-    if ((usingGeneratedUsers || usingGeneratedDrivers) && (DIALECT === 'mysql' || DIALECT === 'mariadb')) {
+    if (
+      (usingGeneratedUsers || usingGeneratedDrivers) &&
+      (DIALECT === 'mysql' || DIALECT === 'mariadb')
+    ) {
       await queryInterface.sequelize.query('SET FOREIGN_KEY_CHECKS=0;');
     }
 
@@ -108,13 +114,13 @@ module.exports = {
 
     const PLACE_NAMES = [
       "Mama's Cafe",
-      "Marina Mall",
-      "Airport Road",
-      "University Gate",
-      "City Stadium",
-      "Main Park",
-      "Central Market",
-      "Hotel Avenue",
+      'Marina Mall',
+      'Airport Road',
+      'University Gate',
+      'City Stadium',
+      'Main Park',
+      'Central Market',
+      'Hotel Avenue',
     ];
 
     const STREETS = [
@@ -142,8 +148,8 @@ module.exports = {
       const status = (() => {
         const r = Math.random();
         if (r < 0.55) return 'COMPLETED';
-        if (r < 0.70) return 'CANCELLED';
-        if (r < 0.80) return 'ON_THE_WAY';
+        if (r < 0.7) return 'CANCELLED';
+        if (r < 0.8) return 'ON_THE_WAY';
         if (r < 0.88) return 'ACCEPTED';
         if (r < 0.94) return 'ASSIGNED';
         if (r < 0.97) return 'ARRIVED';
@@ -153,17 +159,23 @@ module.exports = {
       const paymentType = pick(PAYMENT_TYPES);
 
       const createdAt = randomPastDateWithin(30);
-      const startTime = status === 'COMPLETED' || status === 'CANCELLED' || Math.random() < 0.6
-        ? new Date(createdAt.getTime() + randInt(5, 30) * 60_000)
-        : null;
+      const startTime =
+        status === 'COMPLETED' || status === 'CANCELLED' || Math.random() < 0.6
+          ? new Date(createdAt.getTime() + randInt(5, 30) * 60_000)
+          : null;
 
-      const arrivalTime = startTime && (status === 'COMPLETED' || status === 'ARRIVED' || status === 'ON_THE_WAY')
-        ? new Date(startTime.getTime() + randInt(5, 20) * 60_000)
-        : null;
+      const arrivalTime =
+        startTime &&
+        (status === 'COMPLETED' ||
+          status === 'ARRIVED' ||
+          status === 'ON_THE_WAY')
+          ? new Date(startTime.getTime() + randInt(5, 20) * 60_000)
+          : null;
 
-      const endTime = startTime && status === 'COMPLETED'
-        ? new Date(startTime.getTime() + randInt(15, 55) * 60_000)
-        : null;
+      const endTime =
+        startTime && status === 'COMPLETED'
+          ? new Date(startTime.getTime() + randInt(15, 55) * 60_000)
+          : null;
 
       const estimatedFee = moneyDecimalString(300, 8000);
 
@@ -247,7 +259,10 @@ module.exports = {
     await queryInterface.bulkInsert('payments', payments, {});
     await queryInterface.bulkInsert('coins', coins, {});
 
-    if ((usingGeneratedUsers || usingGeneratedDrivers) && (DIALECT === 'mysql' || DIALECT === 'mariadb')) {
+    if (
+      (usingGeneratedUsers || usingGeneratedDrivers) &&
+      (DIALECT === 'mysql' || DIALECT === 'mariadb')
+    ) {
       await queryInterface.sequelize.query('SET FOREIGN_KEY_CHECKS=1;');
     }
   },
