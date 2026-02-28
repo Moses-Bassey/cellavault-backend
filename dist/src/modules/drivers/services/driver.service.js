@@ -14,6 +14,7 @@ const common_1 = require("@nestjs/common");
 const driver_repository_1 = require("../repositories/driver.repository");
 const cursor_util_1 = require("../../../utils/cursor.util");
 const kyc_enums_1 = require("../../../enums/kyc.enums");
+const driver_verification_status_enum_1 = require("../../../enums/driver-verification-status.enum");
 let DriverService = class DriverService {
     driverRepository;
     constructor(driverRepository) {
@@ -107,11 +108,13 @@ let DriverService = class DriverService {
             fullName: updated.fullName,
             email: updated.email ?? null,
             phoneNo: updated.phoneNo ?? null,
-            imageUrl: updated.imageUrl ?? null,
+            imageUrl: updated.profileImageUrl ?? null,
             vehicleName: updated.vehicleName ?? null,
             vehiclePlate: updated.vehiclePlate ?? null,
-            status: updated.status,
-            kycStatus: updated.kycStatus,
+            status: updated.verificationStatus == driver_verification_status_enum_1.DRIVER_VERIFICATION_STATUS.VERIFIED
+                ? 'ACTIVE'
+                : 'INACTIVE',
+            kycStatus: updated.kycCompleted,
             joinDate: updated.createdAt.toISOString(),
             shortDescription: updated.shortDescription ?? null,
         };
@@ -120,12 +123,12 @@ let DriverService = class DriverService {
         const driver = await this.driverRepository.findById(driverId);
         if (!driver)
             throw new common_1.NotFoundException('Driver not found');
-        if (driver.status === 'SUSPENDED')
+        if (driver.verificationStatus === driver_verification_status_enum_1.DRIVER_VERIFICATION_STATUS.REJECTED ||
+            driver.isDisabled === true)
             return { ok: true };
         const updated = await this.driverRepository.updateById(driverId, {
-            status: 'SUSPENDED',
-            suspensionReason: body.reason?.slice(0, 500) ?? null,
-            suspendedAt: new Date(),
+            isDisabled: true,
+            isAvailable: false,
         });
         if (!updated)
             throw new common_1.NotFoundException('Driver not found');
@@ -135,12 +138,11 @@ let DriverService = class DriverService {
         const driver = await this.driverRepository.findById(driverId);
         if (!driver)
             throw new common_1.NotFoundException('Driver not found');
-        if (driver.status === 'ACTIVE')
+        if (driver.isDisabled === false)
             return { ok: true };
         const updated = await this.driverRepository.updateById(driverId, {
-            status: 'ACTIVE',
-            suspensionReason: null,
-            suspendedAt: null,
+            isDisabled: false,
+            isAvailable: true,
         });
         if (!updated)
             throw new common_1.NotFoundException('Driver not found');

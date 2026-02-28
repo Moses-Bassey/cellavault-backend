@@ -73,7 +73,6 @@ export class StationRepository {
   private async countTable(
     model: BaseModelStatic,
   ): Promise<{ total: number; active: number; inactive: number }> {
-    // MySQL-safe boolean checks: isActive = 1 / 0
     const row = (await model.findOne({
       attributes: [
         [fn('COUNT', col('id')), 'total'],
@@ -164,13 +163,28 @@ export class StationRepository {
     return (rows as any[]).map((r) => ({ ...r, __source: source }));
   }
 
+  /* ----------------------------- Create station ----------------------------- */
+
+  async createStation(source: StationSource, payload: Record<string, any>) {
+    switch (source) {
+      case 'CNG':
+        return this.cngStationModel.create(payload as any);
+      case 'CNG_FUELING':
+        return this.cngFuelingModel.create(payload as any);
+      case 'EV_CHARGING':
+        return this.chargingModel.create(payload as any);
+      default:
+        throw new Error('Invalid station type');
+    }
+  }
+
   /* ----------------------------- Get by id ----------------------------- */
 
   async findById(
     source: StationSource,
     id: string,
   ): Promise<StationEntity | null> {
-    // Here we return typed instances, not Model<any,any>
+    // return typed instances, not Model<any,any>
     switch (source) {
       case 'CNG':
         return this.cngStationModel.findByPk(id);
@@ -223,7 +237,7 @@ export class StationRepository {
   /* ----------------------------- Helpers ----------------------------- */
 
   /**
-   * Base model for generic querying (findAll) without TS “this context” issues
+   * Base model for generic querying (findAll)
    */
   private getModel(source: StationSource): BaseModelStatic {
     switch (source) {
@@ -254,6 +268,29 @@ export class StationRepository {
         return this.chargingModel;
       default:
         return this.cngStationModel;
+    }
+  }
+
+  async existsByNameAndAddress(
+    source: StationSource,
+    name: string,
+    address: string,
+  ): Promise<boolean> {
+    switch (source) {
+      case 'CNG':
+        return (
+          (await this.cngStationModel.count({ where: { name, address } })) > 0
+        );
+      case 'CNG_FUELING':
+        return (
+          (await this.cngFuelingModel.count({ where: { name, address } })) > 0
+        );
+      case 'EV_CHARGING':
+        return (
+          (await this.chargingModel.count({ where: { name, address } })) > 0
+        );
+      default:
+        return false;
     }
   }
 }

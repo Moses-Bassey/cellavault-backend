@@ -1,6 +1,7 @@
 import { DriverRepository } from '../repositories/driver.repository';
-import { DriverAccountDto, DriverSummaryDto } from '../dto/driver.dto';
+import { DriverAccountDto, DriverSummaryDto, UpdateDriverDto } from '../dto/driver.dto';
 import { KYC_COMPLETED } from 'src/enums/kyc.enums';
+import { DRIVER_VERIFICATION_STATUS } from 'src/enums/driver-verification-status.enum';
 export declare class DriverService {
     private readonly driverRepository;
     constructor(driverRepository: DriverRepository);
@@ -22,7 +23,7 @@ export declare class DriverService {
             imageUrl: string;
             vehicleName: string | null;
             vehiclePlate: string | null;
-            status: import("../../../enums/driver-verification-status.enum").DRIVER_VERIFICATION_STATUS;
+            status: DRIVER_VERIFICATION_STATUS;
             kycStatus: KYC_COMPLETED;
             totalTrips: number;
             earningsMinor: number;
@@ -31,15 +32,7 @@ export declare class DriverService {
         nextCursor: string | null;
     }>;
     getDriverAccount(driverId: string): Promise<DriverAccountDto>;
-    updateDriverAccount(driverId: string, patch: {
-        fullName?: string;
-        email?: string;
-        phoneNo?: string;
-        imageUrl?: string;
-        vehicleName?: string;
-        vehiclePlate?: string;
-        shortDescription?: string;
-    }): Promise<DriverAccountDto>;
+    updateDriverAccount(driverId: string, patch: UpdateDriverDto): Promise<DriverAccountDto>;
     suspendDriver(driverId: string, body: {
         reason?: string;
     }): Promise<{

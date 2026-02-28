@@ -16,6 +16,8 @@ exports.DriverController = void 0;
 const common_1 = require("@nestjs/common");
 const swagger_1 = require("@nestjs/swagger");
 const driver_service_1 = require("../services/driver.service");
+const driver_dto_1 = require("../dto/driver.dto");
+const auth_decorator_1 = require("../../auth/decorators/auth.decorator");
 const auth_guard_1 = require("../../auth/guards/auth.guard");
 const roles_guard_1 = require("../../auth/guards/roles.guard");
 const roles_decorator_1 = require("../../auth/decorators/roles.decorator");
@@ -29,56 +31,70 @@ let DriverController = class DriverController {
     }
     async getSummary() {
         const data = await this.driverService.getSummary();
-        return response_utils_1.ResponseUtil.handleResponse(data, '', common_1.HttpStatus.OK);
+        return response_utils_1.ResponseUtil.handleResponse(data, "Drivers' summary retrieved successfully", common_1.HttpStatus.OK);
     }
-    async listDrivers(search, status, kycStatus, limit, cursor) {
+    async listDrivers(query) {
         const data = await this.driverService.listDrivers({
-            search,
-            status,
-            kycStatus,
-            limit: limit ? Number(limit) : undefined,
-            cursor,
+            search: query.search,
+            status: query.status,
+            kycStatus: query.kycStatus,
+            limit: query.limit ? Number(query.limit) : undefined,
+            cursor: query.cursor,
         });
         console.log('data: ', data);
-        return response_utils_1.ResponseUtil.handleResponse(data, '', common_1.HttpStatus.OK);
+        return response_utils_1.ResponseUtil.handleResponse(data, 'Drivers retrieved successfully', common_1.HttpStatus.OK);
     }
     async getDriver(driverId) {
         const data = await this.driverService.getDriverAccount(driverId);
-        return response_utils_1.ResponseUtil.handleResponse(data, '', common_1.HttpStatus.OK);
+        return response_utils_1.ResponseUtil.handleResponse(data, 'Driver retrieved successfully', common_1.HttpStatus.OK);
     }
     async updateDriver(driverId, body) {
         const data = await this.driverService.updateDriverAccount(driverId, body);
-        return response_utils_1.ResponseUtil.handleResponse(data, '', common_1.HttpStatus.OK);
+        return response_utils_1.ResponseUtil.handleResponse(data, 'Driver details updated successfully', common_1.HttpStatus.OK);
     }
     async suspend(driverId, body) {
         const data = await this.driverService.suspendDriver(driverId, body);
-        return response_utils_1.ResponseUtil.handleResponse(data, '', common_1.HttpStatus.OK);
+        return response_utils_1.ResponseUtil.handleResponse(data, 'Driver successfully suspended', common_1.HttpStatus.OK);
     }
     async unsuspend(driverId) {
         const data = await this.driverService.unsuspendDriver(driverId);
-        return response_utils_1.ResponseUtil.handleResponse(data, '', common_1.HttpStatus.OK);
+        return response_utils_1.ResponseUtil.handleResponse(data, 'Driver unsuspended successfully', common_1.HttpStatus.OK);
     }
 };
 exports.DriverController = DriverController;
 __decorate([
     (0, common_1.Get)('summary'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get all drivers metrics' }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Drivers metrics retrieved successfully',
+    }),
+    (0, swagger_1.ApiResponse)({ status: 404, description: 'Drivers metrics not found' }),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], DriverController.prototype, "getSummary", null);
 __decorate([
     (0, common_1.Get)(),
-    __param(0, (0, common_1.Query)('search')),
-    __param(1, (0, common_1.Query)('status')),
-    __param(2, (0, common_1.Query)('kycStatus')),
-    __param(3, (0, common_1.Query)('limit')),
-    __param(4, (0, common_1.Query)('cursor')),
+    (0, swagger_1.ApiOperation)({ summary: 'Get all drivers' }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Drivers retrieved successfully',
+    }),
+    (0, swagger_1.ApiResponse)({ status: 404, description: 'Drivers not found' }),
+    __param(0, (0, common_1.Query)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, String, String, String, String]),
+    __metadata("design:paramtypes", [driver_dto_1.GetDriversQueryDto]),
     __metadata("design:returntype", Promise)
 ], DriverController.prototype, "listDrivers", null);
 __decorate([
     (0, common_1.Get)(':driverId'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get driver by id' }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Driver retrieved successfully',
+    }),
+    (0, swagger_1.ApiResponse)({ status: 404, description: 'Driver not found' }),
     __param(0, (0, common_1.Param)('driverId', uuid_validator_pipe_1.UuidValidationPipe)),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
@@ -86,14 +102,27 @@ __decorate([
 ], DriverController.prototype, "getDriver", null);
 __decorate([
     (0, common_1.Patch)(':driverId'),
+    (0, swagger_1.ApiOperation)({ summary: 'Update driver details' }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Driver updated successfully',
+    }),
+    (0, swagger_1.ApiResponse)({ status: 404, description: 'Driver not found' }),
     __param(0, (0, common_1.Param)('driverId', uuid_validator_pipe_1.UuidValidationPipe)),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:paramtypes", [String, driver_dto_1.UpdateDriverDto]),
     __metadata("design:returntype", Promise)
 ], DriverController.prototype, "updateDriver", null);
 __decorate([
     (0, common_1.Post)(':driverId/suspend'),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    (0, swagger_1.ApiOperation)({ summary: "Suspend driver's account" }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Driver suspended successfully',
+    }),
+    (0, swagger_1.ApiResponse)({ status: 404, description: 'Driver not found' }),
     __param(0, (0, common_1.Param)('driverId', uuid_validator_pipe_1.UuidValidationPipe)),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -102,6 +131,13 @@ __decorate([
 ], DriverController.prototype, "suspend", null);
 __decorate([
     (0, common_1.Post)(':driverId/unsuspend'),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    (0, swagger_1.ApiOperation)({ summary: "Unsuspend driver's account" }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Driver unsuspended successfully',
+    }),
+    (0, swagger_1.ApiResponse)({ status: 404, description: 'Driver not found' }),
     __param(0, (0, common_1.Param)('driverId', uuid_validator_pipe_1.UuidValidationPipe)),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
@@ -110,6 +146,7 @@ __decorate([
 exports.DriverController = DriverController = __decorate([
     (0, swagger_1.ApiTags)('Drivers'),
     (0, swagger_1.ApiBearerAuth)(),
+    (0, auth_decorator_1.Auth)(),
     (0, roles_decorator_1.Roles)(user_type_enum_1.UserType.SUPER_ADMIN, user_type_enum_1.UserType.PEPP_ADMIN, user_type_enum_1.UserType.PEPP_MANAGER),
     (0, common_1.UseGuards)(auth_guard_1.AuthGuard, roles_guard_1.RolesGuard),
     (0, common_1.Controller)('admin/drivers'),

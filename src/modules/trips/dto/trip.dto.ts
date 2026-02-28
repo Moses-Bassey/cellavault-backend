@@ -1,4 +1,5 @@
-// src/modules/trips/dto/admin-trip.dto.ts
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsOptional, IsEnum, IsNumber } from 'class-validator';
 import { PaymentType, TripStatus } from '../entities/trip.entity';
 
 export class TripsSummaryDto {
@@ -78,4 +79,50 @@ export class TripDetailsDto {
     phoneNo?: string | null;
     imageUrl?: string | null;
   } | null;
+}
+export class GetTripsQueryDto {
+  @ApiProperty({ description: 'Search parameter', example: 'Pepp cng station' })
+  @IsOptional()
+  search?: string;
+
+  @ApiProperty({ description: 'Filter by active status', example: 'COMPLETED' })
+  @IsOptional()
+  @IsEnum(TripStatus)
+  status?: TripStatus;
+
+  @ApiProperty({ description: 'Filter by station type', example: 'CNG' })
+  @IsOptional()
+  paymentType?: PaymentType;
+
+  @ApiProperty({ description: 'Number of items per page', example: 10 })
+  @IsOptional()
+  limit?: string | number;
+
+  @ApiProperty({
+    description: 'Cursor for optimized pagination',
+    example: null,
+  })
+  @IsOptional()
+  cursor?: string;
+
+  @ApiProperty({
+    description: 'Start date',
+    example: null,
+  })
+  @IsOptional()
+  from?: string;
+
+  @ApiProperty({
+    description: 'End date',
+    example: null,
+  })
+  @IsOptional()
+  to?: string;
+
+  @ApiProperty({
+    description: '',
+    example: null,
+  })
+  @IsOptional()
+  withDelta?: string;
 }

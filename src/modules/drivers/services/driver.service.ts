@@ -161,22 +161,12 @@ import {
   DriverAccountDto,
   DriverListRowDto,
   DriverSummaryDto,
+  UpdateDriverDto,
 } from '../dto/driver.dto';
 import { CursorPageDto } from '../../../shared/dto/user.dto';
 import { decodeCursor } from '../../../utils/cursor.util';
 import { KYC_COMPLETED } from 'src/enums/kyc.enums';
-
-// function decodeCursor(
-//   cursor?: string,
-// ): { createdAt: Date; id: string } | undefined {
-//   if (!cursor) return undefined;
-//   try {
-//     const decoded = JSON.parse(Buffer.from(cursor, 'base64').toString('utf8'));
-//     return { createdAt: new Date(decoded.createdAt), id: decoded.id };
-//   } catch {
-//     throw new BadRequestException('Invalid cursor');
-//   }
-// }
+import { DRIVER_VERIFICATION_STATUS } from 'src/enums/driver-verification-status.enum';
 
 @Injectable()
 export class DriverService {
@@ -296,32 +286,11 @@ export class DriverService {
     if (!driver) throw new NotFoundException('Driver not found');
 
     return this.toAccountDto(driver, vehicle);
-    // {
-    //   id: driver.id,
-    //   fullName: driver.fullName,
-    //   email: driver.email ?? null,
-    //   phoneNo: driver.phoneNo ?? null,
-    //   imageUrl: driver.profileImageUrl ?? null,
-    //   vehicleName: (driver as any).vehicleName ?? null,
-    //   vehiclePlate: (driver as any).vehiclePlate ?? null,
-    //   status: driver.verificationStatus, // use tenary oper.
-    //   kycStatus: (driver as any).kycStatus,
-    //   joinDate: driver.createdAt.toISOString(),
-    //   shortDescription: (driver as any).shortDescription ?? null,
-    // };
   }
 
   async updateDriverAccount(
     driverId: string,
-    patch: {
-      fullName?: string;
-      email?: string;
-      phoneNo?: string;
-      imageUrl?: string;
-      vehicleName?: string;
-      vehiclePlate?: string;
-      shortDescription?: string;
-    },
+    patch: UpdateDriverDto,
   ): Promise<DriverAccountDto> {
     if (patch.email && !patch.email.includes('@')) {
       throw new BadRequestException('Invalid email');
@@ -337,12 +306,15 @@ export class DriverService {
       id: updated.id,
       fullName: updated.fullName,
       email: updated.email ?? null,
-      phoneNo: (updated as any).phoneNo ?? null,
-      imageUrl: (updated as any).imageUrl ?? null,
+      phoneNo: updated.phoneNo ?? null,
+      imageUrl: updated.profileImageUrl ?? null,
       vehicleName: (updated as any).vehicleName ?? null,
       vehiclePlate: (updated as any).vehiclePlate ?? null,
-      status: (updated as any).status,
-      kycStatus: (updated as any).kycStatus,
+      status:
+        updated.verificationStatus == DRIVER_VERIFICATION_STATUS.VERIFIED
+          ? 'ACTIVE'
+          : 'INACTIVE',
+      kycStatus: updated.kycCompleted,
       joinDate: updated.createdAt.toISOString(),
       shortDescription: (updated as any).shortDescription ?? null,
     };
@@ -352,13 +324,16 @@ export class DriverService {
     const driver = await this.driverRepository.findById(driverId);
     if (!driver) throw new NotFoundException('Driver not found');
 
-    if ((driver as any).status === 'SUSPENDED') return { ok: true };
+    if (
+      driver.verificationStatus === DRIVER_VERIFICATION_STATUS.REJECTED ||
+      driver.isDisabled === true
+    )
+      return { ok: true };
 
     const updated = await this.driverRepository.updateById(driverId, {
-      status: 'SUSPENDED',
-      suspensionReason: body.reason?.slice(0, 500) ?? null,
-      suspendedAt: new Date(),
-    } as any);
+      isDisabled: true,
+      isAvailable: false,
+    });
 
     if (!updated) throw new NotFoundException('Driver not found');
     return { ok: true };
@@ -368,13 +343,12 @@ export class DriverService {
     const driver = await this.driverRepository.findById(driverId);
     if (!driver) throw new NotFoundException('Driver not found');
 
-    if ((driver as any).status === 'ACTIVE') return { ok: true };
+    if (driver.isDisabled === false) return { ok: true };
 
     const updated = await this.driverRepository.updateById(driverId, {
-      status: 'ACTIVE',
-      suspensionReason: null,
-      suspendedAt: null,
-    } as any);
+      isDisabled: false,
+      isAvailable: true,
+    });
 
     if (!updated) throw new NotFoundException('Driver not found');
     return { ok: true };

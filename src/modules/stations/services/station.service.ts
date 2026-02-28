@@ -10,6 +10,7 @@ import {
   StationListRowDto,
   StationsSummaryDto,
   StationSource,
+  CreateStationDto,
 } from '../dto/station.dto';
 import {
   decodeStationCursor,
@@ -37,6 +38,46 @@ function stationTypeLabel(source: StationSource) {
 @Injectable()
 export class StationService {
   constructor(private readonly stationRepository: StationRepository) {}
+
+  async createStation(dto: CreateStationDto) {
+    const name = dto.name.trim();
+    const address = dto.address.trim();
+
+    if (!name) throw new BadRequestException('Station name is required');
+    if (!address) throw new BadRequestException('Address is required');
+
+    // Optional: prevent duplicates (simple heuristic)
+    const exists = await this.stationRepository.existsByNameAndAddress(
+      dto.stationType,
+      name,
+      address,
+    );
+    if (exists) throw new BadRequestException('Station already exists');
+
+    const created = await this.stationRepository.createStation(
+      dto.stationType,
+      {
+        name,
+        address,
+        state: dto.state?.trim() || null,
+        country: dto.country?.trim() || 'Nigeria',
+        // set defaults
+        openingTime: '08:00:00',
+        closingTime: '18:00:00',
+      },
+    );
+
+    return {
+      id: created.id,
+      source: dto.stationType,
+      name: created.name,
+      address: created.address,
+      state: created.state ?? null,
+      country: created.country ?? null,
+      isActive: created.isActive,
+      createdAt: created.createdAt,
+    };
+  }
 
   async getSummary(): Promise<StationsSummaryDto> {
     return this.stationRepository.getSummary();
@@ -139,7 +180,7 @@ export class StationService {
       openingTime: station.openingTime,
       closingTime: station.closingTime,
 
-      amountPerUnit: String(station.amountPerUnit),
+      amountPerUnit: Number(station.amountPerUnit),
       amountPerUnitType: station.amountPerUnitType,
       currency: station.currency,
 
@@ -197,6 +238,7 @@ export class StationService {
     const updated = await this.stationRepository.updateStation(source, id, {
       isActive,
     });
+    console.log('Is active:', isActive);
     if (!updated) throw new NotFoundException('Station not found');
     return { ok: true };
   }

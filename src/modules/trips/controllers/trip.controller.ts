@@ -13,14 +13,12 @@ import {
   ApiBearerAuth,
 } from '@nestjs/swagger';
 import { TripService } from '../services/trip.service';
-import { PaymentType, TripStatus } from '../entities/trip.entity';
+import { GetTripsQueryDto } from '../dto/trip.dto';
 import { AuthGuard } from '../../auth/guards/auth.guard';
 import { RolesGuard } from '../../auth/guards/roles.guard';
 import { Roles } from '../../auth/decorators/roles.decorator';
 import { UserType } from '../../../enums/user-type.enum';
-import { JwtAuthPayload } from 'src/modules/auth/auth.interface';
 import { ResponseUtil } from 'src/utils/response.utils';
-import type { Request as ExpressRequest } from 'express';
 import { UuidValidationPipe } from '../../../shared/pipes/uuid.validator.pipe';
 
 @ApiTags('Trips')
@@ -32,12 +30,18 @@ export class TripController {
   constructor(private readonly tripService: TripService) {}
 
   @Get('summary')
-  async getSummary(
-    @Query('from') from?: string,
-    @Query('to') to?: string,
-    @Query('withDelta') withDelta?: string,
-  ) {
-    const data = await this.tripService.getSummary({ from, to, withDelta });
+  @ApiOperation({ summary: 'Get trip metrics' })
+  @ApiResponse({
+    status: 200,
+    description: 'Trip metrics retrieved successfully',
+  })
+  @ApiResponse({ status: 404, description: 'Trip metrics not found' })
+  async getSummary(@Query() query: GetTripsQueryDto) {
+    const data = await this.tripService.getSummary({
+      from: query.from,
+      to: query.to,
+      withDelta: query.withDelta,
+    });
     return ResponseUtil.handleResponse(
       data,
       'Trips summary retrieved successfully',
@@ -46,23 +50,21 @@ export class TripController {
   }
 
   @Get()
-  async listTrips(
-    @Query('search') search?: string,
-    @Query('status') status?: TripStatus,
-    @Query('paymentType') paymentType?: PaymentType,
-    @Query('limit') limit?: string,
-    @Query('cursor') cursor?: string,
-    @Query('from') from?: string,
-    @Query('to') to?: string,
-  ) {
+  @ApiOperation({ summary: 'Get all trips' })
+  @ApiResponse({
+    status: 200,
+    description: 'Trips retrieved successfully',
+  })
+  @ApiResponse({ status: 404, description: 'Trips not found' })
+  async listTrips(@Query() query: GetTripsQueryDto) {
     const data = await this.tripService.listTrips({
-      search,
-      status,
-      paymentType,
-      limit: limit ? Number(limit) : undefined,
-      cursor,
-      from,
-      to,
+      search: query.search,
+      status: query.status,
+      paymentType: query.paymentType,
+      limit: query.limit ? Number(query.limit) : undefined,
+      cursor: query.cursor,
+      from: query.from,
+      to: query.to,
     });
     return ResponseUtil.handleResponse(
       data,
@@ -72,6 +74,12 @@ export class TripController {
   }
 
   @Get(':tripId')
+  @ApiOperation({ summary: 'Get trip by id' })
+  @ApiResponse({
+    status: 200,
+    description: 'Trip retrieved successfully',
+  })
+  @ApiResponse({ status: 404, description: 'Trip not found' })
   async getTripDetails(@Param('tripId', UuidValidationPipe) tripId: string) {
     const data = await this.tripService.getTripDetails(tripId);
     return ResponseUtil.handleResponse(
