@@ -1,5 +1,0 @@
-export declare enum CNG_CONVERSION_STATUS {
-    PENDING = "PENDING",
-    APPROVED = "APPROVED",
-    REJECTED = "REJECTED"
-}

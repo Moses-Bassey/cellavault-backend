@@ -18,7 +18,9 @@ import { ConfigService } from '@nestjs/config';
           secret:
             configService.get<string>('app.jwtSecret') || 'default-secret',
           signOptions: {
-            // No expiresIn means the token will not expire
+            expiresIn:
+              configService.get<string | number>(
+                'app.jwtExpiresIn'),
           },
         };
       },

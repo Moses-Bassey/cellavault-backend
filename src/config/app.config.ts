@@ -7,8 +7,8 @@ export default registerAs('app', () => ({
     ? process.env.CORS_ORIGIN.split(',').map((origin) => origin.trim())
     : ['https://www.dev.peppcruise.com', 'https://www.admin.peppcruise.com'],
   jwtSecret: process.env.JWT_SECRET || '',
-  jwtExpiresIn: process.env.JWT_EXPIRES_IN || '1d',
-  jwtTokenExpiry: process.env.JWT_TOKEN_EXPIRY || '1h',
+  jwtExpiresIn: process.env.JWT_EXPIRES_IN || '12h',
+  jwtTokenExpiry: process.env.JWT_TOKEN_EXPIRY || '1d',
   apiKey: process.env.PEPPCRUISE_API_KEY || '',
   rateLimitTtl: parseInt(process.env.RATE_LIMIT_TTL || '60000', 10),
   rateLimitLimit: parseInt(process.env.RATE_LIMIT_LIMIT || '10', 10),
