@@ -159,6 +159,9 @@ export class UserService {
     await this.userRepository.restore(id);
   }
 
+
+  // ======================================= //
+
   async countActiveUsers(): Promise<number | null> {
     const isDisabled = false;
     const users = await this.userRepository.findActiveUsers(isDisabled);
