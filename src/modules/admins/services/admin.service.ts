@@ -12,6 +12,7 @@ import { DriverService } from '../../drivers/services/driver.service';
 // import { PaymentService } from '../../paymentService/services/paymant.service';
 // import { PayoutService } from '../../payout/services/payout.service';
 import { DashboardDataDto } from '../dto/dashboard-data.dto';
+import { decodeCursor } from '../../../utils/cursor.util';
 
 @Injectable()
 export class AdminService {
@@ -33,15 +34,27 @@ export class AdminService {
     return admin;
   }
 
-  async findAll(options?: {
+  async findAll(params?: {
     limit?: number;
-    offset?: number;
-  }): Promise<Admin[]> {
-    const ratings = await this.adminRepository.findAll(options);
+    cursor?: string;
+  }): Promise<{ items: Admin[]; nextCursor: string | null }> {
+    const limit = Math.min(Math.max(Number(params?.limit ?? 20), 1), 50);
+
+    const decodedCursor = decodeCursor(params?.cursor);
+
+    const { admins, nextCursor } = await this.adminRepository.findAll({
+      limit,
+      cursor: decodedCursor,
+    });
+
     this.logger.log(
-      `Found ${ratings.length} ratings (filters: ${JSON.stringify(options)})`,
+      `Fetched ${admins.length} admins (cursor: ${params?.cursor ?? 'none'})`,
     );
-    return ratings;
+
+    return {
+      items: admins,
+      nextCursor,
+    };
   }
 
   async update(id: string, data: Partial<Admin>): Promise<number | null> {

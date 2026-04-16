@@ -43,7 +43,7 @@ export class CngConversionService {
         offset: offset,
       });
       return {
-        fetchTransmission: await this.fetchTransmission(),
+        fetchTransmission: this.fetchTransmission(),
         conversions,
       };
     } catch (error) {

@@ -59,12 +59,13 @@ export class AdminController {
   @HttpCode(HttpStatus.OK)
   async findAll(
     @Query('limit') limit?: number,
-    @Query('offset') offset?: number,
+    @Query('cursor') cursor?: string,
   ) {
     const data = await this.adminService.findAll({
       limit: limit ? Number(limit) : undefined,
-      offset: offset ? Number(offset) : undefined,
+      cursor,
     });
+
     return ResponseUtil.handleResponse(
       data,
       'Admins retrieved successfully',

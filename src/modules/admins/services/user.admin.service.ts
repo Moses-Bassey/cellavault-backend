@@ -5,6 +5,7 @@ import {
   BadRequestException,
   NotFoundException,
 } from '@nestjs/common';
+import { User } from '../../users/entities/user.entity';
 import { AdminService } from './admin.service';
 import { UserService } from '../../users/services/user.service';
 import { DriverService } from '../../drivers/services/driver.service';
@@ -13,6 +14,8 @@ import { DriverService } from '../../drivers/services/driver.service';
 // import { PayoutService } from '../../payout/services/payout.service';
 import { DashboardDataDto } from '../dto/dashboard-data.dto';
 import { PasswordUtil } from '../../../utils/password.util';
+import { decodeCursor } from '../../../utils/cursor.util';
+import { CursorPageDto } from '../../../shared/dto/user.dto';
 
 @Injectable()
 export class UserAdminService {
@@ -52,25 +55,10 @@ export class UserAdminService {
   async findAll(options: {
     search?: string;
     status?: boolean;
-    limit: number;
-    page: number;
+    limit?: number;
+    cursor?: string;
   }) {
-    const offset = (options.page - 1) * options.limit;
-    const users = await this.userService.findAll({ ...options, offset });
-    const filterOptions = {
-      search: options.search,
-      status: options.status,
-    };
-    const totalCount = await this.userService.countFiltered(filterOptions);
-
-    return {
-      users,
-      pagination: {
-        totalCount,
-        page: options.page,
-        limit: options.limit,
-      },
-    };
+    return this.userService.findAll(options);
   }
 
   async findById(id: string) {

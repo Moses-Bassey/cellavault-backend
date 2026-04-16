@@ -29,9 +29,9 @@ export class GetUsersQueryDto {
 
   @ApiProperty({ description: 'Number of items per page', example: 10 })
   @IsOptional()
-  limit = 10;
+  limit?: number | string;
 
   @ApiProperty({ description: 'Page number', example: 1 })
   @IsOptional()
-  page = 1;
+  cursor?: string;
 }

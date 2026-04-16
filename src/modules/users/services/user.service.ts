@@ -36,18 +36,6 @@ function parseISODateOrUndefined(value?: string): Date | undefined {
   return d;
 }
 
-// function decodeCursor(
-//   cursor?: string,
-// ): { createdAt: Date; id: string } | undefined {
-//   if (!cursor) return undefined;
-//   try {
-//     const decoded = JSON.parse(Buffer.from(cursor, 'base64').toString('utf8'));
-//     return { createdAt: new Date(decoded.createdAt), id: decoded.id };
-//   } catch {
-//     throw new BadRequestException('Invalid cursor');
-//   }
-// }
-
 @Injectable()
 export class UserService {
   constructor(
@@ -131,13 +119,28 @@ export class UserService {
     }
   }
 
-  async findAll(options: {
+  async findAll(params: {
     search?: string;
     status?: boolean;
-    limit: number;
-    offset: number;
-  }): Promise<User[]> {
-    return await this.userRepository.findAll(options);
+    limit?: number;
+    cursor?: string;
+  }): Promise<CursorPageDto<User>> {
+    const limit = Math.min(Math.max(Number(params.limit ?? 20), 1), 50);
+
+    const cursor = decodeCursor(params.cursor);
+    const search = params.search?.trim();
+
+    const { users, nextCursor } = await this.userRepository.findAll({
+      search,
+      status: params.status,
+      limit,
+      cursor,
+    });
+
+    return {
+      items: users,
+      nextCursor,
+    };
   }
 
   async countFiltered(options: {

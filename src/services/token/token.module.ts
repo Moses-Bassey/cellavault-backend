@@ -5,6 +5,7 @@ import { Token } from './entities';
 import { TokenService } from './token.service';
 import { TokenRepository } from './repositories/token.repository';
 import { ConfigService } from '@nestjs/config';
+import type { StringValue } from 'ms';
 
 @Global()
 @Module({
@@ -19,8 +20,9 @@ import { ConfigService } from '@nestjs/config';
             configService.get<string>('app.jwtSecret') || 'default-secret',
           signOptions: {
             expiresIn:
-              configService.get<string | number>(
-                'app.jwtExpiresIn'),
+              (configService.get<string | number>(
+                'app.jwtExpiresIn',
+              ) as StringValue) ?? '12hr',
           },
         };
       },

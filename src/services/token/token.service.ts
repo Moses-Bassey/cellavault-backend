@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { JwtService } from '@nestjs/jwt';
+import { JwtService, JwtSignOptions } from '@nestjs/jwt';
 import { isAfter } from 'date-fns';
 import { CreateTokenDto, VerifyCustomTokenDto } from './dto/token.dto';
 import { TokenRepository } from './repositories/token.repository';
@@ -169,8 +169,11 @@ export class TokenService {
     };
   }
 
-  async generateJWTtoken(payload: any) {
-    return await this.jwtService.signAsync(payload);
+  async generateJWTtoken<T extends object>(
+    payload: T,
+    options?: JwtSignOptions,
+  ) {
+    return await this.jwtService.signAsync(payload, options);
   }
 
   async verifyJWTtoken(token: string) {

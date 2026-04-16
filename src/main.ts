@@ -3,7 +3,7 @@ import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import { Logger, ValidationPipe, VersioningType } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { ApiKeyInterceptor } from './interceptors/api-key.interceptors';
+// import { ApiKeyInterceptor } from './interceptors/api-key.interceptors';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -25,7 +25,6 @@ async function bootstrap() {
       'Accept',
       'Authorization',
       'X-Forwarded-For',
-      'x-product-key',
     ],
   });
 
@@ -52,8 +51,8 @@ async function bootstrap() {
   );
 
   // Global API key interceptor
-  const apiKeyInterceptor = app.get(ApiKeyInterceptor);
-  app.useGlobalInterceptors(apiKeyInterceptor);
+  // const apiKeyInterceptor = app.get(ApiKeyInterceptor);
+  // app.useGlobalInterceptors(apiKeyInterceptor);
 
   // Swagger documentation
   if (configService.get<string>('NODE_ENV') !== 'production') {

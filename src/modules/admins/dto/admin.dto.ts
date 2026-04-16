@@ -78,6 +78,10 @@ export class AdminLoginDto {
   @ApiProperty({ description: "Admin's password", example: '32rvn39nved' })
   @IsString()
   password: string;
+
+  @ApiProperty({ description: "Token validity lifespan", example: false })
+  @IsBoolean()
+  rememberMe: boolean;
 }
 
 export class LoginOtpDto {
@@ -101,6 +105,10 @@ export class LoginOtpDto {
   @MinLength(6)
   @MaxLength(6)
   otp: string;
+
+  @ApiProperty({ description: "Token validity lifespan", example: false })
+  @IsBoolean()
+  rememberMe: boolean;
 
   @ApiProperty({
     description: 'Device information',

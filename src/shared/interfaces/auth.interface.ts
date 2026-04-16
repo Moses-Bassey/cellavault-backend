@@ -23,6 +23,5 @@ export interface IAdminLoginData {
   id: string;
   token: string;
   adminType: UserType;
-  adminId: string;
   email: string;
 }

@@ -119,29 +119,77 @@ export class UserRepository {
     search?: string;
     status?: boolean;
     limit: number;
-    offset: number;
-  }): Promise<User[]> {
-    const { search, status, limit, offset } = options;
+    cursor?: { createdAt: Date; id: string };
+  }): Promise<{ users: User[]; nextCursor: string | null }> {
+    const { search, status, limit, cursor } = options;
 
-    console.log('Status: ', status);
-    const where: WhereOptions = {
-      ...(typeof status === 'boolean' && { isActive: status }),
+    const andConditions: any[] = [];
 
-      ...(search && {
+    /* ---------- FILTERS ---------- */
+
+    if (typeof status === 'boolean') {
+      andConditions.push({ isActive: status });
+    }
+
+    if (search) {
+      andConditions.push({
         [Op.or]: [
           { fullName: { [Op.like]: `%${search}%` } },
           { phoneNo: { [Op.like]: `%${search}%` } },
           { email: { [Op.like]: `%${search}%` } },
         ],
-      }),
-    };
+      });
+    }
 
-    return this.userModel.findAll({
+    /* ---------- CURSOR PAGINATION ---------- */
+
+    if (cursor) {
+      andConditions.push({
+        [Op.or]: [
+          { createdAt: { [Op.lt]: cursor.createdAt } },
+          {
+            createdAt: cursor.createdAt,
+            id: { [Op.lt]: cursor.id },
+          },
+        ],
+      });
+    }
+
+    const where: WhereOptions<User> = andConditions.length
+      ? { [Op.and]: andConditions }
+      : {};
+
+    const rows = await this.userModel.findAll({
       where,
-      order: [['createdAt', 'DESC']],
+      order: [
+        ['createdAt', 'DESC'],
+        ['id', 'DESC'],
+      ],
       limit,
-      offset,
+      /* EXCLUDE PASSWORD AT DB LEVEL */
+      attributes: {
+        exclude: ['password'],
+      },
     });
+
+    /* ---------- NEXT CURSOR ---------- */
+
+    const last = rows[rows.length - 1];
+
+    const nextCursor =
+      rows.length === limit && last
+        ? Buffer.from(
+            JSON.stringify({
+              createdAt: last.createdAt,
+              id: last.id,
+            }),
+          ).toString('base64')
+        : null;
+
+    return {
+      users: rows,
+      nextCursor,
+    };
   }
 
   async countAll(): Promise<User[] | null> {

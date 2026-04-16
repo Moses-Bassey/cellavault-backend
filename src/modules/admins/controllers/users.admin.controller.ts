@@ -68,8 +68,8 @@ export class UserAdminController {
     const data = await this.userAdminService.findAll({
       search: query.search,
       status: query.status,
-      limit: query.limit,
-      page: query.page,
+      limit: query.limit ? Number(query.limit) : undefined,
+      cursor: query.cursor,
     });
 
     return ResponseUtil.handleResponse(

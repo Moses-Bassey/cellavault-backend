@@ -7,6 +7,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import moment from 'moment';
+import { JwtSignOptions } from '@nestjs/jwt';
 import { TokenService } from 'src/services/token/token.service';
 import { TokenSubject } from 'src/enums/token.enum';
 import { Request as ExpressRequest, request } from 'express';
@@ -56,7 +57,7 @@ export class AuthAdminService {
     data: AdminLoginDto,
     request: Request, // inject request properly
   ): Promise<IAdminLoginData> {
-    const { email, password } = data;
+    const { email, password, rememberMe } = data;
 
     // Find admin
     const admin = await this.checkEmailExist(email);
@@ -86,18 +87,18 @@ export class AuthAdminService {
       | string
       | undefined;
 
-    console.log('clientDeviceToken:', clientDeviceToken);
+    // console.log('clientDeviceToken:', clientDeviceToken);
 
     if (clientDeviceToken) {
       await this.validateClientDevice(admin, clientDeviceToken);
     }
 
     // Generate JWT & response
-    return this.buildLoginResponse(admin);
+    return this.createAuthPayload(admin, rememberMe);
   }
 
   async loginOtp(input: LoginOtpDto, request: Request) {
-    const { email, otp, password, deviceInfo } = input;
+    const { email, otp, password, rememberMe, deviceInfo } = input;
 
     const admin = await this.checkEmailExist(email);
     if (!admin) throw new NotFoundException('Account not found');
@@ -121,14 +122,7 @@ export class AuthAdminService {
       throw new UnauthorizedException('Invalid Credentials');
     }
 
-    const payload = {
-      sub: admin.id,
-      adminType: admin.role,
-      adminId: admin.id,
-      email: admin.email,
-    };
-
-    const token: string = await this.tokenService.generateJWTtoken(payload);
+    const loginResponse = await this.createAuthPayload(admin, rememberMe);
 
     const loginTime = moment().format('MMMM Do YYYY, h:mm A');
 
@@ -151,12 +145,7 @@ export class AuthAdminService {
       userType: admin.role,
     });
 
-    return {
-      email: admin.email,
-      adminType: payload.adminType,
-      id: admin.id,
-      token: token,
-    };
+    return loginResponse;
   }
 
   async deleteAdminAccount(email: string, password: string): Promise<null> {
@@ -217,7 +206,12 @@ export class AuthAdminService {
     throw new UnauthorizedException('Detected new device login');
   }
 
-  private async buildLoginResponse(admin: Admin): Promise<IAdminLoginData> {
+  private async createAuthPayload(
+    admin: Admin,
+    rememberMe: boolean,
+  ): Promise<IAdminLoginData> {
+    const tokenOptions: JwtSignOptions = rememberMe ? { expiresIn: '7d' } : {};
+
     const payload: JwtAuthPayload = {
       sub: admin.id,
       userId: admin.id,
@@ -225,11 +219,13 @@ export class AuthAdminService {
       userType: admin.role, // TODO: remove later
     };
 
-    const token = await this.tokenService.generateJWTtoken(payload);
+    const token = await this.tokenService.generateJWTtoken(
+      payload,
+      tokenOptions,
+    );
 
     return {
       id: admin.id,
-      adminId: admin.id,
       adminType: admin.role,
       email: admin.email,
       token,
