@@ -99,8 +99,20 @@ export class TripRepository {
 
   // ============================== //
 
-  async getPassengerRideSummary(userId: string, from?: Date, to?: Date) {
-    const where: WhereOptions = { userId };
+  async getUserRideSummary({
+    userId,
+    driverId,
+    from,
+    to,
+  }: {
+    userId?: string;
+    driverId?: string;
+    from?: Date;
+    to?: Date;
+  }) {
+    const where: WhereOptions = {
+      ...(userId ? { userId } : driverId ? { driverId } : {}),
+    };
     if (from || to) {
       where['createdAt'] = {
         ...(from ? { [Op.gte]: from } : {}),
@@ -138,17 +150,20 @@ export class TripRepository {
     };
   }
 
-  async listPassengerRides(params: {
-    userId: string;
+  async listUserRides(params: {
+    userId?: string;
+    driverId?: string;
     from?: Date;
     to?: Date;
     status?: TripStatus;
     limit: number;
     cursor?: { createdAt: Date; id: string }; // cursor for stable pagination
   }) {
-    const { userId, from, to, status, limit, cursor } = params;
+    const { userId, driverId, from, to, status, limit, cursor } = params;
 
-    const where: WhereOptions<Trip> = { userId };
+    const where: WhereOptions<Trip> = {
+      ...(userId ? { userId } : driverId ? { driverId } : {}),
+    };
     if (status) where['status'] = status;
 
     if (from || to) {
@@ -199,9 +214,16 @@ export class TripRepository {
     return { rows, nextCursor };
   }
 
+
   findPassengerRideById(passengerId: string, rideId: string) {
     return this.tripModel.findOne({
       where: { id: rideId, userId: passengerId },
+    });
+  }
+
+  findDriverRideById(driverId: string, rideId: string) {
+    return this.tripModel.findOne({
+      where: { id: rideId, driverId },
     });
   }
 
@@ -432,5 +454,19 @@ export class TripRepository {
 
   async findTripById(tripId: string) {
     return this.tripModel.findByPk(tripId);
+  }
+
+  async countOngoingTrips(): Promise<number> {
+    const ongoingStatuses = [
+      TripStatus.ACCEPTED,
+      TripStatus.ON_THE_WAY,
+      TripStatus.ARRIVED,
+    ];
+
+    return await this.tripModel.count({
+      where: {
+        status: { [Op.in]: ongoingStatuses },
+      },
+    });
   }
 }

@@ -26,13 +26,14 @@ import { Roles } from '../../auth/decorators/roles.decorator';
 import { UserType } from '../../../enums/user-type.enum';
 import { ResponseUtil } from 'src/utils/response.utils';
 import { UuidValidationPipe } from '../../../shared/pipes/uuid.validator.pipe';
+import { TripStatus } from '../../trips/entities/trip.entity';
 
 @ApiTags('Drivers')
 @ApiBearerAuth()
 @Auth()
 @Roles(UserType.SUPER_ADMIN, UserType.PEPP_ADMIN, UserType.PEPP_MANAGER)
 @UseGuards(AuthGuard, RolesGuard)
-@Controller('admin/drivers')
+@Controller('drivers')
 export class DriverController {
   constructor(private readonly driverService: DriverService) {}
 
@@ -90,61 +91,147 @@ export class DriverController {
       HttpStatus.OK,
     );
   }
+  // Activity screen
 
-  @Patch(':driverId')
-  @ApiOperation({ summary: 'Update driver details' })
+  @Get(':driverId/summary')
+  @ApiOperation({ summary: "Fetch driver's ride activity" })
   @ApiResponse({
     status: 200,
-    description: 'Driver updated successfully',
+    description: "Driver's ride activity retrieved successfully",
   })
-  @ApiResponse({ status: 404, description: 'Driver not found' })
-  async updateDriver(
+  @ApiResponse({
+    status: 400,
+    description: "Failed to retrieve driver's ride activity",
+  })
+  @ApiResponse({ status: 404, description: "Driver's ride activity not found" })
+  async getActivitySummary(
     @Param('driverId', UuidValidationPipe) driverId: string,
-    @Body()
-    body: UpdateDriverDto,
+    @Query('from') from?: string,
+    @Query('to') to?: string,
   ) {
-    const data = await this.driverService.updateDriverAccount(driverId, body);
+    const data = await this.driverService.getDriverActivitySummary({
+      driverId,
+      from,
+      to,
+    });
     return ResponseUtil.handleResponse(
       data,
-      'Driver details updated successfully',
+      "Driver's ride activity retrieved successfully",
       HttpStatus.OK,
     );
   }
 
-  @Post(':driverId/suspend')
-  @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: "Suspend driver's account" })
+  @Get(':driverId/rides')
+  @ApiOperation({ summary: "Fetch driver's ride history" })
   @ApiResponse({
     status: 200,
-    description: 'Driver suspended successfully',
+    description: "Driver's ride history retrieved successfully",
   })
-  @ApiResponse({ status: 404, description: 'Driver not found' })
-  async suspend(
+  @ApiResponse({
+    status: 400,
+    description: "Failed to retrieve driver's ride history",
+  })
+  @ApiResponse({ status: 404, description: "Driver's ride history not found" })
+  async listRides(
     @Param('driverId', UuidValidationPipe) driverId: string,
-    @Body() body: { reason?: string },
+    @Query('from') from?: string,
+    @Query('to') to?: string,
+    @Query('status') status?: TripStatus,
+    @Query('limit') limit?: string,
+    @Query('cursor') cursor?: string,
   ) {
-    const data = await this.driverService.suspendDriver(driverId, body);
+    const data = await this.driverService.listDriverRides({
+      driverId,
+      from,
+      to,
+      status,
+      limit: limit ? Number(limit) : undefined,
+      cursor,
+    });
     return ResponseUtil.handleResponse(
       data,
-      'Driver successfully suspended',
+      "Driver's ride history retrieved successfully",
       HttpStatus.OK,
     );
   }
 
-  @Post(':driverId/unsuspend')
-  @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: "Unsuspend driver's account" })
+  @Get(':driverId/rides/:rideId')
+  @ApiOperation({ summary: 'Fetch ride details' })
   @ApiResponse({
     status: 200,
-    description: 'Driver unsuspended successfully',
+    description: 'Ride details retrieved successfully',
   })
-  @ApiResponse({ status: 404, description: 'Driver not found' })
-  async unsuspend(@Param('driverId', UuidValidationPipe) driverId: string) {
-    const data = await this.driverService.unsuspendDriver(driverId);
+  @ApiResponse({
+    status: 400,
+    description: "Failed to retrieve ride's details",
+  })
+  @ApiResponse({ status: 404, description: 'Ride details not found' })
+  async getRideDetails(
+    @Param('driverId', UuidValidationPipe) driverId: string,
+    @Param('rideId', UuidValidationPipe) rideId: string,
+  ) {
+    const data = await this.driverService.getRideDetails(driverId, rideId);
     return ResponseUtil.handleResponse(
       data,
-      'Driver unsuspended successfully',
+      'Ride details retrieved successfully',
       HttpStatus.OK,
     );
   }
+
+  // @Patch(':driverId')
+  // @ApiOperation({ summary: 'Update driver details' })
+  // @ApiResponse({
+  //   status: 200,
+  //   description: 'Driver updated successfully',
+  // })
+  // @ApiResponse({ status: 404, description: 'Driver not found' })
+  // async updateDriver(
+  //   @Param('driverId', UuidValidationPipe) driverId: string,
+  //   @Body()
+  //   body: UpdateDriverDto,
+  // ) {
+  //   const data = await this.driverService.updateDriverAccount(driverId, body);
+  //   return ResponseUtil.handleResponse(
+  //     data,
+  //     'Driver details updated successfully',
+  //     HttpStatus.OK,
+  //   );
+  // }
+
+  // @Post(':driverId/suspend')
+  // @HttpCode(HttpStatus.OK)
+  // @ApiOperation({ summary: "Suspend driver's account" })
+  // @ApiResponse({
+  //   status: 200,
+  //   description: 'Driver suspended successfully',
+  // })
+  // @ApiResponse({ status: 404, description: 'Driver not found' })
+  // async suspend(
+  //   @Param('driverId', UuidValidationPipe) driverId: string,
+  //   @Body() body: { reason?: string },
+  // ) {
+  //   const data = await this.driverService.suspendDriver(driverId, body);
+  //   return ResponseUtil.handleResponse(
+  //     data,
+  //     'Driver successfully suspended',
+  //     HttpStatus.OK,
+  //   );
+  // }
+
+  // @Post(':driverId/unsuspend')
+  // @HttpCode(HttpStatus.OK)
+  // @ApiOperation({ summary: "Unsuspend driver's account" })
+  // @ApiResponse({
+  //   status: 200,
+  //   description: 'Driver unsuspended successfully',
+  // })
+  // @ApiResponse({ status: 404, description: 'Driver not found' })
+  // async unsuspend(@Param('driverId', UuidValidationPipe) driverId: string) {
+  //   const data = await this.driverService.unsuspendDriver(driverId);
+  //   return ResponseUtil.handleResponse(
+  //     data,
+  //     'Driver unsuspended successfully',
+  //     HttpStatus.OK,
+  //   );
+  // }
 }

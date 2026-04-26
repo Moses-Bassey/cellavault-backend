@@ -31,17 +31,6 @@ import { UuidValidationPipe } from '../../../shared/pipes/uuid.validator.pipe';
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
-  @Get('dashboard')
-  @HttpCode(HttpStatus.OK)
-  async getDashboardData() {
-    const data = await this.adminService.getDashboardData();
-    return ResponseUtil.handleResponse(
-      data,
-      'Dashboard data retrieved successfully',
-      HttpStatus.OK,
-    );
-  }
-
   @Roles(UserType.PEPP_ADMIN, UserType.SUPER_ADMIN)
   @Get(':id')
   @HttpCode(HttpStatus.OK)

@@ -30,7 +30,7 @@ import { UuidValidationPipe } from '../../../shared/pipes/uuid.validator.pipe';
 @ApiBearerAuth()
 @Roles(UserType.SUPER_ADMIN, UserType.PEPP_ADMIN, UserType.PEPP_MANAGER)
 @UseGuards(AuthGuard, RolesGuard)
-@Controller('admin/stations')
+@Controller('stations')
 export class StationController {
   constructor(private readonly stationService: StationService) {}
 

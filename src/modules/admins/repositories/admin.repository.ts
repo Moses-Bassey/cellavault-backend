@@ -10,19 +10,19 @@ export class AdminRepository {
     private readonly adminModel: typeof Admin,
   ) {}
 
-  async create(adminData: Partial<Admin>): Promise<Admin> {
-    try {
-      return await this.adminModel.create(adminData as any);
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        console.error(`Error creating admin: ${error.message}`);
-        throw new Error(`Error creating admin: ${error.message}`);
-      } else {
-        console.error(`Error creating admin: ${error as any}`);
-        throw new Error(`Error creating admin: ${error as any}`);
-      }
-    }
-  }
+  // async create(adminData: Partial<Admin>): Promise<Admin> {
+  //   try {
+  //     return await this.adminModel.create(adminData as any);
+  //   } catch (error: unknown) {
+  //     if (error instanceof Error) {
+  //       console.error(`Error creating admin: ${error.message}`);
+  //       throw new Error(`Error creating admin: ${error.message}`);
+  //     } else {
+  //       console.error(`Error creating admin: ${error as any}`);
+  //       throw new Error(`Error creating admin: ${error as any}`);
+  //     }
+  //   }
+  // }
 
   async findById(id: string): Promise<Admin | null> {
     try {
@@ -144,36 +144,19 @@ export class AdminRepository {
     }
   }
 
-  async delete(id: string): Promise<number> {
-    try {
-      return await this.adminModel.destroy({
-        where: { id },
-      });
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        console.error(`Error deleting admin: ${error.message}`);
-        throw new Error(`Error deleting admin: ${error.message}`);
-      } else {
-        console.error(`Error deleting admin: ${error as any}`);
-        throw new Error(`Error deleting admin: ${error as any}`);
-      }
-    }
-  }
-
-  async restore(id: string): Promise<void> {
-    try {
-      // Soft delete restore: set deletedAt back to null
-      return await this.adminModel.restore({
-        where: { id },
-      });
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        console.error(`Error restoring admin: ${error.message}`);
-        throw new Error(`Error restoring admin: ${error.message}`);
-      } else {
-        console.error(`Error restoring admin: ${error as any}`);
-        throw new Error(`Error restoring admin: ${error as any}`);
-      }
-    }
-  }
+  // async delete(id: string): Promise<number> {
+  //   try {
+  //     return await this.adminModel.destroy({
+  //       where: { id },
+  //     });
+  //   } catch (error: unknown) {
+  //     if (error instanceof Error) {
+  //       console.error(`Error deleting admin: ${error.message}`);
+  //       throw new Error(`Error deleting admin: ${error.message}`);
+  //     } else {
+  //       console.error(`Error deleting admin: ${error as any}`);
+  //       throw new Error(`Error deleting admin: ${error as any}`);
+  //     }
+  //   }
+  // }
 }

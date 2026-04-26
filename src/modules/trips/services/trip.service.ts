@@ -277,4 +277,8 @@ export class TripService {
         : null,
     };
   }
+
+  async countOngoingTrips(): Promise<number> {
+    return await this.tripRepository.countOngoingTrips();
+  }
 }

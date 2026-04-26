@@ -1,780 +1,263 @@
 import {
   BadRequestException,
   ConflictException,
-  HttpStatus,
   Injectable,
   NotFoundException,
   UnauthorizedException,
+  Logger,
 } from '@nestjs/common';
-import { Request as ExpressRequest, request } from 'express';
-import { add } from 'date-fns';
-import { User } from '../users/entities';
-import { UserLoginIdentityType, UserType } from '../../enums/user-type.enum';
-import { MailService } from 'src/services/mail/mail.service';
-import { EmailEventService } from 'src/services/mail/email-event.service';
-import { SmsEventService } from 'src/services/sms/sms-event.service';
-import { TOKEN_SUBJECT } from 'src/services/token/token.constants';
-import { TokenService } from 'src/services/token/token.service';
-import { PasswordUtil } from 'src/utils/password.util';
-import { UserRepository } from '../users/repositories/user.repository';
-import { JwtAuthPayload } from './auth.interface';
-import {
-  ChangePasswordDto,
-  ForgotPasswordDto,
-  LoginOtpDto,
-  LoginUserDto,
-  LoginUserSocialDto,
-  ResetPasswordDto,
-  SignupEmail,
-  SignupPhone,
-  SignUpSocialUserDto,
-  SignUpUserDto,
-  VerifyOtpDto,
-} from './dto/auth.dto';
-import { TokenSubject, TokenType } from 'src/enums/token.enum';
 import moment from 'moment';
-import { LoginType } from 'src/enums/login-type.enum';
-import { CountryService } from '../countries/services/country.service';
-import { UserService } from '../users/services/user.service';
+import { JwtSignOptions } from '@nestjs/jwt';
+import { TokenService } from 'src/services/token/token.service';
+import { TokenSubject } from 'src/enums/token.enum';
+import { Request as ExpressRequest, request } from 'express';
+import { AdminRepository } from '../admins/repositories/admin.repository';
+import { Admin } from '../admins/entities/admin.entity';
 import { ClientDeviceService } from '../client-devices/services/client-device.service';
-import { Validators } from 'src/utils/validators.utils';
-import { Utils } from 'src/utils/utils';
-import { IUserLoginData } from 'src/shared/interfaces/auth.interface';
+import { ClientDeviceEventEmitter } from '../client-devices/emitters/client-device.emitter';
+import { IAdminLoginData } from '../../shared/interfaces/auth.interface';
+import { UserType } from '../../enums/user-type.enum';
+import { EmailEventService } from 'src/services/mail/email-event.service';
+import { PasswordUtil } from '../../utils/password.util';
+import { CreateAdminDto, AdminLoginDto, LoginOtpDto } from './dto/auth.dto';
+import { Validators } from '../../utils/validators.utils';
+import { JwtAuthPayload } from './auth.interface';
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
   constructor(
-    private readonly userRepository: UserRepository,
-    private mailService: MailService,
-    private tokenService: TokenService,
-    private emailEventService: EmailEventService,
-    private smsEventService: SmsEventService,
-    private countryService: CountryService,
-    private userService: UserService,
-    private clientDeviceService: ClientDeviceService,
+    private readonly adminRepository: AdminRepository,
+    private readonly clientDeviceService: ClientDeviceService,
+    private readonly emailEventService: EmailEventService,
+    private readonly tokenService: TokenService,
+    private readonly clientDeviceEventEmitter: ClientDeviceEventEmitter,
   ) {}
 
-  //   async signUpPhoneNo(input: SignupPhone) {
-  //     try {
-  //       const { country, phoneNo } = input;
+  // async create(data: CreateAdminDto): Promise<Admin> {
+  //   data.email = Validators.validateEmail(data.email);
 
-  //       const existingCountry = await this.countryService.findById(country);
-  //       if (!existingCountry) {
-  //         throw new ConflictException('Country code not found!');
-  //       }
-
-  //       const phone = Utils.normalizeCountryPhone(
-  //         existingCountry.phoneCode,
-  //         phoneNo,
-  //         existingCountry.phoneLength,
-  //       );
-
-  //       const existingUser = await this.userRepository.findByPhone(phone);
-  //       if (existingUser) {
-  //         throw new ConflictException('User with this phoneNo already exist');
-  //       }
-
-  //       const otpToken = await this.tokenService.generateOTPtoken({
-  //         phoneNo: phone,
-  //         expiry: moment().add(10, 'minutes').toDate(),
-  //         subject: TokenSubject.SIGN_UP_PHONE,
-  //       });
-
-  //       // Send SMS with OTP
-  //       await this.smsEventService.emitSignUpOtpSms(
-  //         Utils.phoneSMSFormat(phone),
-  //         otpToken.token,
-  //       );
-
-  //       return {};
-  //     } catch (error) {
-  //       throw new BadRequestException(error);
-  //     }
+  //   const emailUser = await this.checkEmailExist(data.email);
+  //   if (emailUser) {
+  //     throw new ConflictException('Admin with email already exists');
   //   }
 
-  //   async deleteUserAccount(identity: string, password: string): Promise<null> {
-  //     try {
-  //       // Step 1: Find user
-  //       const user = '';
-  //       // await this.userService.findByIdentity(identity);
-  //       // if (!user) {
-  //       //   throw new NotFoundException('User not found');
-  //       // }
+  //   const hashedPassword = await PasswordUtil.hashPassword(data.password);
 
-  //       // Step 2: Verify password
-  //       const verifyPassword = await PasswordUtil.verifyPassword(
-  //         password,
-  //         user.password,
-  //       );
-  //       if (!verifyPassword) {
-  //         throw new UnauthorizedException('Invalid credentials');
-  //       }
+  //   const admin = await this.adminRepository.create({
+  //     fullName: data.fullName,
+  //     email: data.email,
+  //     password: hashedPassword,
+  //     role: UserType.PEPP_ADMIN,
+  //   });
+  //   return admin;
+  // }
 
-  //       // Step 4: Update email to email-uuid
-  //       const newEmail = `${user.email}-${user.id}`;
-  //       const newPhoneNo = `${user.phoneNo}-${user.id}`;
+  async login(
+    data: AdminLoginDto,
+    request: Request, // inject request properly
+  ): Promise<IAdminLoginData> {
+    const { email, password, rememberMe } = data;
 
-  //       const updatedDriver = await this.userRepository.update(user.id, {
-  //         email: newEmail,
-  //         phoneNo: newPhoneNo,
-  //       });
-  //       if (!updatedDriver) {
-  //         throw new NotFoundException('User not found after deletion');
-  //       }
+    // Find admin
+    const admin = await this.checkEmailExist(email);
+    if (!admin) {
+      throw new NotFoundException('Account not found');
+    }
 
-  //       await this.userRepository.delete(user.id);
+    // Check account status
+    if (!admin.isVerified || !admin.isActive) {
+      throw new UnauthorizedException(
+        'Account creation request not approved, please contact support team.',
+      );
+    }
 
-  //       return null;
-  //     } catch (error: unknown) {
-  //       if (
-  //         error instanceof NotFoundException ||
-  //         error instanceof UnauthorizedException
-  //       ) {
-  //         throw error;
-  //       }
-  //       throw new NotFoundException('Failed to delete driver account');
-  //     }
+    // Verify password
+    const isPasswordValid = await PasswordUtil.verifyPassword(
+      password,
+      admin.password,
+    );
+
+    if (!isPasswordValid) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
+    // Validate device (if token is provided)
+    const clientDeviceToken = request.headers['x-client-device-token'] as
+      | string
+      | undefined;
+
+    // console.log('clientDeviceToken:', clientDeviceToken);
+
+    if (clientDeviceToken) {
+      await this.validateClientDevice(admin, clientDeviceToken);
+    }
+
+    // Generate JWT & response
+    return this.createAuthPayload(admin, rememberMe);
+  }
+
+  async loginOtp(input: LoginOtpDto, request: Request) {
+    const { email, otp, password, rememberMe, deviceInfo } = input;
+
+    const admin = await this.checkEmailExist(email);
+    if (!admin) throw new NotFoundException('Account not found');
+
+    const verifyOtp = await this.tokenService.verifyOTP({
+      email: admin.email,
+      token: otp,
+      subject: TokenSubject.NEW_DEVICE_LOGIN_OTP,
+    });
+
+    if (!verifyOtp) {
+      throw new BadRequestException('Invalid OTP');
+    }
+
+    const verifyPassword = await PasswordUtil.verifyPassword(
+      password,
+      admin.password,
+    );
+
+    if (!verifyPassword) {
+      throw new UnauthorizedException('Invalid Credentials');
+    }
+
+    const loginResponse = await this.createAuthPayload(admin, rememberMe);
+
+    const loginTime = moment().format('MMMM Do YYYY, h:mm A');
+
+    // Emit email event
+    this.emailEventService.emitNewLoginEmail(
+      admin.email,
+      admin.fullName,
+      deviceInfo.name || 'Unknown Device',
+      loginTime,
+    );
+
+    const ipAddress = this.getClientIp(request);
+
+    // Emit client device event asynchronously
+    this.clientDeviceEventEmitter.emitAddDeviceToken({
+      adminId: admin.id,
+      ipAddress: ipAddress ?? 'Unknown IP',
+      deviceFCMToken: deviceInfo.deviceFCMToken || null,
+      name: deviceInfo.name || null,
+      userType: admin.role,
+    });
+
+    return loginResponse;
+  }
+
+  // async deleteAdminAccount(email: string, password: string): Promise<null> {
+  //   const admin = await this.adminRepository.findByEmail(email);
+  //   if (!admin) throw new NotFoundException('Admin not found');
+
+  //   const verifyPassword = await PasswordUtil.verifyPassword(
+  //     password,
+  //     admin.password,
+  //   );
+  //   if (!verifyPassword) throw new UnauthorizedException('Invalid credentials');
+
+  //   const newEmail = `${admin.email}-${admin.id}`;
+  //   const updatedAdmin = await this.adminRepository.update(admin.id, {
+  //     email: newEmail,
+  //   });
+  //   if (!updatedAdmin)
+  //     throw new NotFoundException('Admin not found after deletion');
+
+  //   const deletedCount = await this.adminRepository.delete(admin.id);
+  //   if (deletedCount == 0) {
+  //     this.logger.warn(`Admin id=${admin.id} not deleted`);
+  //     throw new BadRequestException('Failed to delete');
   //   }
-
-  //   async signUpEmail(input: SignupEmail) {
-  //     try {
-  //       input.email = Validators.validateEmail(input.email);
-  //       const existingUser = await this.userRepository.findByEmail(input.email);
-
-  //       if (existingUser) {
-  //         throw new ConflictException('User with this email already exist');
-  //       }
-  //       const expiryDate = moment().add(10, 'minutes').toDate();
-  //       const otpToken = await this.tokenService.generateOTPtoken({
-  //         email: input.email,
-  //         expiry: expiryDate,
-  //         subject: TokenSubject.SIGN_UP_EMAIL,
-  //       });
-
-  //       // Send forget password email
-  //       await this.emailEventService.emitSignUpOtpEmail(
-  //         input.email,
-  //         otpToken.token,
-  //         expiryDate.toISOString(),
-  //       );
-
-  //       return null;
-  //     } catch (error) {
-  //       throw new BadRequestException(error);
-  //     }
-  //   }
-
-  //   async verifyOtp(input: VerifyOtpDto) {
-  //     const { token, subject, email, phoneNo, country } = input;
-
-  //     let data;
-
-  //     if (subject === TokenSubject.SIGN_UP_EMAIL) {
-  //       input.email = Validators.validateEmail(input.email);
-  //       data = await this.tokenService.validateOtp({
-  //         token,
-  //         subject,
-  //         email,
-  //         phoneNo,
-  //       });
-  //     } else {
-  //       if (!country) {
-  //         throw new BadRequestException('Must provide a valid country!');
-  //       }
-
-  //       const existingCountry = await this.countryService.findById(country);
-  //       if (!existingCountry) {
-  //         throw new ConflictException('Country code not found!');
-  //       }
-
-  //       const phone = Utils.normalizeCountryPhone(
-  //         existingCountry.phoneCode,
-  //         phoneNo,
-  //         existingCountry.phoneLength,
-  //       );
-
-  //       data = await this.tokenService.validateOtp({
-  //         token,
-  //         subject,
-  //         phoneNo: phone,
-  //       });
-  //     }
-
-  //     if (!data) {
-  //       throw new BadRequestException('Invalid OTP');
-  //     }
-
-  //     return input;
-  //   }
-
-  //   async verifyPasswordResetOtp(input: VerifyOtpDto) {
-  //     const { token, subject, email } = input;
-
-  //     input.email = Validators.validateEmail(input.email);
-  //     const data = await this.tokenService.validatePasswordResetOtp({
-  //       token,
-  //       subject,
-  //       email,
-  //     });
-
-  //     if (!data) {
-  //       throw new BadRequestException('Invalid Password Reset OTP');
-  //     }
-
-  //     return input;
-  //   }
-
-  //   async signUp(input: SignUpUserDto) {
-  //     const country = await this.countryService.findById(input.country);
-  //     if (!country) {
-  //       throw new NotFoundException('Country not found');
-  //     }
-
-  //     input.email = Validators.validateEmail(input.email);
-
-  //     const emailUser = await this.checkEmailExist(input.email);
-  //     if (emailUser) {
-  //       throw new ConflictException('User with email already exist');
-  //     }
-
-  //     if (!input.country) {
-  //       throw new BadRequestException('Must provide a valid country!');
-  //     }
-
-  //     const existingCountry = await this.countryService.findById(input.country);
-  //     if (!existingCountry) {
-  //       throw new ConflictException('Country code not found!');
-  //     }
-
-  //     const phone = Utils.normalizeCountryPhone(
-  //       existingCountry.phoneCode,
-  //       input.phoneNo,
-  //       existingCountry.phoneLength,
-  //     );
-
-  //     const verifyPhoneOtp = await this.tokenService.verifySignUpOTP({
-  //       phoneNo: phone,
-  //       token: input.otpPhone,
-  //       subject: TokenSubject.SIGN_UP_PHONE,
-  //     });
-
-  //     if (!verifyPhoneOtp) {
-  //       throw new BadRequestException('Invalid OTP');
-  //     }
-
-  //     const verifyEmailOtp = await this.tokenService.verifySignUpOTP({
-  //       email: input.email,
-  //       token: input.otpEmail,
-  //       subject: TokenSubject.SIGN_UP_EMAIL,
-  //     });
-
-  //     if (!verifyEmailOtp) {
-  //       throw new BadRequestException('Invalid OTP');
-  //     }
-
-  //     const password = await PasswordUtil.hashPassword(input.password);
-
-  //     const user = await this.userRepository.create({
-  //       email: input.email,
-  //       phoneNo: phone,
-  //       fullName: input.fullName,
-  //       password: password,
-  //       countryId: country.id,
-  //       userType: UserType.USER,
-  //       loginType: LoginType.NORMAL,
-  //       isEmailVerified: true,
-  //       isPhoneVerified: true,
-  //       isActive: true,
-  //     });
-
-  //     const payload = {
-  //       sub: user.id,
-  //       userType: UserType.USER,
-  //       userId: user!.id,
-  //       email: input.email,
-  //     };
-
-  //     const token: string = await this.tokenService.generateJWTtoken(payload);
-
-  //     // Send welcome email
-  //     await this.emailEventService.emitWelcomeEmail(user.email, user.fullName);
-
-  //     return {
-  //       email: input.email,
-  //       userType: UserType.USER,
-  //       id: user.id,
-  //       token: token,
-  //     };
-  //   }
-
-  //   async signUpSocial(input: SignUpSocialUserDto) {
-  //     const country = await this.countryService.findById(input.country);
-  //     if (!country) {
-  //       throw new NotFoundException('Country not found');
-  //     }
-
-  //     input.email = Validators.validateEmail(input.email);
-
-  //     const emailUser = await this.checkEmailExist(input.email);
-  //     if (emailUser) {
-  //       throw new ConflictException('User with email already exist');
-  //     }
-
-  //     if (!input.country) {
-  //       throw new BadRequestException('Must provide a valid country!');
-  //     }
-
-  //     const existingCountry = await this.countryService.findById(input.country);
-  //     if (!existingCountry) {
-  //       throw new ConflictException('Country code not found!');
-  //     }
-
-  //     const phone = Utils.normalizeCountryPhone(
-  //       existingCountry.phoneCode,
-  //       input.phoneNo,
-  //       existingCountry.phoneLength,
-  //     );
-
-  //     const verifyPhoneOtp = await this.tokenService.verifySignUpOTP({
-  //       phoneNo: phone,
-  //       token: input.otpPhone,
-  //       subject: TokenSubject.SIGN_UP_PHONE,
-  //     });
-
-  //     if (!verifyPhoneOtp) {
-  //       throw new BadRequestException('Invalid OTP');
-  //     }
-
-  //     const password = await PasswordUtil.hashPassword(input.password);
-
-  //     const user = await this.userRepository.create({
-  //       email: input.email,
-  //       phoneNo: phone,
-  //       fullName: input.fullName,
-  //       password: password,
-  //       countryId: country.id,
-  //       userType: UserType.USER,
-  //       loginType: input.loginType,
-  //       isEmailVerified: true,
-  //       isPhoneVerified: true,
-  //       isActive: true,
-  //     });
-
-  //     const payload = {
-  //       sub: user.id,
-  //       userType: UserType.USER,
-  //       userId: user!.id,
-  //       email: input.email,
-  //     };
-
-  //     const token: string = await this.tokenService.generateJWTtoken(payload);
-
-  //     // Send welcome email
-  //     await this.emailEventService.emitWelcomeEmail(user.email, user.fullName);
-
-  //     return {
-  //       email: input.email,
-  //       userType: UserType.USER,
-  //       id: user.id,
-  //       token: token,
-  //     };
-  //   }
-
-  //   async login(input: LoginUserDto) {
-  //     const { identity, country } = input;
-  //     const identityType = Utils.getLoginIdentityType(identity);
-
-  //     let user;
-
-  //     if (identityType == UserLoginIdentityType.EMAIL) {
-  //       user = await this.checkEmailExist(Validators.validateEmail(identity));
-  //     } else {
-  //       if (!country) {
-  //         throw new BadRequestException('Must select a valid phone county');
-  //       }
-
-  //       const existingCountry = await this.countryService.findById(country);
-  //       if (!existingCountry) {
-  //         throw new NotFoundException('Country phone not found!');
-  //       }
-
-  //       const phoneNo = Utils.normalizeCountryPhone(
-  //         existingCountry?.phoneCode,
-  //         identity,
-  //         existingCountry.phoneLength,
-  //       );
-
-  //       user = await this.userRepository.findByPhone(phoneNo);
-  //     }
-
-  //     if (!user) {
-  //       throw new UnauthorizedException('Invalid Credentials');
-  //     }
-
-  //     if (user.loginType !== LoginType.NORMAL) {
-  //       throw new BadRequestException('login with email and password');
-  //     }
-
-  //     if (user.isDisabled) {
-  //       throw new NotFoundException('Your account is disabled, contact Admin');
-  //     }
-
-  //     if (!user.isEmailVerified || !user.isPhoneVerified) {
-  //       throw new UnauthorizedException('Your account is not verified');
-  //     }
-
-  //     const verifyPassword = await PasswordUtil.verifyPassword(
-  //       input.password,
-  //       user.password,
-  //     );
-
-  //     if (!verifyPassword) {
-  //       throw new UnauthorizedException('Invalid Credentials');
-  //     }
-
-  //     //Detect if the user login with a new device using the x-client-device-toke provided in the request header
-  //     const clientDeviceToken = request.headers[
-  //       'x-client-device-token'
-  //     ] as string;
-  //     if (clientDeviceToken) {
-  //       const clientDevice =
-  //         await this.clientDeviceService.findByUserIdAndDeviceToken(
-  //           user.id,
-  //           clientDeviceToken,
-  //         );
-  //       if (!clientDevice) {
-  //         //send new device email with otp here
-  //         const otpToken = await this.tokenService.generateOTPtoken({
-  //           email: user.email,
-  //           expiry: moment().add(10, 'minutes').toDate(),
-  //           subject: TokenSubject.NEW_DEVICE_LOGIN_OTP,
-  //         });
-  //         await this.emailEventService.emitNewDeviceLoginOtpEmail(
-  //           user.email,
-  //           otpToken.token,
-  //         );
-  //         throw new UnauthorizedException('Detected new device login');
-  //       }
-  //     }
-
-  //     const payload: JwtAuthPayload = {
-  //       sub: user.id,
-  //       userType: user.userType,
-  //       userId: user.id,
-  //       email: user.email,
-  //     };
-
-  //     const token: string = await this.tokenService.generateJWTtoken(payload);
-
-  //     const { password, ...rest } = user;
-
-  //     const data: IUserLoginData = {
-  //       id: user.id,
-  //       token,
-  //       userType: user.userType,
-  //       userId: user.id,
-  //       email: user.email,
-  //     };
-
-  //     return data;
-  //   }
-
-  //   async loginSocial(input: LoginUserSocialDto) {
-  //     const { identity } = input;
-
-  //     let user;
-
-  //     user = await this.checkEmailExist(Validators.validateEmail(identity));
-
-  //     if (!user) {
-  //       throw new UnauthorizedException('Invalid Credentials');
-  //     }
-
-  //     if (user.loginType == LoginType.NORMAL) {
-  //       throw new BadRequestException('login with email/phone and password');
-  //     }
-
-  //     if (user.isDisabled) {
-  //       throw new NotFoundException('Your account is disabled, contact Admin');
-  //     }
-
-  //     if (!user.isEmailVerified || !user.isPhoneVerified) {
-  //       throw new UnauthorizedException('Your account is not verified');
-  //     }
-
-  //     //Detect if the user login with a new device using the x-client-device-toke provided in the request header
-  //     const clientDeviceToken = request.headers[
-  //       'x-client-device-token'
-  //     ] as string;
-  //     if (clientDeviceToken) {
-  //       const clientDevice =
-  //         await this.clientDeviceService.findByUserIdAndDeviceToken(
-  //           user.id,
-  //           clientDeviceToken,
-  //         );
-  //       if (!clientDevice) {
-  //         //send new device email with otp here
-  //         const otpToken = await this.tokenService.generateOTPtoken({
-  //           email: user.email,
-  //           expiry: moment().add(10, 'minutes').toDate(),
-  //           subject: TokenSubject.NEW_DEVICE_LOGIN_OTP,
-  //         });
-  //         await this.emailEventService.emitNewDeviceLoginOtpEmail(
-  //           user.email,
-  //           otpToken.token,
-  //         );
-  //         throw new UnauthorizedException('Detected new device login');
-  //       }
-  //     }
-
-  //     const payload: JwtAuthPayload = {
-  //       sub: user.id,
-  //       userType: user.userType,
-  //       userId: user.id,
-  //       email: user.email,
-  //     };
-
-  //     const token: string = await this.tokenService.generateJWTtoken(payload);
-
-  //     const { password, ...rest } = user;
-
-  //     const data: IUserLoginData = {
-  //       id: user.id,
-  //       token,
-  //       userType: user.userType,
-  //       userId: user.id,
-  //       email: user.email,
-  //     };
-
-  //     return data;
-  //   }
-
-  //   async loginOtp(input: LoginOtpDto) {
-  //     const { identity, otp, deviceInfo, country } = input;
-
-  //     let user: User | null = null;
-
-  //     const identityType = Utils.getLoginIdentityType(identity);
-  //     if (identityType == UserLoginIdentityType.EMAIL) {
-  //       // user = await this.checkEmailExist(identity);
-  //     //   user = await this.userService.findByIdentity(
-  //     //     Validators.validateEmail(identity),
-  //     //   );
-  //     // } else {
-  //     //   if (!country) {
-  //     //     throw new BadRequestException('Must select a valid phone county');
-  //     //   }
-
-  //       const existingCountry = await this.countryService.findById(country);
-  //       if (!existingCountry) {
-  //         throw new NotFoundException('Country phone not found!');
-  //       }
-
-  //       const phoneNo = Utils.normalizeCountryPhone(
-  //         existingCountry?.phoneCode,
-  //         identity,
-  //         existingCountry.phoneLength,
-  //       );
-
-  //       user = await this.userRepository.findByPhone(phoneNo);
-  //     }
-
-  //     if (!user) {
-  //       throw new NotFoundException('User not found');
-  //     }
-
-  //     if (user.loginType !== LoginType.NORMAL) {
-  //       throw new BadRequestException(
-  //         'Only normal login type is allowed to login with OTP',
-  //       );
-  //     }
-
-  //     if (!user.isActive) {
-  //       throw new NotFoundException('Your account is disabled, contact Admin');
-  //     }
-
-  //     if (!user.isEmailVerified) {
-  //       throw new UnauthorizedException('Your email account is not verified');
-  //     }
-
-  //     if (!user.isPhoneVerified) {
-  //       throw new UnauthorizedException('Your phone no. is not verified');
-  //     }
-
-  //     const verifyOtp = await this.tokenService.verifyOTP({
-  //       email: user.email,
-  //       token: otp,
-  //       subject: TokenSubject.NEW_DEVICE_LOGIN_OTP,
-  //     });
-
-  //     if (!verifyOtp) {
-  //       throw new BadRequestException('Invalid OTP');
-  //     }
-
-  //     // const verifyPassword = await PasswordUtil.verifyPassword(
-  //     //   password,
-  //     //   user.password,
-  //     // );
-
-  //     // if (!verifyPassword) {
-  //     //   throw new UnauthorizedException('Invalid Credentials');
-  //     // }
-
-  //     const payload = {
-  //       sub: user.id,
-  //       userType: UserType.USER,
-  //       userId: user.id,
-  //       email: user.email,
-  //     };
-
-  //     const token: string = await this.tokenService.generateJWTtoken(payload);
-
-  //     const loginTime = moment().format('MMMM Do YYYY, h:mm A');
-  //     await this.emailEventService.emitNewLoginEmail(
-  //       user.email,
-  //       user.fullName,
-  //       deviceInfo,
-  //       loginTime,
-  //     );
-
-  //     return {
-  //       email: user.email,
-  //       userType: UserType.USER,
-  //       id: user.id,
-  //       token: token,
-  //     };
-  //   }
-
-  //   async forgotPassword(input: ForgotPasswordDto) {
-  //     input.email = Validators.validateEmail(input.email);
-  //     const user = await this.checkEmailExist(input.email);
-
-  //     if (!user) {
-  //       return null;
-  //     }
-
-  //     if (user.loginType !== LoginType.NORMAL) {
-  //       throw new BadRequestException(
-  //         'Only normal login type is allowed to reset password',
-  //       );
-  //     }
-
-  //     const expiry: Date = moment().add(10, 'minutes').toDate();
-
-  //     const otpToken = await this.tokenService.generateOTPtoken({
-  //       email: input.email,
-  //       expiry: expiry,
-  //       subject: TokenSubject.FORGOT_PASSWORD,
-  //     });
-
-  //     await this.emailEventService.emitForgetPasswordEmail(
-  //       user.email,
-  //       otpToken.token,
-  //     );
-
-  //     return null;
-  //   }
-
-  //   async resetPassword(input: ResetPasswordDto) {
-  //     let { confirmPassword, password, email, token } = input;
-
-  //     email = Validators.validateEmail(email);
-
-  //     if (password !== confirmPassword) {
-  //       throw new BadRequestException('Passwords do not match');
-  //     }
-
-  //     const tokenResult = await this.tokenService.verifyOTP({
-  //       token: token,
-  //       subject: TokenSubject.FORGOT_PASSWORD,
-  //       email: email,
-  //     });
-
-  //     if (!tokenResult) {
-  //       throw new BadRequestException('Invalid or expired reset token');
-  //     }
-
-  //     const user = await this.checkEmailExist(email);
-  //     if (!user) {
-  //       throw new NotFoundException('User not found');
-  //     }
-
-  //     if (user.loginType !== LoginType.NORMAL) {
-  //       throw new BadRequestException(
-  //         'Only normal login type is allowed to reset password',
-  //       );
-  //     }
-
-  //     await this.userService.update(user.id, {
-  //       password: await PasswordUtil.hashPassword(password),
-  //     });
-
-  //     return null;
-  //   }
-
-  //   async changePassword(input: ChangePasswordDto, authUser: JwtAuthPayload) {
-  //     const user = await this.checkEmailExist(authUser.email);
-
-  //     if (!user) {
-  //       throw new NotFoundException('User not found');
-  //     }
-
-  //     const { confirmPassword, newPassword, oldPassword } = input;
-
-  //     const verifyOldPass = await PasswordUtil.verifyPassword(
-  //       oldPassword,
-  //       user.password,
-  //     );
-
-  //     if (!verifyOldPass) {
-  //       throw new BadRequestException('Incorrect Old Password');
-  //     }
-
-  //     if (confirmPassword !== newPassword) {
-  //       throw new BadRequestException('Password do not match');
-  //     }
-
-  //     const hashedPassword = await PasswordUtil.hashPassword(newPassword);
-
-  //     await this.userRepository.update(user.id, { password: hashedPassword });
-
-  //     const changedAt = moment().format('MMMM Do YYYY, h:mm A');
-  //     await this.emailEventService.emitPasswordChangedEmail(
-  //       user.email,
-  //       user.fullName,
-  //       changedAt,
-  //     );
-
-  //     return null;
-  //   }
-  //   ////////////////
-  //   //            //
-  //   //   HELPERS  //
-  //   //            //
-  //   ////////////////
-  //   async checkEmailExist(email: string): Promise<User | null> {
-  //     return await this.userRepository.findByEmail(email);
-  //   }
-
-  //   private getBaseUrlFromRequest(req: ExpressRequest): string {
-  //     const origin = req.get('origin') || req.get('referer');
-
-  //     if (origin) {
-  //       const url = new URL(origin);
-  //       return `${url.protocol}//${url.host}`;
-  //     }
-
-  //     return process.env.PEPP_APP_CLIENT_URL || 'https://apps.peppcruise.com';
-  //   }
-
-  //   async logout(input: { deviceToken: string }, userId: string) {
-  //     const user = await this.userRepository.findById(userId);
-  //     if (!user) {
-  //       throw new NotFoundException('User not found');
-  //     }
-
-  //     // await this.clientDeviceService.deleteByUserIdAndDeviceToken(userId, input.deviceToken);
-
-  //     return null;
-  //   }
+  //   this.logger.log(`Admin id=${admin.id} deleted`);
+  //   return null;
+  // }
+
+  async checkEmailExist(email: string): Promise<Admin | null> {
+    return await this.adminRepository.findByEmail(email);
+  }
+
+  // helpers
+  private async validateClientDevice(
+    admin: Admin,
+    clientDeviceToken: string,
+  ): Promise<void> {
+    const clientDevice =
+      await this.clientDeviceService.findByUserIdAndDeviceToken(
+        admin.id,
+        clientDeviceToken,
+      );
+
+    console.log('Client device: ', clientDevice, 'Id: ', admin.id);
+    if (clientDevice) return;
+
+    const otpToken = await this.tokenService.generateOTPtoken({
+      email: admin.email,
+      expiry: moment().add(5, 'minutes').toDate(),
+      subject: TokenSubject.NEW_DEVICE_LOGIN_OTP,
+    });
+
+    await this.emailEventService.emitNewDeviceLoginOtpEmail(
+      admin.email,
+      otpToken.token,
+    );
+
+    throw new UnauthorizedException('Detected new device login');
+  }
+
+  private async createAuthPayload(
+    admin: Admin,
+    rememberMe: boolean,
+  ): Promise<IAdminLoginData> {
+    const tokenOptions: JwtSignOptions = rememberMe ? { expiresIn: '7d' } : {};
+
+    const payload: JwtAuthPayload = {
+      sub: admin.id,
+      userId: admin.id,
+      email: admin.email,
+      userType: admin.role, // TODO: remove later
+    };
+
+    const token = await this.tokenService.generateJWTtoken(
+      payload,
+      tokenOptions,
+    );
+
+    return {
+      id: admin.id,
+      adminType: admin.role,
+      email: admin.email,
+      token,
+    };
+  }
+
+  /**
+   * Safely extract the client IP address from a request
+   * @param request Express Request object
+   * @returns client IP as string or undefined
+   */
+  private getClientIp(request: Request): string | undefined {
+    const forwarded = request.headers['x-forwarded-for'];
+    let ipAddress: string | undefined;
+
+    // Handle x-forwarded-for header (might be string or array)
+    if (forwarded) {
+      ipAddress = Array.isArray(forwarded)
+        ? forwarded[0]
+        : forwarded.split(',')[0].trim();
+    }
+
+    // Fallback to socket remote address
+    if (!ipAddress && 'socket' in request && request.socket) {
+      ipAddress = (request.socket as any).remoteAddress ?? undefined;
+    }
+
+    // Normalize IPv6 addresses
+    if (ipAddress?.startsWith('::ffff:')) {
+      ipAddress = ipAddress.replace('::ffff:', '');
+    }
+
+    return ipAddress;
+  }
 }

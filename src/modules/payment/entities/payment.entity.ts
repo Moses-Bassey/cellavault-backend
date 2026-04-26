@@ -134,7 +134,7 @@ import {
 export type PaymentStatus = 'PENDING' | 'SUCCESS' | 'FAILED';
 
 @Table({
-  tableName: 'payments',
+  tableName: 'mck_payments',
   timestamps: true,
 })
 export class Payment extends Model<Payment> {

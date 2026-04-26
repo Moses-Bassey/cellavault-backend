@@ -25,7 +25,7 @@ import { UuidValidationPipe } from '../../../shared/pipes/uuid.validator.pipe';
 @ApiBearerAuth()
 @Roles(UserType.SUPER_ADMIN, UserType.PEPP_ADMIN, UserType.PEPP_MANAGER)
 @UseGuards(AuthGuard, RolesGuard)
-@Controller('admin/trips')
+@Controller('trips')
 export class TripController {
   constructor(private readonly tripService: TripService) {}
 

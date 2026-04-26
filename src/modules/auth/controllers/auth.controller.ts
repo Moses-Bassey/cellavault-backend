@@ -8,190 +8,69 @@ import {
   Post,
   Request,
   UseGuards,
+  Req,
 } from '@nestjs/common';
-import type { Request as ExpressRequest } from 'express';
-import { AuthService } from '../auth.service';
 import {
-  ChangePasswordDto,
-  ForgotPasswordDto,
-  LoginOtpDto,
-  LoginUserDto,
-  ResetPasswordDto,
-  SignupEmail,
-  SignupPhone,
-  SignUpSocialUserDto,
-  SignUpUserDto,
-  VerifyOtpDto,
-} from '../dto/auth.dto';
-import { Auth } from '../decorators/auth.decorator';
-import { AuthGuard } from '../guards/auth.guard';
-import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
+import type { Request as ExpressRequest } from 'express';
+import { CreateAdminDto, AdminLoginDto, LoginOtpDto } from '../dto/auth.dto';
+import { Auth } from '../../auth/decorators/auth.decorator';
+import { AuthGuard } from '../../auth/guards/auth.guard';
+import { RolesGuard } from '../../auth/guards/roles.guard';
+import { Roles } from '../../auth/decorators/roles.decorator';
+import { UserType } from '../../../enums/user-type.enum';
+import { AuthService } from '../auth.service';
 import { ResponseUtil } from 'src/utils/response.utils';
 
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  // @Post('signup-phone')
+  // @ApiBearerAuth()
+  // @Roles(UserType.SUPER_ADMIN, UserType.PEPP_ADMIN, UserType.PEPP_MANAGER)
+  // @UseGuards(AuthGuard, RolesGuard)
+  // @Post('signup')
   // @HttpCode(HttpStatus.OK)
-  // async signUpPhoneNo(@Body() input: SignupPhone) {
-  //   const data = await this.authService.signUpPhoneNo(input);
+  // async signUp(@Body() input: CreateAdminDto) {
+  //   const data = await this.authService.create(input);
   //   return ResponseUtil.handleResponse(
   //     data,
-  //     'Sign up OTP has been sent to your phoneNo',
-  //     HttpStatus.OK,
-  //   );
-  // }
-
-  // @Post('signup-email')
-  // @HttpCode(HttpStatus.OK)
-  // async signUpEmail(@Body() input: SignupEmail) {
-  //   const data = await this.authService.signUpEmail(input);
-  //   return ResponseUtil.handleResponse(
-  //     data,
-  //     'Sign up OTP has been sent to your email',
-  //     HttpStatus.OK,
-  //   );
-  // }
-
-  // @Post('verify-otp')
-  // @HttpCode(HttpStatus.OK)
-  // async verifyOtp(@Body() input: VerifyOtpDto) {
-  //   const data = await this.authService.verifyOtp(input);
-  //   return ResponseUtil.handleResponse(
-  //     data,
-  //     'OTP Validated successfully',
-  //     HttpStatus.OK,
-  //   );
-  // }
-
-  // @Post('verify-password-reset-otp')
-  // @HttpCode(HttpStatus.OK)
-  // async verifyPasswordResetOtp(@Body() input: VerifyOtpDto) {
-  //   const data = await this.authService.verifyPasswordResetOtp(input);
-  //   return ResponseUtil.handleResponse(
-  //     data,
-  //     'Password reset OTP Validated successfully',
-  //     HttpStatus.OK,
-  //   );
-  // }
-
-  // @Post('sign-up')
-  // @HttpCode(HttpStatus.CREATED)
-  // async signUp(@Body() input: SignUpUserDto) {
-  //   const data = await this.authService.signUp(input);
-  //   return ResponseUtil.handleResponse(
-  //     data,
-  //     'User created successfully',
+  //     'Account created successfully, please await feedback from us',
   //     HttpStatus.CREATED,
   //   );
   // }
 
-  // @Post('sign-up-social')
-  // @HttpCode(HttpStatus.CREATED)
-  // async signUpGoogle(@Body() input: SignUpSocialUserDto) {
-  //   const data = await this.authService.signUpSocial(input);
-  //   return ResponseUtil.handleResponse(
-  //     data,
-  //     'User created successfully',
-  //     HttpStatus.CREATED,
-  //   );
-  // }
+  @Post('login')
+  @HttpCode(HttpStatus.OK)
+  async login(@Body() input: AdminLoginDto, @Req() request: Request) {
+    const data = await this.authService.login(input, request);
+    return ResponseUtil.handleResponse(data, 'Login successful', HttpStatus.OK);
+  }
 
-  // @Post('login-social')
-  // @HttpCode(HttpStatus.OK)
-  // async loginSocial(@Body() input: LoginUserDto) {
-  //   const data = await this.authService.login(input);
-  //   return ResponseUtil.handleResponse(data, 'Login Successful', HttpStatus.OK);
-  // }
-
-  // @Post('login')
-  // @HttpCode(HttpStatus.OK)
-  // async login(@Body() input: LoginUserDto) {
-  //   const data = await this.authService.login(input);
-  //   return ResponseUtil.handleResponse(data, 'Login Successful', HttpStatus.OK);
-  // }
-
-  // @Post('login-with-otp')
-  // @HttpCode(HttpStatus.OK)
-  // async loginOtp(@Body() input: LoginOtpDto) {
-  //   const data = await this.authService.loginOtp(input);
-  //   return ResponseUtil.handleResponse(data, 'Login successful', HttpStatus.OK);
-  // }
-
-  // @Post('forgot-password')
-  // @HttpCode(HttpStatus.OK)
-  // async forgotPassword(
-  //   @Body() input: ForgotPasswordDto,
-  //   @Request() req: ExpressRequest,
-  // ) {
-  //   const data = await this.authService.forgotPassword(input);
-  //   return ResponseUtil.handleResponse(
-  //     data,
-  //     'Reset OTP has been sent to your email',
-  //     HttpStatus.OK,
-  //   );
-  // }
-
-  // @Patch('reset-password')
-  // @HttpCode(HttpStatus.OK)
-  // async resetPassword(@Body() input: ResetPasswordDto) {
-  //   const data = await this.authService.resetPassword(input);
-  //   return ResponseUtil.handleResponse(
-  //     data,
-  //     'Password reset successful',
-  //     HttpStatus.OK,
-  //   );
-  // }
+  @Post('login-otp')
+  @HttpCode(HttpStatus.OK)
+  async loginOtp(@Body() input: LoginOtpDto, @Req() request: Request) {
+    const data = await this.authService.loginOtp(input, request);
+    return ResponseUtil.handleResponse(data, 'Login successful', HttpStatus.OK);
+  }
 
   // @Auth()
   // @ApiBearerAuth()
   // @UseGuards(AuthGuard)
-  // @Patch('change-password')
-  // @HttpCode(HttpStatus.OK)
-  // async changePassword(
-  //   @Body() input: ChangePasswordDto,
-  //   @Request() req: ExpressRequest & { user: any },
-  // ) {
-  //   const data = await this.authService.changePassword(input, req.user);
-  //   return ResponseUtil.handleResponse(
-  //     data,
-  //     'Password changed successfully',
-  //     HttpStatus.OK,
-  //   );
-  // }
-
-  // @Auth()
-  // @ApiBearerAuth()
-  // @UseGuards(AuthGuard)
-  // @Post('logout')
-  // @HttpCode(HttpStatus.OK)
-  // async logout(
-  //   @Body() input: { deviceToken },
-  //   @Request() req: ExpressRequest & { user: any },
-  // ) {
-  //   const data = await this.authService.logout(input, req.user);
-  //   return ResponseUtil.handleResponse(
-  //     data,
-  //     'Password changed successfully',
-  //     HttpStatus.OK,
-  //   );
-  // }
-
+  // @Roles(UserType.PEPP_ADMIN, UserType.SUPER_ADMIN)
   // @Delete()
   // @HttpCode(HttpStatus.OK)
-  // @ApiOperation({ summary: 'Delete user account' })
-  // @ApiResponse({
-  //   status: 200,
-  //   description: 'Driver account deleted successfully',
-  // })
-  // @ApiResponse({ status: 404, description: 'User not found' })
-  // async deleteUserAccount(@Body() reqBody: LoginUserDto) {
-  //   const { identity, password } = reqBody;
-  //   const data = await this.authService.deleteUserAccount(identity, password);
+  // async delete(@Body() userCredentials: { email: string; password: string }) {
+  //   const { email, password } = userCredentials;
+  //   const data = await this.authService.deleteAdminAccount(email, password);
   //   return ResponseUtil.handleResponse(
   //     {},
-  //     'Driver account deleted successfully',
+  //     'Admin account deleted successfully',
   //     HttpStatus.OK,
   //   );
   // }

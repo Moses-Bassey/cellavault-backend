@@ -19,15 +19,6 @@ export class UserRepository {
     private readonly userModel: typeof User,
   ) {}
 
-  async findByIdentity(identity: string): Promise<User | null> {
-    return await this.userModel.findOne({
-      where: {
-        [Op.or]: [{ email: identity }, { phoneNo: identity }],
-      },
-      raw: true,
-    });
-  }
-
   async findById(id: string): Promise<User | null> {
     return await this.userModel.findByPk(id, { raw: true });
   }
@@ -53,36 +44,19 @@ export class UserRepository {
     return user ? (user.toJSON() as User) : null;
   }
 
-  async findByPhone(phoneNo: string): Promise<User | null> {
-    const user = await this.userModel.findOne({
-      where: { phoneNo },
-    });
-    return user ? (user.toJSON() as User) : null;
-  }
-
-  async findByEmailAndRole(
-    email: string,
-    userType: UserType,
-  ): Promise<User | null> {
-    return await this.userModel.findOne({
-      where: { email, userType },
-      raw: true,
-    });
-  }
-
   async findActiveUsers(isDisabled: boolean): Promise<User[] | null> {
     return await this.userModel.findAll({
       where: { isDisabled },
     });
   }
 
-  async create(userData: Partial<User>): Promise<User> {
-    const user = await this.userModel.create(userData as any, {
-      raw: true,
-      returning: true,
-    });
-    return user.toJSON() as User;
-  }
+  // async create(userData: Partial<User>): Promise<User> {
+  //   const user = await this.userModel.create(userData as any, {
+  //     raw: true,
+  //     returning: true,
+  //   });
+  //   return user.toJSON() as User;
+  // }
 
   async update(id: string, userData: Partial<User>): Promise<number | null> {
     const [affectedRows] = await this.userModel.update(userData, {
@@ -93,27 +67,15 @@ export class UserRepository {
     return affectedRows;
   }
 
-  async delete(id: string): Promise<number> {
-    return await this.userModel.destroy({
-      where: { id },
-    });
-  }
-
-  async restore(id: string): Promise<void> {
-    await this.userModel.restore({
-      where: { id },
-    });
-  }
-
-  async findWithCountry(
-    email: string,
-    userType: UserType,
-  ): Promise<User | null> {
-    return await this.userModel.findOne({
-      where: { email, userType },
-      include: ['country'],
-    });
-  }
+  // async findWithCountry(
+  //   email: string,
+  //   userType: UserType,
+  // ): Promise<User | null> {
+  //   return await this.userModel.findOne({
+  //     where: { email, userType },
+  //     include: ['country'],
+  //   });
+  // }
 
   async findAll(options: {
     search?: string;

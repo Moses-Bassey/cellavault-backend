@@ -33,6 +33,7 @@ import { ResponseUtil } from 'src/utils/response.utils';
 // import { DashboardDto, UpdateImageUrlDto } from '../dto/user.dto';
 import { UuidValidationPipe } from '../../../shared/pipes/uuid.validator.pipe';
 import { TripStatus } from '../../trips/entities/trip.entity';
+import { GetUsersQueryDto } from '../dto/user.dto';
 
 @ApiTags('Users')
 @ApiBearerAuth()
@@ -43,84 +44,141 @@ import { TripStatus } from '../../trips/entities/trip.entity';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  // Account screen
-  @Get(':userId')
+  // ======== metrics ========== //
+  @Get('summary')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get all users metrics' })
+  @ApiResponse({
+    status: 200,
+    description: 'Users metrics retrieved successfully',
+  })
+  @ApiResponse({ status: 404, description: 'Users metrics not found' })
+  @UseGuards(AuthGuard)
+  @Roles(UserType.PEPP_ADMIN, UserType.SUPER_ADMIN, UserType.PEPP_MANAGER)
+  async getUsersData() {
+    const data = await this.userService.getUsersData();
+    return ResponseUtil.handleResponse(
+      data,
+      'Users data retrieved successfully',
+      HttpStatus.OK,
+    );
+  }
+
+  @Get('find')
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(AuthGuard)
+  @Roles(UserType.PEPP_ADMIN, UserType.SUPER_ADMIN, UserType.PEPP_MANAGER)
+  async getAllUsers(@Query() query: GetUsersQueryDto) {
+    const data = await this.userService.findAll({
+      search: query.search,
+      status: query.status,
+      limit: query.limit ? Number(query.limit) : undefined,
+      cursor: query.cursor,
+    });
+
+    return ResponseUtil.handleResponse(
+      data,
+      'Users retrieved successfully',
+      HttpStatus.OK,
+    );
+  }
+
+  @Get(':id')
   @ApiOperation({ summary: 'Get User account' })
   @ApiResponse({ status: 200, description: 'User fetchced successfully' })
   @ApiResponse({ status: 404, description: 'User not found' })
-  async getPassenger(@Param('userId', UuidValidationPipe) passengerId: string) {
-    const data = await this.userService.getPassengerAccount(passengerId);
-    return ResponseUtil.handleResponse(
-      data,
-      'User details retrieved',
-      HttpStatus.OK,
-    );
-  }
-
-  @Patch(':userId')
-  @ApiOperation({ summary: 'Update user details' })
-  @ApiResponse({
-    status: 200,
-    description: 'User details updated successfully',
-  })
-  @ApiResponse({ status: 404, description: 'User not found' })
-  async updatePassenger(
-    @Param('userId') passengerId: string,
-    @Body()
-    body: {
-      fullName?: string;
-      email?: string;
-      phoneNo?: string;
-      imageUrl?: string;
-      shortDescription?: string;
-    },
-  ) {
-    const data = await this.userService.updatePassengerAccount(
-      passengerId,
-      body,
-    );
-    return ResponseUtil.handleResponse(
-      data,
-      'User details updated',
-      HttpStatus.OK,
-    );
-  }
-
-  @Post(':userId/suspend')
-  @ApiOperation({ summary: 'Suspend user account' })
-  @ApiResponse({ status: 200, description: 'User account suspended' })
-  @ApiResponse({ status: 400, description: 'Failed to suspend user account' })
   @HttpCode(HttpStatus.OK)
-  async suspendPassenger(
-    @Param('userId', UuidValidationPipe) passengerId: string,
-    @Body() body: { reason?: string },
-  ) {
-    const data = await this.userService.suspendPassenger(passengerId, body);
+  @UseGuards(AuthGuard)
+  @Roles(UserType.PEPP_ADMIN, UserType.SUPER_ADMIN, UserType.PEPP_MANAGER)
+  async getUserById(@Param('id', UuidValidationPipe) id: string) {
+    const data = await this.userService.getPassengerAccount(id);
+
     return ResponseUtil.handleResponse(
       data,
-      'User account suspended',
+      'User retrieved successfully',
       HttpStatus.OK,
     );
   }
 
-  @Post(':userId/unsuspend')
-  @ApiOperation({ summary: 'Enable user account' })
-  @ApiResponse({ status: 200, description: 'User account enabled' })
-  @ApiResponse({ status: 400, description: 'Failed to enable user account' })
-  @HttpCode(HttpStatus.OK)
-  async unsuspendPassenger(
-    @Param('userId', UuidValidationPipe) passengerId: string,
-  ) {
-    const data = await this.userService.unsuspendPassenger(passengerId);
-    return ResponseUtil.handleResponse(
-      data,
-      'User account enabled',
-      HttpStatus.OK,
-    );
-  }
+  // Account screen
+  // @Get(':userId')
+  // @ApiOperation({ summary: 'Get User account' })
+  // @ApiResponse({ status: 200, description: 'User fetchced successfully' })
+  // @ApiResponse({ status: 404, description: 'User not found' })
+  // async getPassenger(@Param('userId', UuidValidationPipe) passengerId: string) {
+  //   const data = await this.userService.getPassengerAccount(passengerId);
+  //   return ResponseUtil.handleResponse(
+  //     data,
+  //     'User details retrieved',
+  //     HttpStatus.OK,
+  //   );
+  // }
+
+  // @Patch(':userId')
+  // @ApiOperation({ summary: 'Update user details' })
+  // @ApiResponse({
+  //   status: 200,
+  //   description: 'User details updated successfully',
+  // })
+  // @ApiResponse({ status: 404, description: 'User not found' })
+  // async updatePassenger(
+  //   @Param('userId', UuidValidationPipe) passengerId: string,
+  //   @Body()
+  //   body: {
+  //     fullName?: string;
+  //     email?: string;
+  //     phoneNo?: string;
+  //     imageUrl?: string;
+  //     shortDescription?: string;
+  //   },
+  // ) {
+  //   const data = await this.userService.updatePassengerAccount(
+  //     passengerId,
+  //     body,
+  //   );
+  //   return ResponseUtil.handleResponse(
+  //     data,
+  //     'User details updated',
+  //     HttpStatus.OK,
+  //   );
+  // }
+
+  // @Post(':userId/suspend')
+  // @ApiOperation({ summary: 'Suspend user account' })
+  // @ApiResponse({ status: 200, description: 'User account suspended' })
+  // @ApiResponse({ status: 400, description: 'Failed to suspend user account' })
+  // @HttpCode(HttpStatus.OK)
+  // async suspendPassenger(
+  //   @Param('userId', UuidValidationPipe) passengerId: string,
+  //   @Body() body: { reason?: string },
+  // ) {
+  //   const data = await this.userService.suspendPassenger(passengerId, body);
+  //   return ResponseUtil.handleResponse(
+  //     data,
+  //     'User account suspended',
+  //     HttpStatus.OK,
+  //   );
+  // }
+
+  // @Post(':userId/unsuspend')
+  // @ApiOperation({ summary: 'Enable user account' })
+  // @ApiResponse({ status: 200, description: 'User account enabled' })
+  // @ApiResponse({ status: 400, description: 'Failed to enable user account' })
+  // @HttpCode(HttpStatus.OK)
+  // async unsuspendPassenger(
+  //   @Param('userId', UuidValidationPipe) passengerId: string,
+  // ) {
+  //   const data = await this.userService.unsuspendPassenger(passengerId);
+  //   return ResponseUtil.handleResponse(
+  //     data,
+  //     'User account enabled',
+  //     HttpStatus.OK,
+  //   );
+  // }
 
   // Activity screen
-  @Get(':userId/activity/summary')
+
+  @Get(':userId/summary')
   @ApiOperation({ summary: "Fetch user's ride activity" })
   @ApiResponse({
     status: 200,
@@ -148,7 +206,7 @@ export class UserController {
     );
   }
 
-  @Get(':userId/activity/rides')
+  @Get(':userId/rides')
   @ApiOperation({ summary: "Fetch user's ride history" })
   @ApiResponse({
     status: 200,
@@ -182,7 +240,7 @@ export class UserController {
     );
   }
 
-  @Get(':userId/activity/rides/:rideId')
+  @Get(':userId/rides/:rideId')
   @ApiOperation({ summary: 'Fetch ride details' })
   @ApiResponse({
     status: 200,
@@ -204,25 +262,4 @@ export class UserController {
       HttpStatus.OK,
     );
   }
-
-  // @Put('profile-image')
-  // @HttpCode(HttpStatus.OK)
-  // @ApiOperation({ summary: 'Update user image URL' })
-  // @ApiResponse({ status: 200, description: 'Image URL updated successfully' })
-  // @ApiResponse({ status: 404, description: 'User not found' })
-  // async updateImageUrl(
-  //   @Request() req: ExpressRequest & { user: JwtAuthPayload },
-  //   @Body() updateImageUrlDto: UpdateImageUrlDto,
-  // ) {
-  //   const userId = Validators.validateUuid(req.user.userId);
-  //   const data = await this.userService.updateImageUrl(
-  //     userId,
-  //     updateImageUrlDto.imageUrl,
-  //   );
-  //   return ResponseUtil.handleResponse(
-  //     data,
-  //     'Image URL updated successfully',
-  //     HttpStatus.OK,
-  //   );
-  // }
 }

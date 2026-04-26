@@ -97,9 +97,11 @@ export class DriverRepository {
   }
 
   async updateById(driverId: string, patch: Partial<Driver>) {
+    console.log('Id : ', driverId);
     const [affected] = await this.driverModel.update(patch, {
       where: { id: driverId },
     });
+    console.log('Affected: ', affected);
     if (!affected) return null;
     return this.findById(driverId);
   }
@@ -172,6 +174,7 @@ export class DriverRepository {
 
     return { drivers: rows, nextCursor };
   }
+
   /**
    * Fetch the latest vehicle for each driverId (by createdAt desc, id desc),
    * then map by driverId.

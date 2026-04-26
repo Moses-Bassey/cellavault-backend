@@ -30,38 +30,38 @@ import { ResponseUtil } from 'src/utils/response.utils';
 export class ClientDeviceController {
   constructor(private readonly clientDeviceService: ClientDeviceService) {}
 
-  @Get()
-  @Roles(UserType.SUPER_ADMIN, UserType.PEPP_ADMIN)
-  @ApiOperation({ summary: 'Get all client devices (Admin only)' })
-  @ApiResponse({
-    status: 200,
-    description: 'Client devices retrieved successfully',
-  })
-  async findAll() {
-    const data = await this.clientDeviceService.findAll();
-    return ResponseUtil.handleResponse(
-      data,
-      'Client devices retrieved successfully',
-      HttpStatus.OK,
-    );
-  }
+  // @Get()
+  // @Roles(UserType.SUPER_ADMIN, UserType.PEPP_ADMIN)
+  // @ApiOperation({ summary: 'Get all client devices (Admin only)' })
+  // @ApiResponse({
+  //   status: 200,
+  //   description: 'Client devices retrieved successfully',
+  // })
+  // async findAll() {
+  //   const data = await this.clientDeviceService.findAll();
+  //   return ResponseUtil.handleResponse(
+  //     data,
+  //     'Client devices retrieved successfully',
+  //     HttpStatus.OK,
+  //   );
+  // }
 
-  @Get('my-devices')
-  @ApiOperation({ summary: 'Get current user devices' })
-  @ApiResponse({
-    status: 200,
-    description: 'User devices retrieved successfully',
-  })
-  async getMyDevices(@Request() req: any) {
-    const userId = req.user?.id;
-    if (!userId) {
-      return { message: 'User not authenticated', statusCode: 401 };
-    }
-    const data = await this.clientDeviceService.findByUserId(userId);
-    return ResponseUtil.handleResponse(
-      data,
-      'User devices retrieved successfully',
-      HttpStatus.OK,
-    );
-  }
+  // @Get('my-devices')
+  // @ApiOperation({ summary: 'Get current user devices' })
+  // @ApiResponse({
+  //   status: 200,
+  //   description: 'User devices retrieved successfully',
+  // })
+  // async getMyDevices(@Request() req: any) {
+  //   const userId = req.user?.id;
+  //   if (!userId) {
+  //     return { message: 'User not authenticated', statusCode: 401 };
+  //   }
+  //   const data = await this.clientDeviceService.findByUserId(userId);
+  //   return ResponseUtil.handleResponse(
+  //     data,
+  //     'User devices retrieved successfully',
+  //     HttpStatus.OK,
+  //   );
+  // }
 }

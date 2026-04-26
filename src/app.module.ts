@@ -9,8 +9,8 @@ import appConfig from './config/app.config';
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { DriversModule } from './modules/drivers/drivers.module';
+import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { CountriesModule } from './modules/countries/countries.module';
-import { CngConversionModule } from './modules/cng-conversion/cng-conversion.module';
 import { ClientDevicesModule } from './modules/client-devices/client-devices.module';
 import { AdminModule } from './modules/admins/admins.module';
 import { TripsModule } from './modules/trips/trips.module';
@@ -33,8 +33,6 @@ import { Vehicle } from './modules/drivers/entities/vehicle.entity';
 import { VehicleRegistration } from './modules/drivers/entities/vehicle-registration.entity';
 import { PeppDriverVehicles } from './modules/drivers/entities/pepp-driver-vehicles.entity';
 import { Country, State, LGA } from './modules/countries/entities';
-import { CngConversion } from './modules/cng-conversion/entities/cng-conversion.entity';
-import { CngStation } from './modules/cng-conversion/entities/cng-station.entity';
 import { ClientDevice } from './modules/client-devices/entities/client-device.entity';
 import { Token } from './services/token/entities';
 
@@ -65,8 +63,6 @@ import { Token } from './services/token/entities';
         Country,
         State,
         LGA,
-        CngConversion,
-        CngStation,
         ClientDevice,
         Token,
         Admin,
@@ -87,7 +83,7 @@ import { Token } from './services/token/entities';
     UsersModule,
     DriversModule,
     CountriesModule,
-    CngConversionModule,
+    DashboardModule,
     ClientDevicesModule,
     AdminModule,
     TripsModule,
@@ -96,7 +92,6 @@ import { Token } from './services/token/entities';
     MailModule,
     SmsModule,
     AxiosModule,
-    // DriversModule,
   ],
   controllers: [AppController],
   providers: [AppService, ApiKeyInterceptor],

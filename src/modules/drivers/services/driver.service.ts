@@ -1,154 +1,3 @@
-// import {
-//   BadRequestException,
-//   Injectable,
-//   NotFoundException,
-// } from '@nestjs/common';
-// import { Driver } from '../entities/driver.entity';
-// import { DriverRepository } from '../repositories/driver.repository';
-// import { DashboardDto } from 'src/modules/users/dto/user.dto';
-// import {
-//   IDashboard,
-//   IDashboardInput,
-// } from 'src/shared/interfaces/dashbaord.interface';
-// import { ClientDeviceService } from 'src/modules/client-devices/services/client-device.service';
-// import {
-//   AddDriverLicenseDto,
-//   UpdateBankAccountDto,
-//   ValidateBankAccountDto,
-// } from '../dto/kyc.dto';
-// import { KYC_COMPLETED } from 'src/enums/kyc.enums';
-
-// @Injectable()
-// export class DriverService {
-//   constructor(
-//     private readonly driverRepository: DriverRepository,
-//     private readonly clientDeviceService: ClientDeviceService,
-//   ) {}
-
-//   async addDriverLicense(userId: string, reqBody: AddDriverLicenseDto) {
-//     try {
-//       const driver = await this.driverRepository.update(userId, {
-//         licenseImageUrl: reqBody.licenseImageUrl,
-//       });
-//       if (!driver) {
-//         throw new NotFoundException('Driver not found!');
-//       }
-//       return reqBody;
-//     } catch (error: unknown) {
-//       throw new BadRequestException(error);
-//     }
-//   }
-
-//   async updateBankAccount(userId: string, reqBody: UpdateBankAccountDto) {
-//     try {
-//       const driver = await this.driverRepository.update(userId, {
-//         accountName: reqBody.accountName,
-//         accountNo: reqBody.accountNo,
-//         bankName: reqBody.bankName,
-//         bankCode: reqBody.bankCode,
-//       });
-
-//       if (!driver) {
-//         throw new NotFoundException('Driver not found!');
-//       }
-
-//       return reqBody;
-//     } catch (error: unknown) {
-//       throw new BadRequestException(error);
-//     }
-//   }
-
-//   async setDriverType(userId: string, isPeppcruiseDriver: boolean) {
-//     const driver = await this.driverRepository.update(userId, {
-//       isPeppcruiseDriver,
-//     });
-//     if (!driver) {
-//       throw new NotFoundException('Driver not found!');
-//     }
-//     return driver;
-//   }
-
-//   async dashboard(data: IDashboardInput, userId: string): Promise<IDashboard> {
-//     try {
-//       const { deviceFCMToken, ipAddress, name } = data;
-
-//       const user = await this.driverRepository.findById(userId);
-//       if (!user) {
-//         throw new NotFoundException('User not found!');
-//       }
-
-//       const clientDevice =
-//         await this.clientDeviceService.findByDriverIdAndDeviceToken(
-//           userId,
-//           deviceFCMToken,
-//         );
-//       if (clientDevice == null) {
-//         await this.clientDeviceService.registerDevice({
-//           driverId: userId,
-//           deviceFCMToken: deviceFCMToken,
-//           ipAddress: ipAddress,
-//           name: name,
-//           userType: user.userType,
-//         });
-//       } else {
-//         await this.clientDeviceService.updateDeviceToken(
-//           clientDevice.id,
-//           deviceFCMToken,
-//         );
-//       }
-
-//       const dashboardRes: IDashboard = {
-//         fullName: user.fullName,
-//         email: user.email,
-//         phoneNo: user.phoneNo,
-//         userId: user.id,
-//       };
-//       return dashboardRes;
-//     } catch (error: unknown) {
-//       throw new BadRequestException(error);
-//     }
-//   }
-
-//   async fetchDriver(id: string): Promise<Driver | null> {
-//     const driver = await this.driverRepository.fetchDriver(id);
-//     if (!driver) {
-//       throw new NotFoundException('Driver not found!');
-//     }
-//     return driver;
-//   }
-
-//   async findById(id: string): Promise<Driver | null> {
-//     return await this.driverRepository.findById(id);
-//   }
-
-//   async findByIdentity(identity: string): Promise<Driver | null> {
-//     return await this.driverRepository.findByIdentity(identity);
-//   }
-
-//   async findByEmail(email: string): Promise<Driver | null> {
-//     return await this.driverRepository.findByEmail(email);
-//   }
-
-//   async findAll(options?: any): Promise<Driver[]> {
-//     return await this.driverRepository.findAll(options);
-//   }
-
-//   async update(
-//     id: string,
-//     driverData: Partial<Driver>,
-//   ): Promise<[number, Driver[]]> {
-//     return await this.driverRepository.update(id, driverData);
-//   }
-
-//   async delete(id: string): Promise<number> {
-//     return await this.driverRepository.delete(id);
-//   }
-
-//   async restore(id: string): Promise<void> {
-//     return await this.driverRepository.restore(id);
-//   }
-// }
-
 import {
   BadRequestException,
   Injectable,
@@ -157,20 +6,34 @@ import {
 import { Driver } from '../entities/driver.entity';
 import { Vehicle } from '../entities/vehicle.entity';
 import { DriverRepository } from '../repositories/driver.repository';
+import { Trip, TripStatus } from '../../trips/entities/trip.entity';
+import { TripRepository } from '../../trips/repositories/trip.repository';
+import { PaymentRepository } from '../../payment/repositories/payment.repository';
+import { CoinRepository } from '../../payment/repositories/coin.repository';
 import {
   DriverAccountDto,
   DriverListRowDto,
   DriverSummaryDto,
   UpdateDriverDto,
 } from '../dto/driver.dto';
-import { CursorPageDto } from '../../../shared/dto/user.dto';
+import {
+  CursorPageDto,
+  PassengerRideRowDto,
+  PassengerActivitySummaryDto,
+} from '../../../shared/dto/user.dto';
 import { decodeCursor } from '../../../utils/cursor.util';
+import { parseISODateOrUndefined } from '../../../utils/date.util';
 import { KYC_COMPLETED } from 'src/enums/kyc.enums';
 import { DRIVER_VERIFICATION_STATUS } from 'src/enums/driver-verification-status.enum';
 
 @Injectable()
 export class DriverService {
-  constructor(private readonly driverRepository: DriverRepository) {}
+  constructor(
+    private readonly driverRepository: DriverRepository,
+    private readonly rides: TripRepository,
+    private readonly payments: PaymentRepository,
+    private readonly coins: CoinRepository,
+  ) {}
 
   private toAccountDto(
     d: Driver,
@@ -288,69 +151,146 @@ export class DriverService {
     return this.toAccountDto(driver, vehicle);
   }
 
-  async updateDriverAccount(
-    driverId: string,
-    patch: UpdateDriverDto,
-  ): Promise<DriverAccountDto> {
-    if (patch.email && !patch.email.includes('@')) {
-      throw new BadRequestException('Invalid email');
-    }
+  async getDriverActivitySummary(params: {
+    driverId: string;
+    from?: string;
+    to?: string;
+  }): Promise<PassengerActivitySummaryDto> {
+    const driver = await this.driverRepository.findById(params.driverId);
+    if (!driver) throw new NotFoundException('Driver not found');
 
-    const updated = await this.driverRepository.updateById(
-      driverId,
-      patch as any,
-    );
-    if (!updated) throw new NotFoundException('Driver not found');
+    const from = parseISODateOrUndefined(params.from);
+    const to = parseISODateOrUndefined(params.to);
+
+    // Run in parallel (low latency)
+    const [rideSummary, totalSpend, totalCoins] = await Promise.all([
+      this.rides.getUserRideSummary({
+        driverId: params.driverId,
+        from,
+        to,
+      }),
+      this.payments.sumPassengerSpend(params.driverId, from, to),
+      this.coins.sumPassengerCoins(params.driverId, from, to),
+    ]);
 
     return {
-      id: updated.id,
-      fullName: updated.fullName,
-      email: updated.email ?? null,
-      phoneNo: updated.phoneNo ?? null,
-      imageUrl: updated.profileImageUrl ?? null,
-      vehicleName: (updated as any).vehicleName ?? null,
-      vehiclePlate: (updated as any).vehiclePlate ?? null,
-      status:
-        updated.verificationStatus == DRIVER_VERIFICATION_STATUS.VERIFIED
-          ? 'ACTIVE'
-          : 'INACTIVE',
-      kycStatus: updated.kycCompleted,
-      joinDate: updated.createdAt.toISOString(),
-      shortDescription: (updated as any).shortDescription ?? null,
+      ...rideSummary,
+      totalSpend,
+      totalCoins,
+      from: from?.toISOString(),
+      to: to?.toISOString(),
     };
   }
 
-  async suspendDriver(driverId: string, body: { reason?: string }) {
-    const driver = await this.driverRepository.findById(driverId);
+  async listDriverRides(params: {
+    driverId: string;
+    from?: string;
+    to?: string;
+    status?: TripStatus;
+    limit?: number;
+    cursor?: string;
+  }): Promise<CursorPageDto<PassengerRideRowDto>> {
+    const driver = await this.driverRepository.findById(params.driverId);
     if (!driver) throw new NotFoundException('Driver not found');
 
-    if (
-      driver.verificationStatus === DRIVER_VERIFICATION_STATUS.REJECTED ||
-      driver.isDisabled === true
-    )
-      return { ok: true };
+    const from = parseISODateOrUndefined(params.from);
+    const to = parseISODateOrUndefined(params.to);
+    const limit = Math.min(Math.max(Number(params.limit ?? 20), 1), 50);
+    const cursor = decodeCursor(params.cursor);
 
-    const updated = await this.driverRepository.updateById(driverId, {
-      isDisabled: true,
-      isAvailable: false,
+    const { rows, nextCursor } = await this.rides.listUserRides({
+      driverId: params.driverId,
+      from,
+      to,
+      status: params.status,
+      limit,
+      cursor,
     });
 
-    if (!updated) throw new NotFoundException('Driver not found');
-    return { ok: true };
+    return {
+      items: rows.map((r: Trip) => ({
+        id: r.id,
+        pickupLabel: r.pickupLocation,
+        pickupAddress: r.pickupAddress,
+        dropoffLabel: r.dropoffLocation,
+        dropoffAddress: r.dropoffAddress, // run migration to normalize name
+        status: r.status,
+        createdAt: new Date(r.createdAt).toISOString(),
+      })),
+      nextCursor,
+    };
   }
 
-  async unsuspendDriver(driverId: string) {
-    const driver = await this.driverRepository.findById(driverId);
-    if (!driver) throw new NotFoundException('Driver not found');
-
-    if (driver.isDisabled === false) return { ok: true };
-
-    const updated = await this.driverRepository.updateById(driverId, {
-      isDisabled: false,
-      isAvailable: true,
-    });
-
-    if (!updated) throw new NotFoundException('Driver not found');
-    return { ok: true };
+  async getRideDetails(driverId: string, rideId: string) {
+    const ride = await this.rides.findDriverRideById(driverId, rideId);
+    if (!ride) throw new NotFoundException('Ride not found for driver');
+    return ride; // map to a dedicated DTO if needed
   }
+
+  // async updateDriverAccount(
+  //   driverId: string,
+  //   patch: UpdateDriverDto,
+  // ): Promise<DriverAccountDto> {
+  //   if (patch.email && !patch.email.includes('@')) {
+  //     throw new BadRequestException('Invalid email');
+  //   }
+
+  //   const updated = await this.driverRepository.updateById(
+  //     driverId,
+  //     patch as any,
+  //   );
+  //   console.log('Updated: ', updated);
+  //   if (!updated) throw new NotFoundException('Driver not found');
+
+  //   return {
+  //     id: updated.id,
+  //     fullName: updated.fullName,
+  //     email: updated.email ?? null,
+  //     phoneNo: updated.phoneNo ?? null,
+  //     imageUrl: updated.profileImageUrl ?? null,
+  //     vehicleName: (updated as any).vehicleName ?? null,
+  //     vehiclePlate: (updated as any).vehiclePlate ?? null,
+  //     status:
+  //       updated.verificationStatus == DRIVER_VERIFICATION_STATUS.VERIFIED
+  //         ? 'ACTIVE'
+  //         : 'INACTIVE',
+  //     kycStatus: updated.kycCompleted,
+  //     joinDate: updated.createdAt.toISOString(),
+  //     shortDescription: (updated as any).shortDescription ?? null,
+  //   };
+  // }
+
+  // async suspendDriver(driverId: string, body: { reason?: string }) {
+  //   const driver = await this.driverRepository.findById(driverId);
+  //   if (!driver) throw new NotFoundException('Driver not found');
+
+  //   if (
+  //     driver.verificationStatus === DRIVER_VERIFICATION_STATUS.REJECTED ||
+  //     driver.isDisabled === true
+  //   )
+  //     return { ok: true };
+
+  //   const updated = await this.driverRepository.updateById(driverId, {
+  //     isDisabled: true,
+  //     isAvailable: false,
+  //   });
+
+  //   if (!updated) throw new NotFoundException('Driver not found');
+  //   return { ok: true };
+  // }
+
+  // async unsuspendDriver(driverId: string) {
+  //   const driver = await this.driverRepository.findById(driverId);
+  //   if (!driver) throw new NotFoundException('Driver not found');
+
+  //   if (driver.isDisabled === false) return { ok: true };
+
+  //   const updated = await this.driverRepository.updateById(driverId, {
+  //     isDisabled: false,
+  //     isAvailable: true,
+  //   });
+
+  //   if (!updated) throw new NotFoundException('Driver not found');
+  //   return { ok: true };
+  // }
 }

@@ -119,7 +119,7 @@ import {
 } from 'sequelize-typescript';
 
 @Table({
-  tableName: 'coins',
+  tableName: 'mck_coins',
   timestamps: true,
 })
 export class Coin extends Model<Coin> {

@@ -11,20 +11,11 @@ import { VehicleRegistration } from './entities/vehicle-registration.entity';
 import { DriverController } from './controllers/driver.controller';
 import { DriverService } from './services/driver.service';
 import { DriverRepository } from './repositories/driver.repository';
-import { GuarantorRepository } from './repositories/guarantor.repository';
-import { Kyc1Repository } from './repositories/kyc1.repository';
-import { Kyc2Repository } from './repositories/kyc2.repository';
-import { Kyc3Repository } from './repositories/kyc3.repository';
-import { VehicleRegistrationRepository } from './repositories/vehicle-registration.repository';
 import { CountriesModule } from '../countries/countries.module';
 import { Country } from '../countries/entities/country.entity';
-import { ClientDevicesModule } from '../client-devices/client-devices.module';
-import { MailModule } from 'src/services/mail/mail.module';
 import { TokenModule } from 'src/services/token/token.module';
-import { SmsModule } from 'src/services/sms/sms.module';
-// import { AuthModule } from '../auth/auth.module';
+import { PaymentModule } from '../payment/payment.module';
 import { TripsModule } from '../trips/trips.module';
-import { ClientDeviceService } from '../client-devices/services/client-device.service';
 
 @Module({
   imports: [
@@ -40,33 +31,12 @@ import { ClientDeviceService } from '../client-devices/services/client-device.se
       Country,
     ]),
     CountriesModule,
-    ClientDevicesModule,
     TokenModule,
-    MailModule,
-    SmsModule,
-    // AuthModule,
     TripsModule,
+    PaymentModule,
   ],
   controllers: [DriverController],
-  providers: [
-    DriverService,
-    DriverRepository,
-    GuarantorRepository,
-    Kyc1Repository,
-    Kyc2Repository,
-    Kyc3Repository,
-    VehicleRegistrationRepository,
-    ClientDeviceService,
-  ],
-  exports: [
-    DriverService,
-    DriverRepository,
-    GuarantorRepository,
-    Kyc1Repository,
-    Kyc2Repository,
-    Kyc3Repository,
-    VehicleRegistrationRepository,
-    ClientDeviceService,
-  ],
+  providers: [DriverService, DriverRepository],
+  exports: [DriverService, DriverRepository],
 })
 export class DriversModule {}

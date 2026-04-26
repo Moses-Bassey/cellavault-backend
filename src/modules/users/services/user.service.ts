@@ -1,17 +1,12 @@
 import {
   Injectable,
   NotFoundException,
-  UnauthorizedException,
-  OnModuleInit,
   BadRequestException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { User } from '../entities/user.entity';
 import { Trip, TripStatus } from '../../trips/entities/trip.entity';
 import { UserRepository } from '../repositories/user.repository';
-import { ClientDeviceService } from 'src/modules/client-devices/services/client-device.service';
-import { DashboardDto } from '../dto/user.dto';
-import { DriverService } from 'src/modules/drivers/services/driver.service';
 import { TripRepository } from '../../trips/repositories/trip.repository';
 import { PaymentRepository } from '../../payment/repositories/payment.repository';
 import { CoinRepository } from '../../payment/repositories/coin.repository';
@@ -21,26 +16,16 @@ import {
   PassengerRideRowDto,
   CursorPageDto,
 } from '../../../shared/dto/user.dto';
-import {
-  IDashboard,
-  IDashboardInput,
-} from 'src/shared/interfaces/dashbaord.interface';
 import { PasswordUtil } from 'src/utils/password.util';
 import { PAYMENT_TYPE } from 'src/enums/payment.enums';
 import { decodeCursor } from '../../../utils/cursor.util';
+import { parseISODateOrUndefined } from '../../../utils/date.util';
 
-function parseISODateOrUndefined(value?: string): Date | undefined {
-  if (!value) return undefined;
-  const d = new Date(value);
-  if (Number.isNaN(d.getTime())) throw new BadRequestException('Invalid date');
-  return d;
-}
 
 @Injectable()
 export class UserService {
   constructor(
     private readonly userRepository: UserRepository,
-    private readonly clientDeviceService: ClientDeviceService,
     private readonly rides: TripRepository,
     private readonly payments: PaymentRepository,
     private readonly coins: CoinRepository,
@@ -70,50 +55,6 @@ export class UserService {
         throw new NotFoundException('User not found!');
       }
       return user;
-    } catch (error: unknown) {
-      throw new NotFoundException('User not found!');
-    }
-  }
-
-  async dashboard(data: IDashboardInput, userId: string): Promise<IDashboard> {
-    try {
-      const { deviceFCMToken, ipAddress, name } = data;
-
-      const user = await this.userRepository.fetchUser(userId);
-      if (!user) {
-        throw new NotFoundException('User not found!');
-      }
-
-      const clientDevice =
-        await this.clientDeviceService.findByUserIdAndDeviceToken(
-          userId,
-          deviceFCMToken,
-        );
-      if (clientDevice == null) {
-        await this.clientDeviceService.registerDevice({
-          userId: userId,
-          deviceFCMToken: deviceFCMToken,
-          ipAddress: ipAddress,
-          name: name,
-          userType: user.userType,
-        });
-      } else {
-        await this.clientDeviceService.updateDeviceToken(
-          clientDevice.id,
-          deviceFCMToken,
-        );
-        // throw new UnauthorizedException("A new client device token was detected");
-      }
-
-      const dashboardRes: IDashboard = {
-        fullName: user.fullName,
-        email: user.email,
-        phoneNo: user.phoneNo,
-        userId: user.id,
-        // paymentType: [PAYMENT_TYPE.CASH, PAYMENT_TYPE.PEPP_COIN, PAYMENT_TYPE.PI_COIN, PAYMENT_TYPE.WALLET]
-      };
-
-      return dashboardRes;
     } catch (error: unknown) {
       throw new NotFoundException('User not found!');
     }
@@ -149,19 +90,6 @@ export class UserService {
   }): Promise<number> {
     return this.userRepository.countFiltered(options);
   }
-
-  async update(id: string, userData: Partial<User>): Promise<number | null> {
-    return await this.userRepository.update(id, userData);
-  }
-
-  async delete(id: string): Promise<number> {
-    return await this.userRepository.delete(id);
-  }
-
-  async restore(id: string): Promise<void> {
-    await this.userRepository.restore(id);
-  }
-
 
   // ======================================= //
 
@@ -275,7 +203,7 @@ export class UserService {
 
     // Run in parallel (low latency)
     const [rideSummary, totalSpend, totalCoins] = await Promise.all([
-      this.rides.getPassengerRideSummary(params.passengerId, from, to),
+      this.rides.getUserRideSummary({ userId: params.passengerId, from, to }),
       this.payments.sumPassengerSpend(params.passengerId, from, to),
       this.coins.sumPassengerCoins(params.passengerId, from, to),
     ]);
@@ -305,7 +233,7 @@ export class UserService {
     const limit = Math.min(Math.max(Number(params.limit ?? 20), 1), 50);
     const cursor = decodeCursor(params.cursor);
 
-    const { rows, nextCursor } = await this.rides.listPassengerRides({
+    const { rows, nextCursor } = await this.rides.listUserRides({
       userId: params.passengerId,
       from,
       to,
@@ -333,4 +261,34 @@ export class UserService {
     if (!ride) throw new NotFoundException('Ride not found for passenger');
     return ride; // map to a dedicated DTO if needed
   }
+
+  async getUsersData() {
+    const [
+      totalRiders,
+      activeRiders,
+      bannedRiders,
+      newRidersThisMonth,
+      // ridersWithComplaints,
+    ] = await Promise.all([
+      this.countAllUsers(),
+      this.countActiveUsers(),
+      this.countBannedUsers(),
+      this.getNewUsersForMonth(),
+      // this.complaintService.countUsersWithPendingComplaints(),
+    ]);
+
+    return {
+      totalRiders,
+      activeRiders,
+      bannedRiders,
+      newRidersThisMonth,
+      // ridersWithComplaints,
+    };
+  }
+
+  // async findById(id: string) {
+  //   const user = await this.userService.fetchUser(id);
+  //   return user;
+  // }
+
 }
