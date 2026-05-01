@@ -3,7 +3,7 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { Country } from './entities/country.entity';
 import { State } from './entities/state.entity';
 import { LGA } from './entities/lga.entity';
-import { CountryController } from './controllers/country.controller';
+// import { CountryController } from './controllers/country.controller';
 import { CountryService } from './services/country.service';
 import { StateService } from './services/state.service';
 import { LgaService } from './services/lga.service';
@@ -13,7 +13,7 @@ import { LgaRepository } from './repositories/lga.repository';
 
 @Module({
   imports: [SequelizeModule.forFeature([Country, State, LGA])],
-  controllers: [CountryController],
+  controllers: [/*CountryController*/],
   providers: [
     CountryService,
     StateService,
