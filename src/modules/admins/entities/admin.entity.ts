@@ -11,6 +11,7 @@ import {
   Unique,
 } from 'sequelize-typescript';
 import { UserType } from '../../../enums/user-type.enum';
+import { InvitationStatus } from '../../../enums/invite-status.enum';
 
 @Table({
   tableName: 'admins',
@@ -51,6 +52,14 @@ export class Admin extends Model<Admin> {
     defaultValue: UserType.PEPP_ADMIN,
   })
   declare role: UserType;
+
+  @Column({
+    type: DataType.ENUM,
+    values: Object.values(InvitationStatus),
+    allowNull: false,
+    defaultValue: InvitationStatus.PENDING,
+  })
+  declare inviteStatus: InvitationStatus;
 
   @Default(false)
   @Column({

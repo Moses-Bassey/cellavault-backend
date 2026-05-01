@@ -36,7 +36,7 @@ import { UuidValidationPipe } from '../../../shared/pipes/uuid.validator.pipe';
 @Auth()
 @UseGuards(AuthGuard)
 @Roles(UserType.PEPP_ADMIN, UserType.SUPER_ADMIN, UserType.PEPP_MANAGER)
-@Controller('dashboard')
+@Controller('admin/dashboard')
 export class DashboardController {
   constructor(private readonly dashboardService: DashboardService) {}
 

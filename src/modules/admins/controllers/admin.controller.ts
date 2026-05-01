@@ -32,7 +32,7 @@ export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
   @Roles(UserType.PEPP_ADMIN, UserType.SUPER_ADMIN)
-  @Get(':id')
+  @Get('id/:id')
   @HttpCode(HttpStatus.OK)
   async findById(@Param('id', UuidValidationPipe) id: string) {
     const data = await this.adminService.findById(id);

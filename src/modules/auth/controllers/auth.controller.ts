@@ -27,7 +27,7 @@ import { AuthService } from '../auth.service';
 import { ResponseUtil } from 'src/utils/response.utils';
 
 @ApiTags('Auth')
-@Controller('auth')
+@Controller('admin/auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 

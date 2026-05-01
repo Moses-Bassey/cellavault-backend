@@ -25,6 +25,10 @@ module.exports = {
         type: DataTypes.STRING(100),
         allowNull: false,
       },
+      inviteStatus: {
+        type: DataTypes.ENUM('ACTIVE', 'PENDING', 'EXPIRED'),
+        allowNull: false,
+      },
       isVerified: {
         type: DataTypes.BOOLEAN,
         defaultValue: false,

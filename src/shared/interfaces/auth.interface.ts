@@ -20,8 +20,10 @@ export interface IUserLoginData {
 }
 
 export interface IAdminLoginData {
-  id: string;
   token: string;
-  adminType: UserType;
-  email: string;
+  user: {
+    id: string;
+    role: UserType;
+    email: string;
+  };
 }

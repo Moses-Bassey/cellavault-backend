@@ -225,10 +225,12 @@ export class AuthService {
     );
 
     return {
-      id: admin.id,
-      adminType: admin.role,
-      email: admin.email,
       token,
+      user: {
+        id: admin.id,
+        role: admin.role,
+        email: admin.email,
+      }
     };
   }
 
