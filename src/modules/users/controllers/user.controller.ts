@@ -40,7 +40,7 @@ import { GetUsersQueryDto } from '../dto/user.dto';
 @Auth()
 @UseGuards(AuthGuard, RolesGuard)
 @Roles(UserType.PEPP_ADMIN, UserType.SUPER_ADMIN, UserType.PEPP_MANAGER)
-@Controller('users')
+@Controller('admin/users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 

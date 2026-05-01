@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { ClientDevice } from './entities/client-device.entity';
-import { ClientDeviceController } from './controllers/client-device.controller';
+// import { ClientDeviceController } from './controllers/client-device.controller';
 import { ClientDeviceService } from './services/client-device.service';
 import { ClientDeviceRepository } from './repositories/client-device.repository';
 import { ClientDeviceGuard } from './guards/client-device.guard';
@@ -14,7 +14,7 @@ import { ClientDeviceEventEmitter } from './emitters/client-device.emitter';
     EventEmitterModule.forRoot(),
     SequelizeModule.forFeature([ClientDevice]),
   ],
-  controllers: [ClientDeviceController],
+  controllers: [/*ClientDeviceController*/],
   providers: [
     ClientDeviceService,
     ClientDeviceRepository,

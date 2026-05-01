@@ -33,7 +33,7 @@ import { TripStatus } from '../../trips/entities/trip.entity';
 @Auth()
 @Roles(UserType.SUPER_ADMIN, UserType.PEPP_ADMIN, UserType.PEPP_MANAGER)
 @UseGuards(AuthGuard, RolesGuard)
-@Controller('drivers')
+@Controller('admin/drivers')
 export class DriverController {
   constructor(private readonly driverService: DriverService) {}
 
