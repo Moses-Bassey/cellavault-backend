@@ -17,7 +17,7 @@ import {
 import { StationBadge } from 'src/enums/station-badge.enum';
 import { Station_Source } from 'src/enums/station-source.enum';
 
-export type StationSource = 'CNG' | 'CNG_FUELING' | 'EV_CHARGING';
+export type StationSource = 'CNG' | 'CNG_CONVERSION' | 'EV_CHARGING';
 
 export class StationsSummaryDto {
   totalStations: number;
