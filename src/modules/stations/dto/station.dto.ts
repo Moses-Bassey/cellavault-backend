@@ -14,6 +14,7 @@ import {
   Min,
   IsNotEmpty,
 } from 'class-validator';
+import { Transform } from 'class-transformer';
 import { StationBadge } from 'src/enums/station-badge.enum';
 import { Station_Source } from 'src/enums/station-source.enum';
 
@@ -238,6 +239,11 @@ export class GetStationsQueryDto {
 
   @ApiProperty({ description: 'Filter by active status', example: true })
   @IsOptional()
+  @Transform(({ value }) => {
+    if (value === 'true') return true;
+    if (value === 'false') return false;
+    return value;
+  })
   @IsBoolean()
   status?: boolean;
 

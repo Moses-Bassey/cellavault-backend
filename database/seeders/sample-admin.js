@@ -20,7 +20,7 @@ module.exports = {
         createdAt: new Date(),
         updatedAt: new Date(),
         deletedAt: null,
-    //   },
+      },
     //   {
     //     id: "b4d1c9f0-2a6e-4d3a-8c11-0a9f8e2d7b33",
     //     fullName: "Operations Admin",

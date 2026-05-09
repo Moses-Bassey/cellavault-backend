@@ -26,7 +26,7 @@ module.exports = {
         allowNull: false,
       },
       inviteStatus: {
-        type: DataTypes.ENUM('ACTIVE', 'PENDING', 'EXPIRED'),
+        type: DataTypes.STRING(),
         allowNull: false,
       },
       isVerified: {
