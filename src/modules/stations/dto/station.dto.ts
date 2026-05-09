@@ -14,10 +14,11 @@ import {
   Min,
   IsNotEmpty,
 } from 'class-validator';
+import { Transform } from 'class-transformer';
 import { StationBadge } from 'src/enums/station-badge.enum';
 import { Station_Source } from 'src/enums/station-source.enum';
 
-export type StationSource = 'CNG' | 'CNG_FUELING' | 'EV_CHARGING';
+export type StationSource = 'CNG' | 'CNG_CONVERSION' | 'EV_CHARGING';
 
 export class StationsSummaryDto {
   totalStations: number;
@@ -238,6 +239,11 @@ export class GetStationsQueryDto {
 
   @ApiProperty({ description: 'Filter by active status', example: true })
   @IsOptional()
+  @Transform(({ value }) => {
+    if (value === 'true') return true;
+    if (value === 'false') return false;
+    return value;
+  })
   @IsBoolean()
   status?: boolean;
 

@@ -25,6 +25,7 @@ async function bootstrap() {
       'Accept',
       'Authorization',
       'X-Forwarded-For',
+      'X-Client-Device-Token',
     ],
   });
 

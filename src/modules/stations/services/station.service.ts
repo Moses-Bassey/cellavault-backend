@@ -31,8 +31,10 @@ function locationString(
 
 function stationTypeLabel(source: StationSource) {
   if (source === 'EV_CHARGING') return 'EV Station';
-  if (source === 'CNG_FUELING') return 'CNG Station';
-  return 'CNG Station';
+  if (source === 'CNG') return 'CNG Station';
+  if (source === 'CNG_CONVERSION') return 'CNG Conversion Station';
+
+  return 'Station';
 }
 
 @Injectable()
@@ -90,8 +92,17 @@ export class StationService {
     badge?: StationBadge;
     limit?: number;
     cursor?: string;
-  }): Promise<CursorPageDto<StationListRowDto>> {
-    const limit = Math.min(Math.max(Number(params.limit ?? 20), 1), 50);
+  }): Promise<
+    CursorPageDto<StationListRowDto> & {
+      total: number;
+    }
+  > {
+    // max limit is now fixed at 10
+    const limit = Math.min(
+      Number(params.limit ?? 10),
+      10,
+    );
+
     const cursor = decodeStationCursor(params.cursor);
 
     const isActive =
@@ -101,60 +112,65 @@ export class StationService {
           ? false
           : undefined;
 
-    const sources: StationSource[] =
-      !params.stationType || params.stationType === 'ALL'
-        ? ['CNG', 'CNG_FUELING', 'EV_CHARGING']
-        : [params.stationType];
+    // default to CNG if ALL is not supported
+    const source: StationSource =
+      !params.stationType ||
+      params.stationType === 'ALL'
+        ? 'CNG'
+        : params.stationType;
 
-    // Fetch batches in parallel (small batches are ok for admin scale)
-    const batchSize = limit; // tune: could be limit or limit*2 for better merge
-    const batches = await Promise.all(
-      sources.map((source) =>
-        this.stationRepository.fetchBatch({
-          source,
-          limit: batchSize,
-          search: params.search,
-          isActive,
-          badge: params.badge,
-          cursor: cursor && cursor.source === source ? cursor : undefined,
-        }),
-      ),
-    );
-
-    // Flatten and merge-sort by updatedAt desc, id desc (stable ordering)
-    const merged = batches.flat().sort((a: any, b: any) => {
-      const tA = new Date(a.updatedAt).getTime();
-      const tB = new Date(b.updatedAt).getTime();
-      if (tA !== tB) return tB - tA;
-      // tie-breaker by id desc
-      return String(b.id).localeCompare(String(a.id));
+    const batch = await this.stationRepository.fetchBatch({
+      source,
+      limit,
+      search: params.search,
+      isActive,
+      badge: params.badge,
+      cursor,
     });
 
-    const page = merged.slice(0, limit);
+    const page = batch.items;
 
     const last = page[page.length - 1];
+
     const nextCursor =
       page.length === limit && last
         ? encodeStationCursor({
-            updatedAt: new Date(last.updatedAt).toISOString(),
+            updatedAt: new Date(
+              last.updatedAt,
+            ).toISOString(),
+
             id: last.id,
+
             source: last.__source,
           })
         : null;
 
-    const items: StationListRowDto[] = page.map((s: any) => ({
-      id: s.id,
-      source: s.__source,
-      name: s.name,
-      stationType: stationTypeLabel(s.__source),
-      location: locationString(s.state, s.country, s.address),
-      address: s.address,
-      isActive: !!s.isActive,
-      stationBadge: s.stationBadge,
-      updatedAt: new Date(s.updatedAt).toISOString(),
-    }));
+    const items: StationListRowDto[] =
+      page.map((s: any) => ({
+        id: s.id,
+        source: s.__source,
+        name: s.name,
+        stationType: stationTypeLabel(
+          s.__source,
+        ),
+        location: locationString(
+          s.state,
+          s.country,
+          s.address,
+        ),
+        address: s.address,
+        isActive: !!s.isActive,
+        stationBadge: s.stationBadge,
+        updatedAt: new Date(
+          s.updatedAt,
+        ).toISOString(),
+      }));
 
-    return { items, nextCursor };
+    return {
+      items,
+      nextCursor,
+      total: batch.total,
+    };
   }
 
   async getStationDetails(

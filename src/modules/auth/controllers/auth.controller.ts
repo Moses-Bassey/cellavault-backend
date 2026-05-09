@@ -47,14 +47,14 @@ export class AuthController {
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
-  async login(@Body() input: AdminLoginDto, @Req() request: Request) {
+  async login(@Body() input: AdminLoginDto, @Req() request: ExpressRequest) {
     const data = await this.authService.login(input, request);
     return ResponseUtil.handleResponse(data, 'Login successful', HttpStatus.OK);
   }
 
   @Post('login-otp')
   @HttpCode(HttpStatus.OK)
-  async loginOtp(@Body() input: LoginOtpDto, @Req() request: Request) {
+  async loginOtp(@Body() input: LoginOtpDto, @Req() request: ExpressRequest) {
     const data = await this.authService.loginOtp(input, request);
     return ResponseUtil.handleResponse(data, 'Login successful', HttpStatus.OK);
   }

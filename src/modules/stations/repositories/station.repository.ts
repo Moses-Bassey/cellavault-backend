@@ -104,15 +104,28 @@ export class StationRepository {
     isActive?: boolean;
     badge?: string;
     cursor?: StationCursor;
-  }): Promise<AnyStation[]> {
+  }): Promise<{
+    items: AnyStation[];
+    total: number;
+  }> {
     const { source, limit, search, isActive, badge, cursor } = params;
 
-    const model = this.getModel(source); // BaseModelStatic
-    const q = search?.trim() ? `%${search.trim()}%` : undefined;
+    console.log('Source: ', source);
+    const model = this.getModel(source);
+
+    const q = search?.trim()
+      ? `%${search.trim()}%`
+      : undefined;
 
     const where: WhereOptions = {
-      ...(typeof isActive === 'boolean' ? { isActive } : {}),
-      ...(badge ? { stationBadge: badge } : {}),
+      ...(typeof isActive === 'boolean'
+        ? { isActive }
+        : {}),
+
+      ...(badge
+        ? { stationBadge: badge }
+        : {}),
+
       ...(q
         ? {
             [Op.or]: [
@@ -123,12 +136,17 @@ export class StationRepository {
             ],
           }
         : {}),
+
       ...(cursor
         ? {
             [Op.and]: [
               {
                 [Op.or]: [
-                  { updatedAt: { [Op.lt]: new Date(cursor.updatedAt) } },
+                  {
+                    updatedAt: {
+                      [Op.lt]: new Date(cursor.updatedAt),
+                    },
+                  },
                   {
                     updatedAt: new Date(cursor.updatedAt),
                     id: { [Op.lt]: cursor.id },
@@ -140,13 +158,16 @@ export class StationRepository {
         : {}),
     } as any;
 
-    const rows = await model.findAll({
+    const { rows, count } = await model.findAndCountAll({
       where,
+
       order: [
         ['updatedAt', 'DESC'],
         ['id', 'DESC'],
       ],
+
       limit,
+
       attributes: [
         'id',
         'name',
@@ -157,10 +178,18 @@ export class StationRepository {
         'stationBadge',
         'updatedAt',
       ],
+
       raw: true,
     });
 
-    return (rows as any[]).map((r) => ({ ...r, __source: source }));
+    return {
+      items: (rows as any[]).map((r) => ({
+        ...r,
+        __source: source,
+      })),
+
+      total: count,
+    };
   }
 
   /* ----------------------------- Create station ----------------------------- */
@@ -169,7 +198,7 @@ export class StationRepository {
     switch (source) {
       case 'CNG':
         return this.cngStationModel.create(payload as any);
-      case 'CNG_FUELING':
+      case 'CNG_CONVERSION':
         return this.cngFuelingModel.create(payload as any);
       case 'EV_CHARGING':
         return this.chargingModel.create(payload as any);
@@ -186,9 +215,9 @@ export class StationRepository {
   ): Promise<StationEntity | null> {
     // return typed instances, not Model<any,any>
     switch (source) {
-      case 'CNG':
+      case 'CNG_CONVERSION':
         return this.cngStationModel.findByPk(id);
-      case 'CNG_FUELING':
+      case 'CNG':
         return this.cngFuelingModel.findByPk(id);
       case 'EV_CHARGING':
         return this.chargingModel.findByPk(id);
@@ -205,7 +234,7 @@ export class StationRepository {
     patch: Record<string, unknown>,
   ): Promise<StationEntity | null> {
     switch (source) {
-      case 'CNG': {
+      case 'CNG_CONVERSION': {
         const [affected] = await this.cngStationModel.update(patch as any, {
           where: { id },
         });
@@ -213,7 +242,7 @@ export class StationRepository {
         return this.cngStationModel.findByPk(id);
       }
 
-      case 'CNG_FUELING': {
+      case 'CNG': {
         const [affected] = await this.cngFuelingModel.update(patch as any, {
           where: { id },
         });
@@ -241,9 +270,9 @@ export class StationRepository {
    */
   private getModel(source: StationSource): BaseModelStatic {
     switch (source) {
-      case 'CNG':
+      case 'CNG_CONVERSION':
         return this.cngStationModel as unknown as BaseModelStatic;
-      case 'CNG_FUELING':
+      case 'CNG':
         return this.cngFuelingModel as unknown as BaseModelStatic;
       case 'EV_CHARGING':
         return this.chargingModel as unknown as BaseModelStatic;
@@ -260,9 +289,9 @@ export class StationRepository {
     source: StationSource,
   ): typeof CngStation | typeof CngFuelingStation | typeof ChargingStation {
     switch (source) {
-      case 'CNG':
+      case 'CNG_CONVERSION':
         return this.cngStationModel;
-      case 'CNG_FUELING':
+      case 'CNG':
         return this.cngFuelingModel;
       case 'EV_CHARGING':
         return this.chargingModel;
@@ -277,11 +306,11 @@ export class StationRepository {
     address: string,
   ): Promise<boolean> {
     switch (source) {
-      case 'CNG':
+      case 'CNG_CONVERSION':
         return (
           (await this.cngStationModel.count({ where: { name, address } })) > 0
         );
-      case 'CNG_FUELING':
+      case 'CNG':
         return (
           (await this.cngFuelingModel.count({ where: { name, address } })) > 0
         );
