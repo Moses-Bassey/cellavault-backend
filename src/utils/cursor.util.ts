@@ -11,3 +11,7 @@ export function decodeCursor(
     throw new BadRequestException('Invalid cursor');
   }
 }
+
+export function encodeCursor(params: { createdAt: Date; id: string; }): string {
+  return Buffer.from(JSON.stringify({ createdAt: params.createdAt, id: params.id }),).toString('base64');
+}

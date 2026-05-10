@@ -5,6 +5,8 @@ import { User } from '../entities/user.entity';
 import { UserType } from '../../../enums/user-type.enum';
 import { Op, WhereOptions } from 'sequelize';
 import { Country } from 'src/modules/countries/entities';
+import { UserStatusFilter } from '../../../enums/user-status.enum';
+import { encodeCursor } from '../../../utils/cursor.util';
 
 interface RepositoryParams {
   search?: string;
@@ -12,6 +14,60 @@ interface RepositoryParams {
   limit: number;
   offset: number;
 }
+
+// ─── Attributes ────────────────────────────────────────────────────────────────
+// Fetch only the columns the list view actually needs.
+// Omitting: password, loginType, userType, hasPasscode, countryId, deletedAt.
+
+const LIST_ATTRIBUTES: (keyof User)[] = [
+  'id',
+  'fullName',
+  'phoneNo',
+  'email',
+  'imageUrl',
+  'isActive',
+  'isDisabled',
+  'isEmailVerified',
+  'isPhoneVerified',
+  'createdAt',
+  'updatedAt',
+];
+
+// ─── Status → WHERE conditions ────────────────────────────────────────────────
+
+function buildStatusCondition(status: UserStatusFilter): WhereOptions {
+  switch (status) {
+    case 'active':
+      return {
+        isDisabled: false,
+        isActive: true,
+        isEmailVerified: true,
+        isPhoneVerified: true,
+      };
+
+    case 'inactive':
+      return {
+        isDisabled: false,
+        isActive: false,
+        isEmailVerified: true,
+        isPhoneVerified: true,
+      };
+
+    case 'pending':
+      // Verified users whose email OR phone isn't confirmed yet.
+      return {
+        isDisabled: false,
+        [Op.or]: [
+          { isEmailVerified: false },
+          { isPhoneVerified: false },
+        ],
+      };
+
+    case 'banned':
+      return { isDisabled: true };
+  }
+}
+
 @Injectable()
 export class UserRepository {
   constructor(
@@ -79,22 +135,21 @@ export class UserRepository {
 
   async findAll(options: {
     search?: string;
-    status?: boolean;
+    status?: UserStatusFilter;
     limit: number;
     cursor?: { createdAt: Date; id: string };
-  }): Promise<{ users: User[]; nextCursor: string | null }> {
+  }): Promise<{ users: User[]; nextCursor: string | null; total: number }> {
     const { search, status, limit, cursor } = options;
 
-    const andConditions: any[] = [];
+    // ── Base WHERE (applied to both the page query AND the total count) ──────
+    const baseConditions: WhereOptions[] = [];
 
-    /* ---------- FILTERS ---------- */
-
-    if (typeof status === 'boolean') {
-      andConditions.push({ isActive: status });
+    if (status) {
+      baseConditions.push(buildStatusCondition(status));
     }
 
     if (search) {
-      andConditions.push({
+      baseConditions.push({
         [Op.or]: [
           { fullName: { [Op.like]: `%${search}%` } },
           { phoneNo: { [Op.like]: `%${search}%` } },
@@ -103,55 +158,49 @@ export class UserRepository {
       });
     }
 
-    /* ---------- CURSOR PAGINATION ---------- */
-
-    if (cursor) {
-      andConditions.push({
-        [Op.or]: [
-          { createdAt: { [Op.lt]: cursor.createdAt } },
-          {
-            createdAt: cursor.createdAt,
-            id: { [Op.lt]: cursor.id },
-          },
-        ],
-      });
-    }
-
-    const where: WhereOptions<User> = andConditions.length
-      ? { [Op.and]: andConditions }
+    const baseWhere: WhereOptions = baseConditions.length
+      ? { [Op.and]: baseConditions }
       : {};
 
-    const rows = await this.userModel.findAll({
-      where,
-      order: [
-        ['createdAt', 'DESC'],
-        ['id', 'DESC'],
-      ],
-      limit,
-      /* EXCLUDE PASSWORD AT DB LEVEL */
-      attributes: {
-        exclude: ['password'],
-      },
-    });
+    // ── Cursor condition (only applied to the page query, NOT the count) ─────
+    const pageWhere: WhereOptions = cursor
+      ? {
+          [Op.and]: [
+            baseWhere,
+            {
+              [Op.or]: [
+                { createdAt: { [Op.lt]: cursor.createdAt } },
+                { createdAt: cursor.createdAt, id: { [Op.lt]: cursor.id } },
+              ],
+            },
+          ],
+        }
+      : baseWhere;
 
-    /* ---------- NEXT CURSOR ---------- */
+    // ── Run page fetch and total count in parallel ────────────────────────────
+    const [rows, total] = await Promise.all([
+      this.userModel.findAll({
+        where: pageWhere,
+        attributes: LIST_ATTRIBUTES,
+        order: [
+          ['createdAt', 'DESC'],
+          ['id', 'DESC'],
+        ],
+        limit,
+      }),
+      this.userModel.count({ where: baseWhere }),
+    ]);
 
-    const last = rows[rows.length - 1];
-
+    const last = rows.at(-1);
     const nextCursor =
       rows.length === limit && last
-        ? Buffer.from(
-            JSON.stringify({
-              createdAt: last.createdAt,
-              id: last.id,
-            }),
-          ).toString('base64')
+        ? encodeCursor({
+            createdAt: last.createdAt,
+            id: last.id,
+          })
         : null;
 
-    return {
-      users: rows,
-      nextCursor,
-    };
+    return { users: rows, nextCursor, total };
   }
 
   async countAll(): Promise<User[] | null> {
