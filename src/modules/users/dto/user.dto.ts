@@ -1,61 +1,96 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
-  IsEmail,
-  IsEnum,
   IsOptional,
   IsString,
-  isUUID,
-  IsUrl,
-  IsBoolean,
+  IsIn,
+  IsInt,
+  Min,
+  Max,
 } from 'class-validator';
-import { UnprocessableEntityException } from '@nestjs/common';
-import { Transform } from 'class-transformer';
-import { UserType } from 'src/enums';
-
-export class DashboardDto {
-  @IsString()
-  deviceFCMToken: string;
-
-  @IsString()
-  @IsOptional()
-  name?: string;
-}
-
-export class UpdateImageUrlDto {
-  @IsString()
-  // @IsUrl()
-  imageUrl: string;
-}
+import { Transform, Type } from 'class-transformer';
+import type { UserStatusFilter } from '../../../enums/user-status.enum';
+import { UserStatus } from '../../../enums/user-status.enum';
 
 export class GetUsersQueryDto {
-  @ApiProperty({ description: 'Search parameter', example: 'john' })
-  @IsOptional()
-  search?: string;
-
-  @ApiProperty({ description: 'Filter by active status', example: true })
-  @Transform(({ value }) => {
-    if (value === undefined) return undefined;
-    if (typeof value === 'boolean') return value;
-
-    const normalized: string = value.toString().toLowerCase();
-    console.log('Type value: ', normalized);
-    if (['true', '1'].includes(normalized)) return true;
-    if (['false', '0'].includes(normalized)) return false;
-
-    // Throw error for invalid values
-    throw new UnprocessableEntityException(
-      `Invalid status value: "${value}". Allowed values are true, false, 1, 0.`,
-    );
+  @ApiPropertyOptional({
+    description: 'Search by name, phone, or email',
+    example: 'ada',
   })
   @IsOptional()
-  @IsBoolean()
-  status?: boolean;
+  @IsString()
+  search?: string;
 
-  @ApiProperty({ description: 'Number of items per page', example: 10 })
+  @ApiPropertyOptional({
+    description: 'Filter by derived status',
+    enum: ['active', 'inactive', 'pending', 'banned'],
+    example: 'active',
+  })
   @IsOptional()
-  limit?: number | string;
+  @IsIn(['active', 'inactive', 'pending', 'banned'])
+  status?: UserStatusFilter;
 
-  @ApiProperty({ description: 'Page number', example: 1 })
+  @ApiPropertyOptional({
+    description: 'Items per page (1–50, default 20)',
+    example: 10 ,
+  })
   @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(50)
+  limit?: number;
+
+  @ApiPropertyOptional({ description: 'Opaque cursor from previous response' })
+  @IsOptional()
+  @IsString()
   cursor?: string;
+}
+
+export class UserListItemDto {
+  @ApiProperty()
+  id: string;
+
+  @ApiProperty()
+  fullName: string;
+
+  @ApiProperty()
+  phoneNo: string;
+
+  @ApiProperty()
+  email: string;
+
+  @ApiProperty({ enum: UserStatus })
+  status: UserStatus;
+
+  @ApiPropertyOptional()
+  imageUrl: string | null;
+
+  @ApiProperty()
+  totalRides: number;
+
+  @ApiPropertyOptional()
+  lastRide: string | null;
+
+  @ApiProperty()
+  joinDate: string;
+
+  @ApiProperty()
+  complaints: number;
+
+  @ApiProperty()
+  createdAt: Date;
+
+  @ApiProperty()
+  updatedAt: Date;
+}
+
+export class UserListPageDto {
+  @ApiProperty({ type: [UserListItemDto] })
+  items: UserListItemDto[];
+
+  @ApiPropertyOptional()
+  nextCursor: string | null;
+
+  @ApiProperty()
+  total: number;
 }

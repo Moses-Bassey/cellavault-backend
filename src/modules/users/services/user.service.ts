@@ -8,6 +8,7 @@ import { User } from '../entities/user.entity';
 import { Trip, TripStatus } from '../../trips/entities/trip.entity';
 import { UserRepository } from '../repositories/user.repository';
 import { TripRepository } from '../../trips/repositories/trip.repository';
+import { TripService } from '../../trips/services/trip.service';
 import { PaymentRepository } from '../../payment/repositories/payment.repository';
 import { CoinRepository } from '../../payment/repositories/coin.repository';
 import {
@@ -16,8 +17,10 @@ import {
   PassengerRideRowDto,
   CursorPageDto,
 } from '../../../shared/dto/user.dto';
-import { PasswordUtil } from 'src/utils/password.util';
-import { PAYMENT_TYPE } from 'src/enums/payment.enums';
+import { deriveUserStatus } from '../../../utils/user-status.util';
+import { UserListItemDto, UserListPageDto } from '../dto/user.dto';
+import { UserStatusFilter } from '../../../enums/user-status.enum';
+// import { PasswordUtil } from 'src/utils/password.util';
 import { decodeCursor } from '../../../utils/cursor.util';
 import { parseISODateOrUndefined } from '../../../utils/date.util';
 
@@ -27,6 +30,7 @@ export class UserService {
   constructor(
     private readonly userRepository: UserRepository,
     private readonly rides: TripRepository,
+    private readonly tripsService: TripService,
     private readonly payments: PaymentRepository,
     private readonly coins: CoinRepository,
     private readonly configService: ConfigService,
@@ -62,25 +66,51 @@ export class UserService {
 
   async findAll(params: {
     search?: string;
-    status?: boolean;
+    status?: UserStatusFilter;
     limit?: number;
     cursor?: string;
-  }): Promise<CursorPageDto<User>> {
-    const limit = Math.min(Math.max(Number(params.limit ?? 20), 1), 50);
+  }): Promise<UserListPageDto> {
+    const limit = Math.min(Math.max(Number(params.limit ?? 10), 1), 50);
 
     const cursor = decodeCursor(params.cursor);
     const search = params.search?.trim();
 
-    const { users, nextCursor } = await this.userRepository.findAll({
+    // ── 1. Paginated users + total count (2 queries in parallel) ─────────────
+    const { users, nextCursor, total } = await this.userRepository.findAll({
       search,
       status: params.status,
       limit,
       cursor,
     });
 
+    // ── 2. Ride stats for this page's users (1 GROUP BY query) ───────────────
+    const riderIds = users.map((u) => u.id);
+    const statsMap   = await this.tripsService.getRideStatsByRiderIds(riderIds);
+
+    // ── 3. Merge + shape the response ─────────────────────────────────────────
+    const items: UserListItemDto[] = users.map((user) => {
+      const stats = statsMap.get(user.id);
+
+      return {
+        id: user.id,
+        fullName: user.fullName,
+        phoneNo: user.phoneNo,
+        email: user.email,
+        imageUrl: user.imageUrl ?? null,
+        status: deriveUserStatus(user),
+        totalRides: stats?.totalRides ?? 0,
+        lastRide: stats?.lastRide?.toISOString() ?? null,
+        joinDate: user.createdAt.toISOString(),
+        complaints: 0, // TODO: wire in when ComplaintsModule is available
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+      };
+    });
+
     return {
-      items: users,
+      items,
       nextCursor,
+      total,
     };
   }
 

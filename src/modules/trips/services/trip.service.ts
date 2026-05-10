@@ -14,6 +14,7 @@ import { PaymentType, TripStatus, Trip } from '../entities/trip.entity';
 import { decodeCursor } from '../../../utils/cursor.util';
 import { User } from '../../users/entities/user.entity';
 import { Driver } from '../../drivers/entities/driver.entity';
+import { RiderStats } from '../../../shared/interfaces/rider-stats.interface';
 
 /* -------------------------------- Utilities -------------------------------- */
 
@@ -280,5 +281,15 @@ export class TripService {
 
   async countOngoingTrips(): Promise<number> {
     return await this.tripRepository.countOngoingTrips();
+  }
+
+  /**
+   * Public interface for ride stats. The UserService calls this; it never
+   * touches the TripRepository directly, preserving module boundaries.
+   */
+  async getRideStatsByRiderIds(
+    riderIds: string[],
+  ): Promise<Map<string, RiderStats>> {
+    return this.tripRepository.getStatsByRiderIds(riderIds);
   }
 }

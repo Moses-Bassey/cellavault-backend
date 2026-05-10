@@ -1,9 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Op, col, fn, literal, WhereOptions } from 'sequelize';
+import { Sequelize } from 'sequelize-typescript';
 import { Trip, TripStatus, PaymentType } from '../entities/trip.entity';
 import { User } from '../../users/entities/user.entity';
 import { Driver } from '../../drivers/entities/driver.entity';
+import { RiderStats } from '../../../shared/interfaces/rider-stats.interface';
 
 @Injectable()
 export class TripRepository {
@@ -12,6 +14,7 @@ export class TripRepository {
     private readonly tripModel: typeof Trip,
     @InjectModel(User) private readonly userModel: typeof User,
     @InjectModel(Driver) private readonly driverModel: typeof Driver,
+    private readonly sequelize: Sequelize,
   ) {}
 
   async create(data: Partial<Trip>): Promise<Trip> {
@@ -24,33 +27,33 @@ export class TripRepository {
     });
   }
 
-  async findUserActiveTrip(userId: string): Promise<Trip | null> {
-    return await this.tripModel.findOne({
-      where: {
-        userId,
-        status: {
-          [Op.in]: [
-            TripStatus.PENDING,
-            TripStatus.ACCEPTED,
-            TripStatus.ON_THE_WAY,
-            TripStatus.ARRIVED,
-          ],
-        },
-      },
-      include: [
-        {
-          association: 'user',
-          attributes: ['id', 'fullName', 'email', 'phoneNo', 'imageUrl'],
-        },
-        {
-          association: 'driver',
-          attributes: ['id', 'fullName', 'email', 'phoneNo', 'profileImageUrl'],
-          required: false,
-        },
-      ],
-      order: [['createdAt', 'DESC']],
-    });
-  }
+  // async findUserActiveTrip(userId: string): Promise<Trip | null> {
+  //   return await this.tripModel.findOne({
+  //     where: {
+  //       userId,
+  //       status: {
+  //         [Op.in]: [
+  //           TripStatus.PENDING,
+  //           TripStatus.ACCEPTED,
+  //           TripStatus.ON_THE_WAY,
+  //           TripStatus.ARRIVED,
+  //         ],
+  //       },
+  //     },
+  //     include: [
+  //       {
+  //         association: 'user',
+  //         attributes: ['id', 'fullName', 'email', 'phoneNo', 'imageUrl'],
+  //       },
+  //       {
+  //         association: 'driver',
+  //         attributes: ['id', 'fullName', 'email', 'phoneNo', 'profileImageUrl'],
+  //         required: false,
+  //       },
+  //     ],
+  //     order: [['createdAt', 'DESC']],
+  //   });
+  // }
 
   async findAll(options?: {
     limit?: number;
@@ -69,31 +72,6 @@ export class TripRepository {
       limit: options?.limit,
       offset: options?.offset,
       order: [['createdAt', 'DESC']],
-    });
-  }
-
-  async update(id: string, data: Partial<Trip>): Promise<[number, Trip[]]> {
-    return await this.tripModel.update(data, {
-      where: { id },
-      returning: true,
-    });
-  }
-
-  async updateStatus(id: string, status: TripStatus): Promise<Trip | null> {
-    const [affectedCount] = await this.tripModel.update(
-      { status },
-      { where: { id } },
-    );
-
-    if (affectedCount > 0) {
-      return await this.findById(id);
-    }
-    return null;
-  }
-
-  async delete(id: string): Promise<number> {
-    return await this.tripModel.destroy({
-      where: { id },
     });
   }
 
@@ -468,5 +446,57 @@ export class TripRepository {
         status: { [Op.in]: ongoingStatuses },
       },
     });
+  }
+
+  /**
+   * Returns ride stats for a batch of rider IDs in a single GROUP BY query.
+   *
+   * Complexity: O(1) DB round trips regardless of how many riders are on the page.
+   *
+   * Performance notes:
+   *   • Requires an index on (userId) — or composite (userId, completedAt) for
+   *     even faster MAX() resolution. Add via migration if not already present:
+   *     CREATE INDEX idx_trips_rider_completed ON trips (userId, completedAt DESC);
+   *   • Raw: true skips Sequelize model hydration — fastest possible mapping.
+   *
+   * @param userIds  Array of user IDs from the current page (max 50 from your limit cap)
+   */
+  async getStatsByRiderIds(
+    userIds: string[],
+  ): Promise<Map<string, RiderStats>> {
+    if (!userIds.length) return new Map();
+
+    // ── Single aggregation query ──────────────────────────────────────────────
+    const rows = await this.tripModel.findAll({
+      where: {
+        userId: { [Op.in]: userIds },
+        // Uncomment to count only completed trips:
+        // status: TripStatus.COMPLETED,
+      },
+      attributes: [
+        'userId',
+        [this.sequelize.fn('COUNT', this.sequelize.col('id')), 'totalRides'],
+        // Use completedAt if available; fall back to createdAt
+        [this.sequelize.fn('MAX', this.sequelize.col('completedAt')), 'lastRide'],
+      ],
+      group: ['userId'],
+      raw: true,
+    }) as unknown as Array<{
+      riderId: string;
+      totalRides: string; // Sequelize returns aggregates as strings
+      lastRide: string | null;
+    }>;
+
+    // ── O(n) Map build for O(1) lookup in the service ─────────────────────────
+    const statsMap = new Map<string, RiderStats>();
+
+    for (const row of rows) {
+      statsMap.set(row.riderId, {
+        totalRides: Number(row.totalRides),
+        lastRide:   row.lastRide ? new Date(row.lastRide) : null,
+      });
+    }
+
+    return statsMap;
   }
 }

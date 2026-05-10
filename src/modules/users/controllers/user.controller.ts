@@ -64,7 +64,7 @@ export class UserController {
     );
   }
 
-  @Get('find')
+  @Get()
   @HttpCode(HttpStatus.OK)
   @UseGuards(AuthGuard)
   @Roles(UserType.PEPP_ADMIN, UserType.SUPER_ADMIN, UserType.PEPP_MANAGER)
