@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Admin } from '../entities/admin.entity';
 import { Op } from 'sequelize';
+import { InvitationStatus } from '../../../enums/invite-status.enum';
 
 @Injectable()
 export class AdminRepository {
@@ -9,20 +10,6 @@ export class AdminRepository {
     @InjectModel(Admin)
     private readonly adminModel: typeof Admin,
   ) {}
-
-  // async create(adminData: Partial<Admin>): Promise<Admin> {
-  //   try {
-  //     return await this.adminModel.create(adminData as any);
-  //   } catch (error: unknown) {
-  //     if (error instanceof Error) {
-  //       console.error(`Error creating admin: ${error.message}`);
-  //       throw new Error(`Error creating admin: ${error.message}`);
-  //     } else {
-  //       console.error(`Error creating admin: ${error as any}`);
-  //       throw new Error(`Error creating admin: ${error as any}`);
-  //     }
-  //   }
-  // }
 
   async findById(id: string): Promise<Admin | null> {
     try {
@@ -58,7 +45,7 @@ export class AdminRepository {
     limit: number;
     cursor?: { createdAt: Date; id: string };
   }): Promise<{ admins: Admin[]; nextCursor: string | null }> {
-    const { limit = 20, cursor } = options || {};
+    const { limit, cursor } = options || {};
 
     try {
       const andConditions: any[] = [];
@@ -83,17 +70,25 @@ export class AdminRepository {
 
       const rows = await this.adminModel.findAll({
         where,
+        attributes: [
+          'id',
+          'fullname',
+          'email',
+          'phoneNo',
+          'imageUrl',
+          'role',
+          'inviteStatus',
+          'createdAt',
+          'invitedAcceptedAt',
+          'lastLogin',
+        ],
         order: [
           ['createdAt', 'DESC'],
           ['id', 'DESC'],
         ],
         limit,
-
-        /* EXCLUDE PASSWORD AT DB LEVEL */
-        attributes: {
-          exclude: ['password'],
-        },
       });
+      console.log('Rows: ', rows);
 
       /* ---------- NEXT CURSOR ---------- */
 
@@ -124,6 +119,37 @@ export class AdminRepository {
     }
   }
 
+  async getAdminSummary() {
+    const [total, active, pendingInvite, expired] = await Promise.all([
+      this.adminModel.count(),
+
+      this.adminModel.count({
+        where: {
+          inviteStatus: InvitationStatus.ACTIVE,
+        },
+      }),
+
+      this.adminModel.count({
+        where: {
+          inviteStatus: InvitationStatus.PENDING,
+        },
+      }),
+
+      this.adminModel.count({
+        where: {
+          inviteStatus: InvitationStatus.EXPIRED,
+        },
+      }),
+    ]);
+
+    return {
+      total,
+      active,
+      pendingInvite,
+      expired,
+    };
+  }
+
   async update(
     id: string,
     updates: Partial<Admin>,
@@ -143,20 +169,4 @@ export class AdminRepository {
       }
     }
   }
-
-  // async delete(id: string): Promise<number> {
-  //   try {
-  //     return await this.adminModel.destroy({
-  //       where: { id },
-  //     });
-  //   } catch (error: unknown) {
-  //     if (error instanceof Error) {
-  //       console.error(`Error deleting admin: ${error.message}`);
-  //       throw new Error(`Error deleting admin: ${error.message}`);
-  //     } else {
-  //       console.error(`Error deleting admin: ${error as any}`);
-  //       throw new Error(`Error deleting admin: ${error as any}`);
-  //     }
-  //   }
-  // }
 }

@@ -85,7 +85,7 @@ export class UserService {
 
     // ── 2. Ride stats for this page's users (1 GROUP BY query) ───────────────
     const riderIds = users.map((u) => u.id);
-    const statsMap   = await this.tripsService.getRideStatsByRiderIds(riderIds);
+    const statsMap = await this.tripsService.getRideStatsByRiderIds(riderIds);
 
     // ── 3. Merge + shape the response ─────────────────────────────────────────
     const items: UserListItemDto[] = users.map((user) => {
@@ -106,6 +106,8 @@ export class UserService {
         updatedAt: user.updatedAt,
       };
     });
+
+    console.log('data: ', statsMap);
 
     return {
       items,

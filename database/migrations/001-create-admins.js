@@ -17,6 +17,11 @@ module.exports = {
         allowNull: false,
         unique: true,
       },
+      phoneNo: {
+        type: DataTypes.STRING(100),
+        allowNull: false,
+        unique: true,
+      },
       password: {
         type: DataTypes.STRING(1000),
         allowNull: false,
@@ -24,6 +29,10 @@ module.exports = {
       role: {
         type: DataTypes.STRING(100),
         allowNull: false,
+      },
+      imageUrl: {
+        type: DataTypes.TEXT,
+        allowNull: true,
       },
       inviteStatus: {
         type: DataTypes.STRING(),
@@ -38,6 +47,10 @@ module.exports = {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
         allowNull: false,
+      },
+      invitedAcceptedAt: {
+        type: DataTypes.DATE,
+        allowNull: true
       },
       lastLogin: {
         type: DataTypes.DATE,

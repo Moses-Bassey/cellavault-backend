@@ -466,34 +466,52 @@ export class TripRepository {
   ): Promise<Map<string, RiderStats>> {
     if (!userIds.length) return new Map();
 
-    // ── Single aggregation query ──────────────────────────────────────────────
     const rows = await this.tripModel.findAll({
       where: {
         userId: { [Op.in]: userIds },
-        // Uncomment to count only completed trips:
-        // status: TripStatus.COMPLETED,
       },
+
       attributes: [
         'userId',
-        [this.sequelize.fn('COUNT', this.sequelize.col('id')), 'totalRides'],
-        // Use completedAt if available; fall back to createdAt
-        [this.sequelize.fn('MAX', this.sequelize.col('completedAt')), 'lastRide'],
+
+        [
+          this.sequelize.fn(
+            'COUNT',
+            this.sequelize.col('id'),
+          ),
+          'totalRides',
+        ],
+
+        [
+          this.sequelize.fn(
+            'MAX',
+            this.sequelize.fn(
+              'COALESCE',
+              this.sequelize.col('completedAt'),
+              this.sequelize.col('createdAt'),
+            ),
+          ),
+          'lastRide',
+        ],
       ],
+
       group: ['userId'],
+
       raw: true,
     }) as unknown as Array<{
-      riderId: string;
-      totalRides: string; // Sequelize returns aggregates as strings
+      userId: string;
+      totalRides: string;
       lastRide: string | null;
     }>;
 
-    // ── O(n) Map build for O(1) lookup in the service ─────────────────────────
     const statsMap = new Map<string, RiderStats>();
 
     for (const row of rows) {
-      statsMap.set(row.riderId, {
+      statsMap.set(row.userId, {
         totalRides: Number(row.totalRides),
-        lastRide:   row.lastRide ? new Date(row.lastRide) : null,
+        lastRide: row.lastRide
+          ? new Date(row.lastRide)
+          : null,
       });
     }
 
