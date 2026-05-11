@@ -61,7 +61,9 @@ export class DriverService {
   }
 
   async getSummary(): Promise<DriverSummaryDto> {
-    return this.driverRepository.getSummary();
+    const data = await this.driverRepository.getSummary();
+    if (!data) throw new NotFoundException('Summary not found');
+    return data;
   }
 
   async countActiveDrivers(): Promise<number | null> {
@@ -133,6 +135,7 @@ export class DriverService {
         lastActiveAt: agg?.lastActiveAt ? agg.lastActiveAt.toISOString() : null,
       };
     });
+    console.log('Driver details: ', tripAgg, 'vehicle: ', vehiclesMap)
 
     return { items, nextCursor };
   }

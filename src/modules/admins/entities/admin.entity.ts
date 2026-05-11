@@ -42,6 +42,11 @@ export class Admin extends Model<Admin> {
   })
   declare email: string;
 
+  //
+  @Unique
+  @Column(DataType.STRING(300))
+  declare phoneNo: string;
+
   @Column(DataType.STRING(1000))
   declare password: string;
 
@@ -52,6 +57,12 @@ export class Admin extends Model<Admin> {
     defaultValue: UserType.PEPP_ADMIN,
   })
   declare role: UserType;
+
+  @Column({
+    type: DataType.TEXT,
+    allowNull: true,
+  })
+  declare imageUrl: string | null;
 
   @Column({
     type: DataType.ENUM,
@@ -74,6 +85,13 @@ export class Admin extends Model<Admin> {
     allowNull: false,
   })
   declare isActive: boolean;
+
+  //
+  @Column({
+    type: DataType.DATE,
+    allowNull: true,
+  })
+  declare invitedAcceptedAt: Date | null;
 
   @Column({
     type: DataType.DATE,

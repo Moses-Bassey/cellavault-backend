@@ -31,6 +31,16 @@ import { UuidValidationPipe } from '../../../shared/pipes/uuid.validator.pipe';
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
+  @Get('summary')
+  async getAdminSummary() {
+    const data = await this.adminService.getAdminSummary();
+    return ResponseUtil.handleResponse(
+      data,
+      'Admin metrics retrieved successfully',
+      HttpStatus.OK,
+    )
+  }
+
   @Roles(UserType.PEPP_ADMIN, UserType.SUPER_ADMIN)
   @Get('id/:id')
   @HttpCode(HttpStatus.OK)
