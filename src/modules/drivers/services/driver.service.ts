@@ -135,7 +135,6 @@ export class DriverService {
         lastActiveAt: agg?.lastActiveAt ? agg.lastActiveAt.toISOString() : null,
       };
     });
-    console.log('Driver details: ', tripAgg, 'vehicle: ', vehiclesMap)
 
     return { items, nextCursor };
   }
@@ -148,7 +147,6 @@ export class DriverService {
     if (!driver) throw new NotFoundException('Driver not found');
 
     const vehicle = vehicles.get(driver.id);
-    console.log('Vehicle', vehicle);
     if (!driver) throw new NotFoundException('Driver not found');
 
     return this.toAccountDto(driver, vehicle);

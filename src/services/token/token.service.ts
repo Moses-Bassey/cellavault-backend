@@ -76,7 +76,6 @@ export class TokenService {
   }
 
   public async verifyOTP(input: IOTPInterface): Promise<{ token: string }> {
-    console.log(input);
     const { token, email, subject: subject } = input;
 
     let userToken: Token | null =

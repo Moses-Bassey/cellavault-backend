@@ -14,7 +14,6 @@ export class GetUsersQueryDto {
     if (typeof value === 'boolean') return value;
 
     const normalized: string = value.toString().toLowerCase();
-    console.log('Type value: ', normalized);
     if (['true', '1'].includes(normalized)) return true;
     if (['false', '0'].includes(normalized)) return false;
 

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Admin } from '../entities/admin.entity';
-import { Op } from 'sequelize';
+import { Op, WhereOptions } from 'sequelize';
 import { InvitationStatus } from '../../../enums/invite-status.enum';
 
 @Injectable()
@@ -44,8 +44,17 @@ export class AdminRepository {
   async findAll(options?: {
     limit: number;
     cursor?: { createdAt: Date; id: string };
+    search?: string;
+    role?: string;
+    status?: string;
   }): Promise<{ admins: Admin[]; nextCursor: string | null }> {
-    const { limit, cursor } = options || {};
+    const {
+      limit,
+      cursor,
+      search,
+      role,
+      status,
+    } = options || {};
 
     try {
       const andConditions: any[] = [];
@@ -64,15 +73,54 @@ export class AdminRepository {
         });
       }
 
-      const where = andConditions.length
-        ? { [Op.and]: andConditions }
-        : undefined;
+      /* ---------- SEARCH ---------- */
+
+      if (search?.trim()) {
+        andConditions.push({
+          [Op.or]: [
+            {
+              fullname: {
+                [Op.like]: `%${search.trim()}%`,
+              },
+            },
+            {
+              email: {
+                [Op.like]: `%${search.trim()}%`,
+              },
+            },
+            {
+              phoneNo: {
+                [Op.like]: `%${search.trim()}%`,
+              },
+            },
+          ],
+        });
+      }
+
+      /* ---------- ROLE FILTER ---------- */
+
+      if (role && role !== 'all') {
+        andConditions.push({
+          role,
+        });
+      }
+
+      /* ---------- STATUS FILTER ---------- */
+
+      if (status && status !== 'all') {
+        andConditions.push({
+          inviteStatus: status.toUpperCase(),
+        });
+      }
+
+      const where: WhereOptions =
+        andConditions.length > 0 ? { [Op.and]: andConditions } : {};
 
       const rows = await this.adminModel.findAll({
         where,
         attributes: [
           'id',
-          'fullname',
+          'fullName',
           'email',
           'phoneNo',
           'imageUrl',
@@ -88,9 +136,6 @@ export class AdminRepository {
         ],
         limit,
       });
-      console.log('Rows: ', rows);
-
-      /* ---------- NEXT CURSOR ---------- */
 
       const last = rows[rows.length - 1];
 
