@@ -9,13 +9,16 @@ module.exports = {
     await queryInterface.bulkInsert("admins", [
       {
         id: "7c2d3f2e-9a1b-4a9d-9f5b-3f1c2a8d9e10",
-        fullName: "Super Admin",
-        email: "danielokpa11@peppcruise.com",
+        fullName: "Test Admin",
+        email: "danielokpa11@gmail.com",
+        phoneNo: "08106616246",
         password: passwordHash,
         role: "SUPER_ADMIN",
+        imageUrl: null,
         inviteStatus: "ACTIVE",
         isVerified: true,
         isActive: true,
+        invitedAcceptedAt: new Date(),
         lastLogin: null,
         createdAt: new Date(),
         updatedAt: new Date(),
