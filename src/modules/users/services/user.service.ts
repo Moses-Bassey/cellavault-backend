@@ -107,7 +107,6 @@ export class UserService {
       };
     });
 
-    console.log('data: ', statsMap);
 
     return {
       items,
@@ -190,7 +189,6 @@ export class UserService {
     if (!updated) throw new NotFoundException('Passenger not found');
     const user = await this.fetchUser(passengerId);
     if (!user) throw new NotFoundException('User not found');
-    console.log('Update: ', updated, '\n', 'User: ', user);
     return this.toAccountDto(user);
   }
 

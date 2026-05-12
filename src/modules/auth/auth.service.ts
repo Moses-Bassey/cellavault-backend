@@ -193,7 +193,7 @@ export class AuthService {
         clientDeviceToken,
       );
 
-    console.log('Client device: ', clientDevice, 'Id: ', admin.id);
+    // console.log('Client device: ', clientDevice, 'Id: ', admin.id);
     if (clientDevice) return;
 
     const otpToken = await this.tokenService.generateOTPtoken({

@@ -59,10 +59,16 @@ export class AdminController {
   async findAll(
     @Query('limit') limit?: number,
     @Query('cursor') cursor?: string,
+    @Query('search') search?: string,
+    @Query('role') role?: string,
+    @Query('status') status?: string,
   ) {
     const data = await this.adminService.findAll({
       limit: limit ? Number(limit) : undefined,
       cursor,
+      search,
+      role,
+      status,
     });
 
     return ResponseUtil.handleResponse(

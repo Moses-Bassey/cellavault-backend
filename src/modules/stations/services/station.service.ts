@@ -254,7 +254,6 @@ export class StationService {
     const updated = await this.stationRepository.updateStation(source, id, {
       isActive,
     });
-    console.log('Is active:', isActive);
     if (!updated) throw new NotFoundException('Station not found');
     return { ok: true };
   }

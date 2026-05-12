@@ -68,7 +68,6 @@ export class DriverController {
       limit: query.limit ? Number(query.limit) : undefined,
       cursor: query.cursor,
     });
-    console.log('data: ', data);
     return ResponseUtil.handleResponse(
       data,
       'Drivers retrieved successfully',

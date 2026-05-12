@@ -33,6 +33,9 @@ export class AdminService {
   async findAll(params?: {
     limit?: number;
     cursor?: string;
+    search?: string;
+    role?: string;
+    status?: string;
   }): Promise<{ items: any[]; nextCursor: string | null }> {
     const limit = Math.min(Math.max(Number(params?.limit ?? 20), 1), 50);
 
@@ -41,6 +44,9 @@ export class AdminService {
     const { admins, nextCursor } = await this.adminRepository.findAll({
       limit,
       cursor: decodedCursor,
+      search: params?.search,
+      role: params?.role,
+      status: params?.status,
     });
 
     const items = admins.map((admin) => {
