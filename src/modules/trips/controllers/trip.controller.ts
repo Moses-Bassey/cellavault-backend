@@ -14,6 +14,7 @@ import {
 } from '@nestjs/swagger';
 import { TripService } from '../services/trip.service';
 import { GetTripsQueryDto } from '../dto/trip.dto';
+
 import { AuthGuard } from '../../auth/guards/auth.guard';
 import { RolesGuard } from '../../auth/guards/roles.guard';
 import { Roles } from '../../auth/decorators/roles.decorator';

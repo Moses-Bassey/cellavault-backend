@@ -107,10 +107,10 @@ export class StationRepository {
   }): Promise<{
     items: AnyStation[];
     total: number;
+    nextCursor: string | null;
   }> {
     const { source, limit, search, isActive, badge, cursor } = params;
 
-    // console.log('Source: ', source);
     const model = this.getModel(source);
 
     const q = search?.trim()
@@ -182,6 +182,18 @@ export class StationRepository {
       raw: true,
     });
 
+    const last = rows[rows.length - 1];
+
+    const nextCursor =
+      rows.length === limit && last
+        ? Buffer.from(
+            JSON.stringify({
+              updatedAt: last.updatedAt,
+              id: last.id,
+            }),
+          ).toString('base64')
+        : null;
+
     return {
       items: (rows as any[]).map((r) => ({
         ...r,
@@ -189,6 +201,8 @@ export class StationRepository {
       })),
 
       total: count,
+
+      nextCursor,
     };
   }
 

@@ -321,20 +321,25 @@ export class TripRepository {
   async listTrips(params: {
     from?: Date;
     to?: Date;
-    status?: TripStatus;
+
+    statuses?: TripStatus[];
+
     paymentType?: PaymentType;
+
     limit: number;
+
     cursor?: { createdAt: Date; id: string };
 
-    // for DB-level search filtering
     tripId?: string;
+
     userIds?: string[];
+
     driverIds?: string[];
   }): Promise<{ trips: any[]; nextCursor: string | null }> {
     const {
       from,
       to,
-      status,
+      statuses,
       paymentType,
       limit,
       cursor,
@@ -345,7 +350,8 @@ export class TripRepository {
 
     const andConditions: any[] = [];
 
-    // Date range
+    /* ------------------------------ DATE FILTER ------------------------------ */
+
     if (from || to) {
       andConditions.push({
         createdAt: {
@@ -355,43 +361,80 @@ export class TripRepository {
       });
     }
 
-    // Cursor pagination condition
+    /* --------------------------- CURSOR PAGINATION --------------------------- */
+
     if (cursor) {
       andConditions.push({
         [Op.or]: [
           { createdAt: { [Op.lt]: cursor.createdAt } },
-          { createdAt: cursor.createdAt, id: { [Op.lt]: cursor.id } },
+          {
+            createdAt: cursor.createdAt,
+            id: { [Op.lt]: cursor.id },
+          },
         ],
       });
     }
 
-    // Direct trip lookup (UUID)
+    /* ----------------------------- TRIP ID FILTER ---------------------------- */
+
     if (tripId) {
       andConditions.push({ id: tripId });
     }
 
-    // Search by passenger/driver IDs (DB-level)
-    // If both provided, OR them together (match either passenger or driver)
+    /* --------------------------- USER/DRIVER FILTER -------------------------- */
+
     if ((userIds && userIds.length) || (driverIds && driverIds.length)) {
       const or: any[] = [];
-      if (userIds?.length) or.push({ userId: { [Op.in]: userIds } });
-      if (driverIds?.length) or.push({ driverId: { [Op.in]: driverIds } });
-      andConditions.push({ [Op.or]: or });
+
+      if (userIds?.length) {
+        or.push({
+          userId: {
+            [Op.in]: userIds,
+          },
+        });
+      }
+
+      if (driverIds?.length) {
+        or.push({
+          driverId: {
+            [Op.in]: driverIds,
+          },
+        });
+      }
+
+      andConditions.push({
+        [Op.or]: or,
+      });
     }
 
     const where: WhereOptions<Trip> = {
-      ...(status ? { status } : {}),
+      ...(statuses?.length
+        ? {
+            status: {
+              [Op.in]: statuses,
+            },
+          }
+        : {}),
+
       ...(paymentType ? { paymentType } : {}),
-      ...(andConditions.length ? { [Op.and]: andConditions } : {}),
+
+      ...(andConditions.length
+        ? {
+            [Op.and]: andConditions,
+          }
+        : {}),
     } as any;
 
     const rows = await this.tripModel.findAll({
       where,
+
       order: [
         ['createdAt', 'DESC'],
         ['id', 'DESC'],
       ],
+
       limit,
+
       attributes: [
         'id',
         'userId',
@@ -403,18 +446,26 @@ export class TripRepository {
         'pickupLocation',
         'dropoffLocation',
       ],
+
       raw: true,
     });
 
     const last = rows[rows.length - 1];
+
     const nextCursor =
       rows.length === limit && last
         ? Buffer.from(
-            JSON.stringify({ createdAt: last.createdAt, id: last.id }),
+            JSON.stringify({
+              createdAt: last.createdAt,
+              id: last.id,
+            }),
           ).toString('base64')
         : null;
 
-    return { trips: rows, nextCursor };
+    return {
+      trips: rows,
+      nextCursor,
+    };
   }
 
   async batchGetUsers(userIds: string[]) {

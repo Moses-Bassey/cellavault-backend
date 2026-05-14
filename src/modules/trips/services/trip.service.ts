@@ -13,6 +13,8 @@ import {
 } from '../dto/trip.dto';
 import { PaymentType } from 'src/enums/trip-payment-type.enum';
 import { TripStatus } from 'src/enums/ride-status.enum';
+import { TripFilterStatus } from 'src/enums/trip-filter-status.enum';
+import { TRIP_FILTER_STATUS_MAP } from '../constants/trip-status.constant';
 import { decodeCursor } from '../../../utils/cursor.util';
 import { User } from '../../users/entities/user.entity';
 import { Driver } from '../../drivers/entities/driver.entity';
@@ -110,7 +112,7 @@ export class TripService {
 
   async listTrips(params: {
     search?: string;
-    status?: TripStatus;
+    status?: TripFilterStatus;
     paymentType?: PaymentType;
     limit?: number;
     cursor?: string;
@@ -154,12 +156,17 @@ export class TripService {
       }
     }
 
+    // map frontend status to db statuses
+    const statuses = params.status
+      ? TRIP_FILTER_STATUS_MAP[params.status]
+      : undefined;
+    
     /* ---------- Fetch Trips (DB-level filtering) ---------- */
 
     const { trips, nextCursor } = await this.tripRepository.listTrips({
       from,
       to,
-      status: params.status,
+      statuses,
       paymentType: params.paymentType,
       limit,
       cursor,
