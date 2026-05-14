@@ -2,7 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Op, col, fn, literal, WhereOptions } from 'sequelize';
 import { Sequelize } from 'sequelize-typescript';
-import { Trip, TripStatus, PaymentType } from '../entities/trip.entity';
+import { Trip } from '../entities/trip.entity';
+import { PaymentType } from 'src/enums/trip-payment-type.enum';
+import { TripStatus } from 'src/enums/ride-status.enum';
 import { User } from '../../users/entities/user.entity';
 import { Driver } from '../../drivers/entities/driver.entity';
 import { RiderStats } from '../../../shared/interfaces/rider-stats.interface';
@@ -255,9 +257,12 @@ export class TripRepository {
     // Define “ongoing”
     // (tweak as you like)
     const ongoingStatuses = [
-      TripStatus.ACCEPTED,
-      TripStatus.ON_THE_WAY,
-      TripStatus.ARRIVED,
+      TripStatus.TRIP_BOOKED,
+      TripStatus.TRIP_ASSIGNED,
+      TripStatus.DRIVER_ACCEPTED,
+      TripStatus.DRIVER_ARRIVED,
+      TripStatus.TRIP_STARTED,
+      TripStatus.TRIP_RE_ASSIGN,
     ];
 
     // Define “scheduled”
@@ -436,14 +441,19 @@ export class TripRepository {
 
   async countOngoingTrips(): Promise<number> {
     const ongoingStatuses = [
-      TripStatus.ACCEPTED,
-      TripStatus.ON_THE_WAY,
-      TripStatus.ARRIVED,
+      TripStatus.TRIP_BOOKED,
+      TripStatus.TRIP_ASSIGNED,
+      TripStatus.DRIVER_ACCEPTED,
+      TripStatus.DRIVER_ARRIVED,
+      TripStatus.TRIP_STARTED,
+      TripStatus.TRIP_RE_ASSIGN,
     ];
 
     return await this.tripModel.count({
       where: {
-        status: { [Op.in]: ongoingStatuses },
+        status: {
+          [Op.in]: ongoingStatuses,
+        },
       },
     });
   }
@@ -509,12 +519,40 @@ export class TripRepository {
     for (const row of rows) {
       statsMap.set(row.userId, {
         totalRides: Number(row.totalRides),
-        lastRide: row.lastRide
-          ? new Date(row.lastRide)
-          : null,
+        lastRide: row.lastRide ? new Date(row.lastRide)  : null,
       });
     }
 
     return statsMap;
+  }
+
+  async sumPassengerSpend(
+    userId: string,
+    from?: Date,
+    to?: Date,
+  ): Promise<number> {
+    const where: WhereOptions = {
+      userId,
+
+      status: 'TRIP_COMPLETED',
+    };
+
+    if (from || to) {
+      where.completedAt = {};
+
+      if (from) {
+        where.completedAt[Op.gte] = from;
+      }
+
+      if (to) {
+        where.completedAt[Op.lte] = to;
+      }
+    }
+
+    const total = await this.tripModel.sum('finalFee', {
+      where,
+    });
+
+    return Number(total || 0);
   }
 }

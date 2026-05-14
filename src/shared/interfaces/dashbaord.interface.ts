@@ -1,5 +1,4 @@
 import { IsString } from 'class-validator';
-import { PAYMENT_TYPE } from 'src/enums/payment.enums';
 
 export interface IDashboard {
   userId: string;

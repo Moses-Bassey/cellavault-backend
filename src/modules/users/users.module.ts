@@ -5,12 +5,12 @@ import { UserController } from './controllers/user.controller';
 import { UserService } from './services/user.service';
 import { UserRepository } from './repositories/user.repository';
 import { TripsModule } from '../trips/trips.module';
-import { PaymentModule } from '../payment/payment.module';
+import { PeppcoinModule } from '../peppcoin/peppcoin.module';
 
 @Module({
-  imports: [SequelizeModule.forFeature([User]), TripsModule, PaymentModule],
+  imports: [SequelizeModule.forFeature([User]), TripsModule, PeppcoinModule],
   controllers: [UserController],
   providers: [UserService, UserRepository],
-  exports: [UserService, UserRepository],
+  exports: [SequelizeModule, UserService, UserRepository],
 })
 export class UsersModule {}

@@ -6,10 +6,10 @@ import {
 import { Driver } from '../entities/driver.entity';
 import { Vehicle } from '../entities/vehicle.entity';
 import { DriverRepository } from '../repositories/driver.repository';
-import { Trip, TripStatus } from '../../trips/entities/trip.entity';
+import { Trip } from '../../trips/entities/trip.entity';
+import { TripStatus } from 'src/enums/ride-status.enum';
 import { TripRepository } from '../../trips/repositories/trip.repository';
-import { PaymentRepository } from '../../payment/repositories/payment.repository';
-import { CoinRepository } from '../../payment/repositories/coin.repository';
+import { PeppcoinService } from '../../peppcoin/services/peppcoin.service';
 import {
   DriverAccountDto,
   DriverListRowDto,
@@ -31,8 +31,7 @@ export class DriverService {
   constructor(
     private readonly driverRepository: DriverRepository,
     private readonly rides: TripRepository,
-    private readonly payments: PaymentRepository,
-    private readonly coins: CoinRepository,
+    private readonly coinService: PeppcoinService,
   ) {}
 
   private toAccountDto(
@@ -170,8 +169,8 @@ export class DriverService {
         from,
         to,
       }),
-      this.payments.sumPassengerSpend(params.driverId, from, to),
-      this.coins.sumPassengerCoins(params.driverId, from, to),
+      this.rides.sumPassengerSpend(params.driverId, from, to),
+      this.coinService.getLedgerBalance(params.driverId),
     ]);
 
     return {

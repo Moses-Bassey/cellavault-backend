@@ -14,8 +14,8 @@ import { DriverRepository } from './repositories/driver.repository';
 import { CountriesModule } from '../countries/countries.module';
 import { Country } from '../countries/entities/country.entity';
 import { TokenModule } from 'src/services/token/token.module';
-import { PaymentModule } from '../payment/payment.module';
 import { TripsModule } from '../trips/trips.module';
+import { PeppcoinModule } from '../peppcoin/peppcoin.module';
 
 @Module({
   imports: [
@@ -33,10 +33,10 @@ import { TripsModule } from '../trips/trips.module';
     CountriesModule,
     TokenModule,
     TripsModule,
-    PaymentModule,
+    PeppcoinModule,
   ],
   controllers: [DriverController],
   providers: [DriverService, DriverRepository],
-  exports: [DriverService, DriverRepository],
+  exports: [SequelizeModule, DriverService, DriverRepository],
 })
 export class DriversModule {}

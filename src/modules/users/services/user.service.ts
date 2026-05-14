@@ -5,12 +5,13 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { User } from '../entities/user.entity';
-import { Trip, TripStatus } from '../../trips/entities/trip.entity';
+import { Trip } from '../../trips/entities/trip.entity';
+import { TripStatus } from 'src/enums/ride-status.enum';
 import { UserRepository } from '../repositories/user.repository';
 import { TripRepository } from '../../trips/repositories/trip.repository';
 import { TripService } from '../../trips/services/trip.service';
 import { PaymentRepository } from '../../payment/repositories/payment.repository';
-import { CoinRepository } from '../../payment/repositories/coin.repository';
+import { PeppcoinService } from '../../peppcoin/services/peppcoin.service';
 import {
   PassengerAccountDto,
   PassengerActivitySummaryDto,
@@ -24,15 +25,13 @@ import { UserStatusFilter } from '../../../enums/user-status.enum';
 import { decodeCursor } from '../../../utils/cursor.util';
 import { parseISODateOrUndefined } from '../../../utils/date.util';
 
-
 @Injectable()
 export class UserService {
   constructor(
     private readonly userRepository: UserRepository,
     private readonly rides: TripRepository,
     private readonly tripsService: TripService,
-    private readonly payments: PaymentRepository,
-    private readonly coins: CoinRepository,
+    private readonly coinService: PeppcoinService,
     private readonly configService: ConfigService,
   ) {}
 
@@ -234,8 +233,8 @@ export class UserService {
     // Run in parallel (low latency)
     const [rideSummary, totalSpend, totalCoins] = await Promise.all([
       this.rides.getUserRideSummary({ userId: params.passengerId, from, to }),
-      this.payments.sumPassengerSpend(params.passengerId, from, to),
-      this.coins.sumPassengerCoins(params.passengerId, from, to),
+      this.rides.sumPassengerSpend(params.passengerId, from, to),
+      this.coinService.getLedgerBalance(params.passengerId),
     ]);
 
     return {

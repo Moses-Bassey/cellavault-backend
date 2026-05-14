@@ -3,6 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { Trip } from '../entities/trip.entity';
 import { TripRepository } from '../repositories/trip.repository';
 import {
   CursorPageDto,
@@ -10,7 +11,8 @@ import {
   TripListRowDto,
   TripsSummaryDto,
 } from '../dto/trip.dto';
-import { PaymentType, TripStatus, Trip } from '../entities/trip.entity';
+import { PaymentType } from 'src/enums/trip-payment-type.enum';
+import { TripStatus } from 'src/enums/ride-status.enum';
 import { decodeCursor } from '../../../utils/cursor.util';
 import { User } from '../../users/entities/user.entity';
 import { Driver } from '../../drivers/entities/driver.entity';
@@ -256,7 +258,7 @@ export class TripService {
       dropoffLocation: trip.dropoffLocation ?? null,
 
       startTime: trip.startTime ? trip.startTime.toISOString() : null,
-      arrivalTime: trip.arrivalTime ? trip.arrivalTime.toISOString() : null,
+      arrivalTime: trip.driverArrivalTime ? trip.driverArrivalTime.toISOString() : null,
       endTime: trip.endTime ? trip.endTime.toISOString() : null,
 
       passenger: {

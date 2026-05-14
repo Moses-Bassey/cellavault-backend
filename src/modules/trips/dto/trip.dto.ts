@@ -1,6 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsOptional, IsEnum, IsNumber } from 'class-validator';
-import { PaymentType, TripStatus } from '../entities/trip.entity';
+import { PaymentType } from 'src/enums/trip-payment-type.enum';
+import { TripStatus } from 'src/enums/ride-status.enum';
 
 export class TripsSummaryDto {
   totalTrips: number;

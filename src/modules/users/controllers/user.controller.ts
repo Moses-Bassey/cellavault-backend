@@ -32,7 +32,7 @@ import { ResponseUtil } from 'src/utils/response.utils';
 // import { Validators } from 'src/utils/validators.utils';
 // import { DashboardDto, UpdateImageUrlDto } from '../dto/user.dto';
 import { UuidValidationPipe } from '../../../shared/pipes/uuid.validator.pipe';
-import { TripStatus } from '../../trips/entities/trip.entity';
+import { TripStatus } from 'src/enums/ride-status.enum';
 import { GetUsersQueryDto } from '../dto/user.dto';
 
 @ApiTags('Users')

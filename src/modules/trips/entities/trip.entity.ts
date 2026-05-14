@@ -13,24 +13,28 @@ import {
 } from 'sequelize-typescript';
 import { User } from '../../users/entities/user.entity';
 import { Driver } from '../../drivers/entities/driver.entity';
+import { PaymentType } from 'src/enums/trip-payment-type.enum';
+import { TripStatus } from 'src/enums/ride-status.enum';
+import { TripPaymentStatus } from 'src/enums/trip-payment-status.enum';
+import { PeppcruiseFees } from '../../fees/entities/peppcruise-fees.entity';
 
-export enum PaymentType {
-  PEPP_COIN = 'PEPP_COIN',
-  CASH = 'CASH',
-  PI_COIN = 'PI_COIN',
-  CARD = 'CARD',
-  WALLET = 'WALLET',
-}
+// export enum PaymentType {
+//   PEPP_COIN = 'PEPP_COIN',
+//   CASH = 'CASH',
+//   PI_COIN = 'PI_COIN',
+//   CARD = 'CARD',
+//   WALLET = 'WALLET',
+// }
 
-export enum TripStatus {
-  PENDING = 'PENDING',
-  ASSIGNED = 'ASSIGNED',
-  ACCEPTED = 'ACCEPTED',
-  COMPLETED = 'COMPLETED',
-  CANCELLED = 'CANCELLED',
-  ON_THE_WAY = 'ON_THE_WAY',
-  ARRIVED = 'ARRIVED',
-}
+// export enum TripStatus {
+//   PENDING = 'PENDING',
+//   ASSIGNED = 'ASSIGNED',
+//   ACCEPTED = 'ACCEPTED',
+//   COMPLETED = 'COMPLETED',
+//   CANCELLED = 'CANCELLED',
+//   ON_THE_WAY = 'ON_THE_WAY',
+//   ARRIVED = 'ARRIVED',
+// }
 
 @Table({
   tableName: 'trips',
@@ -60,6 +64,16 @@ export class Trip extends Model<Trip> {
   @BelongsTo(() => User)
   declare user: User;
 
+  @ForeignKey(() => PeppcruiseFees)
+  @AllowNull(false)
+  @Column({
+    type: DataType.UUID,
+  })
+  declare feeId: string;
+
+  @BelongsTo(() => PeppcruiseFees)
+  declare fee: PeppcruiseFees;
+
   @ForeignKey(() => Driver)
   @AllowNull(true)
   @Column({
@@ -70,11 +84,25 @@ export class Trip extends Model<Trip> {
   @BelongsTo(() => Driver)
   declare driver?: Driver;
 
+  /** Tax amount (money) for the trip, when applicable. */
+  @AllowNull(true)
+  @Column({
+    type: DataType.DECIMAL(10, 2),
+    allowNull: true,
+  })
+  declare tax?: number;
+
   @AllowNull(false)
   @Column({
     type: DataType.DECIMAL(10, 2),
   })
   declare estimatedFee: number;
+
+  @AllowNull(true)
+  @Column({
+    type: DataType.DECIMAL(10, 2),
+  })
+  declare finalFee: number;
 
   @AllowNull(true)
   @Column({
@@ -92,7 +120,8 @@ export class Trip extends Model<Trip> {
   @Column({
     type: DataType.DATE,
   })
-  declare arrivalTime?: Date;
+  declare driverArrivalTime?: Date;
+
 
   @Default(PaymentType.CASH)
   @AllowNull(true)
@@ -100,6 +129,7 @@ export class Trip extends Model<Trip> {
     type: DataType.ENUM(...Object.values(PaymentType)),
   })
   declare paymentType?: PaymentType;
+
 
   @Column({
     type: DataType.STRING(5000),
@@ -126,6 +156,43 @@ export class Trip extends Model<Trip> {
   declare dropoffLocation?: string;
 
   @Column({
+    type: DataType.STRING(1000),
+    allowNull: true,
+  })
+  declare stopLocation?: string;
+
+  @Column({
+    type: DataType.DECIMAL(9, 6),
+    allowNull: true,
+  })
+  declare stopLongitude?: string;
+
+  @Column({
+    type: DataType.DECIMAL(9, 6),
+    allowNull: true,
+  })
+  declare stopLatitude?: string;
+
+  @Column({
+    type: DataType.DATE,
+    allowNull: true,
+  })
+  declare stopCompletedTime?: Date;
+
+  @Column({
+    type: DataType.DECIMAL(9, 6),
+    allowNull: true,
+  })
+  declare distanceToPickup?: string;
+
+  @Column({
+    type: DataType.DECIMAL(9, 6),
+    allowNull: true,
+  })
+  declare distanceCovered?: string;
+
+
+  @Column({
     type: DataType.DECIMAL(9, 6),
     allowNull: true,
   })
@@ -149,7 +216,14 @@ export class Trip extends Model<Trip> {
   })
   declare dropoffLongitude?: number;
 
-  @Default(TripStatus.PENDING)
+  @Default(TripPaymentStatus.UNPAID)
+  @AllowNull(false)
+  @Column({
+    type: DataType.ENUM(...Object.values(TripPaymentStatus)),
+  })
+  declare paymentStatus: TripPaymentStatus;
+
+  @Default(TripStatus.TRIP_BOOKED)
   @AllowNull(false)
   @Column({
     type: DataType.ENUM(...Object.values(TripStatus)),
@@ -162,6 +236,18 @@ export class Trip extends Model<Trip> {
     type: DataType.DATE,
   })
   declare createdAt: Date;
+
+  @AllowNull(true)
+  @Column({
+    type: DataType.DATE,
+    allowNull: true,
+  })
+  declare cancelledAt?: Date;
+
+  @Column({
+    type: DataType.DATE,
+  })
+  declare completedAt?: Date;
 
   @UpdatedAt
   @Column({
@@ -177,7 +263,6 @@ export class Trip extends Model<Trip> {
   })
   declare deletedAt: Date | null;
 }
-
 
 // import {
 //   Table,
