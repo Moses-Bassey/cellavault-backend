@@ -1,4 +1,4 @@
-import { TripStatus } from '../../modules/trips/entities/trip.entity';
+import { TripStatus } from 'src/enums/ride-status.enum';
 
 export class PassengerAccountDto {
   id: string;

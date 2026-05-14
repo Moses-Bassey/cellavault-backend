@@ -26,7 +26,7 @@ import { Roles } from '../../auth/decorators/roles.decorator';
 import { UserType } from '../../../enums/user-type.enum';
 import { ResponseUtil } from 'src/utils/response.utils';
 import { UuidValidationPipe } from '../../../shared/pipes/uuid.validator.pipe';
-import { TripStatus } from '../../trips/entities/trip.entity';
+import { TripStatus } from 'src/enums/ride-status.enum';
 
 @ApiTags('Drivers')
 @ApiBearerAuth()

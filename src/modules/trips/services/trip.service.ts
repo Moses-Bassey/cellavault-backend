@@ -3,6 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { Trip } from '../entities/trip.entity';
 import { TripRepository } from '../repositories/trip.repository';
 import {
   CursorPageDto,
@@ -10,7 +11,10 @@ import {
   TripListRowDto,
   TripsSummaryDto,
 } from '../dto/trip.dto';
-import { PaymentType, TripStatus, Trip } from '../entities/trip.entity';
+import { PaymentType } from 'src/enums/trip-payment-type.enum';
+import { TripStatus } from 'src/enums/ride-status.enum';
+import { TripFilterStatus } from 'src/enums/trip-filter-status.enum';
+import { TRIP_FILTER_STATUS_MAP } from '../constants/trip-status.constant';
 import { decodeCursor } from '../../../utils/cursor.util';
 import { User } from '../../users/entities/user.entity';
 import { Driver } from '../../drivers/entities/driver.entity';
@@ -108,7 +112,7 @@ export class TripService {
 
   async listTrips(params: {
     search?: string;
-    status?: TripStatus;
+    status?: TripFilterStatus;
     paymentType?: PaymentType;
     limit?: number;
     cursor?: string;
@@ -152,12 +156,17 @@ export class TripService {
       }
     }
 
+    // map frontend status to db statuses
+    const statuses = params.status
+      ? TRIP_FILTER_STATUS_MAP[params.status]
+      : undefined;
+    
     /* ---------- Fetch Trips (DB-level filtering) ---------- */
 
     const { trips, nextCursor } = await this.tripRepository.listTrips({
       from,
       to,
-      status: params.status,
+      statuses,
       paymentType: params.paymentType,
       limit,
       cursor,
@@ -256,7 +265,7 @@ export class TripService {
       dropoffLocation: trip.dropoffLocation ?? null,
 
       startTime: trip.startTime ? trip.startTime.toISOString() : null,
-      arrivalTime: trip.arrivalTime ? trip.arrivalTime.toISOString() : null,
+      arrivalTime: trip.driverArrivalTime ? trip.driverArrivalTime.toISOString() : null,
       endTime: trip.endTime ? trip.endTime.toISOString() : null,
 
       passenger: {

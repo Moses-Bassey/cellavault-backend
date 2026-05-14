@@ -1,6 +1,8 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsOptional, IsEnum, IsNumber } from 'class-validator';
-import { PaymentType, TripStatus } from '../entities/trip.entity';
+import { PaymentType } from 'src/enums/trip-payment-type.enum';
+import { TripStatus } from 'src/enums/ride-status.enum';
+import { TripFilterStatus } from 'src/enums/trip-filter-status.enum';
 
 export class TripsSummaryDto {
   totalTrips: number;
@@ -87,8 +89,8 @@ export class GetTripsQueryDto {
 
   @ApiProperty({ description: 'Filter by active status', example: 'COMPLETED' })
   @IsOptional()
-  @IsEnum(TripStatus)
-  status?: TripStatus;
+  @IsEnum(TripFilterStatus)
+  status?: TripFilterStatus;
 
   @ApiProperty({ description: 'Filter by station type', example: 'CNG' })
   @IsOptional()
