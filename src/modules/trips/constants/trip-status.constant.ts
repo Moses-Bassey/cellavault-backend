@@ -1,7 +1,7 @@
 import { TripStatus } from 'src/enums/ride-status.enum';
 import { TripFilterStatus } from 'src/enums/trip-filter-status.enum';
 
-export const ACTIVE_TRIP_STATUSES = [
+export const ONGOING_TRIP_STATUSES = [
   TripStatus.TRIP_BOOKED,
   TripStatus.TRIP_ASSIGNED,
   TripStatus.DRIVER_ACCEPTED,
@@ -25,7 +25,7 @@ export const TRIP_FILTER_STATUS_MAP: Record<
   TripFilterStatus,
   TripStatus[]
 > = {
-  [TripFilterStatus.ACTIVE]: ACTIVE_TRIP_STATUSES,
+  [TripFilterStatus.ACTIVE]: ONGOING_TRIP_STATUSES,
 
   [TripFilterStatus.COMPLETED]: COMPLETED_TRIP_STATUSES,
 
