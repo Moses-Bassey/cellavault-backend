@@ -148,6 +148,8 @@ export class DriverService {
     const vehicle = vehicles.get(driver.id);
     if (!driver) throw new NotFoundException('Driver not found');
 
+    console.log('Driver: ', driver);
+    console.log('Vehicle : ', vehicle);
     return this.toAccountDto(driver, vehicle);
   }
 
