@@ -93,10 +93,11 @@ export class DriverRepository {
   }
 
   async findById(driverId: string) {
-    return this.driverModel.findByPk(driverId, {
+    const driver = await this.driverModel.findByPk(driverId, {
       attributes: { exclude: ['password'] },
-      raw: false,
     });
+
+    return driver?.toJSON() ?? null;
   }
 
   async updateById(driverId: string, patch: Partial<Driver>) {
