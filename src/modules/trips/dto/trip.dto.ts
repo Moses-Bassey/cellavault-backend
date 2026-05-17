@@ -3,6 +3,7 @@ import { IsOptional, IsEnum, IsNumber } from 'class-validator';
 import { PaymentType } from 'src/enums/trip-payment-type.enum';
 import { TripStatus } from 'src/enums/ride-status.enum';
 import { TripFilterStatus } from 'src/enums/trip-filter-status.enum';
+import { TripPaymentStatus } from 'src/enums/trip-payment-status.enum';
 
 export class TripsSummaryDto {
   totalTrips: number;
@@ -55,6 +56,7 @@ export class TripDetailsDto {
   id: string;
   status: TripStatus;
   paymentType?: PaymentType | null;
+  paymentStatus: TripPaymentStatus;
   estimatedFee: string;
   createdAt: string;
 
@@ -62,6 +64,8 @@ export class TripDetailsDto {
   dropoffAddress?: string | null;
   pickupLocation?: string | null;
   dropoffLocation?: string | null;
+  tripType?: string; // derived for now
+  distanceCovered?: number; // in km, 
 
   startTime?: string | null;
   arrivalTime?: string | null;

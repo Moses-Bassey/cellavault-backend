@@ -16,6 +16,7 @@ import { TripStatus } from 'src/enums/ride-status.enum';
 import { TripFilterStatus } from 'src/enums/trip-filter-status.enum';
 import { TRIP_FILTER_STATUS_MAP } from '../constants/trip-status.constant';
 import { decodeCursor } from '../../../utils/cursor.util';
+import { calculateTripDistanceKm } from '../../../utils/trip-distance.util';
 import { User } from '../../users/entities/user.entity';
 import { Driver } from '../../drivers/entities/driver.entity';
 import { RiderStats } from '../../../shared/interfaces/rider-stats.interface';
@@ -132,6 +133,7 @@ export class TripService {
 
     /* ---------- SEARCH STRATEGY ---------- */
 
+    
     if (search) {
       if (isUuid(search)) {
         // Direct trip lookup
@@ -160,7 +162,7 @@ export class TripService {
     const statuses = params.status
       ? TRIP_FILTER_STATUS_MAP[params.status]
       : undefined;
-    
+
     /* ---------- Fetch Trips (DB-level filtering) ---------- */
 
     const { trips, nextCursor } = await this.tripRepository.listTrips({
@@ -235,7 +237,6 @@ export class TripService {
 
   async getTripDetails(tripId: string): Promise<TripDetailsDto> {
     const trip = await this.tripRepository.findTripById(tripId);
-
     if (!trip) {
       throw new NotFoundException('Trip not found');
     }
@@ -251,11 +252,19 @@ export class TripService {
     const driver = drivers[0];
 
     const { feeStr } = feeToMinor((trip as any).estimatedFee);
+    const distanceCovered = calculateTripDistanceKm(
+      trip.pickupLatitude,
+      trip.pickupLongitude,
+      trip.dropoffLatitude,
+      trip.dropoffLongitude,
+    );
+    // console.log('Distance: ', distanceCovered);
 
     return {
       id: trip.id,
       status: trip.status,
       paymentType: trip.paymentType ?? null,
+      paymentStatus: trip.paymentStatus,
       estimatedFee: feeStr,
       createdAt: trip.createdAt.toISOString(),
 
@@ -263,6 +272,8 @@ export class TripService {
       dropoffAddress: trip.dropoffAddress ?? null,
       pickupLocation: trip.pickupLocation ?? null,
       dropoffLocation: trip.dropoffLocation ?? null,
+      tripType: deriveTripType(trip),
+      distanceCovered,
 
       startTime: trip.startTime ? trip.startTime.toISOString() : null,
       arrivalTime: trip.driverArrivalTime ? trip.driverArrivalTime.toISOString() : null,
