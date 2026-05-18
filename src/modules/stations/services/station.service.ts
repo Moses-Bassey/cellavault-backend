@@ -93,9 +93,7 @@ export class StationService {
     limit?: number;
     cursor?: string;
   }): Promise<
-    CursorPageDto<StationListRowDto> & {
-      total: number;
-    }
+    CursorPageDto<StationListRowDto>
   > {
     // max limit is now fixed at 10
     const limit = Math.min(
@@ -114,12 +112,13 @@ export class StationService {
 
     // default to CNG if ALL is not supported
     const source: StationSource =
-      !params.stationType ||
-      params.stationType === 'ALL'
+      !params.stationType || params.stationType === 'ALL'
         ? 'CNG'
         : params.stationType;
 
-    const batch = await this.stationRepository.fetchBatch({
+    console.log('Incoming params:', params);
+    console.log('Decoded cursor:', cursor);
+    const { data, nextCursor } = await this.stationRepository.fetchBatch({
       source,
       limit,
       search: params.search,
@@ -128,25 +127,25 @@ export class StationService {
       cursor,
     });
 
-    const page = batch.items;
+    // const page = batch.items;
 
-    const last = page[page.length - 1];
+    // const last = page[page.length - 1];
 
-    const nextCursor =
-      page.length === limit && last
-        ? encodeStationCursor({
-            updatedAt: new Date(
-              last.updatedAt,
-            ).toISOString(),
+    // const nextCursor =
+    //   page.length === limit && last
+    //     ? encodeStationCursor({
+    //         updatedAt: new Date(
+    //           last.updatedAt,
+    //         ).toISOString(),
 
-            id: last.id,
+    //         id: last.id,
 
-            source: last.__source,
-          })
-        : null;
+    //         source: last.__source,
+    //       })
+    //     : null;
 
     const items: StationListRowDto[] =
-      page.map((s: any) => ({
+      data.map((s: any) => ({
         id: s.id,
         source: s.__source,
         name: s.name,
@@ -169,7 +168,6 @@ export class StationService {
     return {
       items,
       nextCursor,
-      total: batch.total,
     };
   }
 

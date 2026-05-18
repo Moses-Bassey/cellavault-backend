@@ -138,10 +138,10 @@ export class UserRepository {
     status?: UserStatusFilter;
     limit: number;
     cursor?: { createdAt: Date; id: string };
-  }): Promise<{ users: User[]; nextCursor: string | null; total: number }> {
+  }): Promise<{ users: User[]; nextCursor: string | null }> {
     const { search, status, limit, cursor } = options;
 
-    // ── Base WHERE (applied to both the page query AND the total count) ──────
+    // ── Base WHERE ─────────────────────────────────────────────────────────────
     const baseConditions: WhereOptions[] = [];
 
     if (status) {
@@ -162,45 +162,67 @@ export class UserRepository {
       ? { [Op.and]: baseConditions }
       : {};
 
-    // ── Cursor condition (only applied to the page query, NOT the count) ─────
+    // ── Cursor WHERE ───────────────────────────────────────────────────────────
     const pageWhere: WhereOptions = cursor
       ? {
           [Op.and]: [
             baseWhere,
             {
               [Op.or]: [
-                { createdAt: { [Op.lt]: cursor.createdAt } },
-                { createdAt: cursor.createdAt, id: { [Op.lt]: cursor.id } },
+                {
+                  createdAt: {
+                    [Op.lt]: cursor.createdAt,
+                  },
+                },
+                {
+                  createdAt: cursor.createdAt,
+                  id: {
+                    [Op.lt]: cursor.id,
+                  },
+                },
               ],
             },
           ],
         }
       : baseWhere;
 
-    // ── Run page fetch and total count in parallel ────────────────────────────
-    const [rows, total] = await Promise.all([
-      this.userModel.findAll({
-        where: pageWhere,
-        attributes: LIST_ATTRIBUTES,
-        order: [
-          ['createdAt', 'DESC'],
-          ['id', 'DESC'],
-        ],
-        limit,
-      }),
-      this.userModel.count({ where: baseWhere }),
-    ]);
+    // ── Fetch one extra row to detect next page ───────────────────────────────
+    const rows = await this.userModel.findAll({
+      where: pageWhere,
 
-    const last = rows.at(-1);
+      attributes: LIST_ATTRIBUTES,
+
+      order: [
+        ['createdAt', 'DESC'],
+        ['id', 'DESC'],
+      ],
+
+      limit: limit + 1,
+    });
+
+    // ── Determine if next page exists ─────────────────────────────────────────
+    const hasNextPage = rows.length > limit;
+
+    // remove extra row
+    const pageRows = hasNextPage
+      ? rows.slice(0, limit)
+      : rows;
+
+    // ── Generate next cursor ──────────────────────────────────────────────────
+    const last = pageRows[pageRows.length - 1];
+
     const nextCursor =
-      rows.length === limit && last
+      hasNextPage && last
         ? encodeCursor({
             createdAt: last.createdAt,
             id: last.id,
           })
         : null;
 
-    return { users: rows, nextCursor, total };
+    return {
+      users: pageRows,
+      nextCursor,
+    };
   }
 
   async countAll(): Promise<User[] | null> {

@@ -815,4 +815,49 @@ export class TripRepository {
 
     return Number(total || 0);
   }
+
+  /**
+   * Returns trip counts bucketed by a MySQL date function for a given window.
+   * The `groupFn` parameter is one of 'HOUR', 'DAY', or 'DAYOFWEEK'.
+   *
+   * Performance: single GROUP BY query — no N+1, index on (deletedAt, createdAt).
+  */
+  async getTripCountByBucket(
+    start: Date,
+    end: Date,
+    groupFn: 'HOUR' | 'DAY' | 'DAYOFWEEK',
+  ): Promise<{ bucket: number; count: number }[]> {
+    const rows = (await this.tripModel.findAll({
+      attributes: [
+        [this.sequelize.fn(groupFn, this.sequelize.col('Trip.createdAt')), 'bucket'],
+        [this.sequelize.fn('COUNT', this.sequelize.col('Trip.id')), 'count'],
+      ],
+      where: {
+        createdAt: { [Op.between]: [start, end] },
+        deletedAt: null,
+      },
+      group: [this.sequelize.fn(groupFn, this.sequelize.col('Trip.createdAt'))],
+      order: [
+        [this.sequelize.fn(groupFn, this.sequelize.col('Trip.createdAt')), 'ASC'],
+      ],
+      raw: true,
+    })) as unknown as { bucket: string; count: string }[];
+
+    return rows.map((r) => ({
+      bucket: parseInt(r.bucket, 10),
+      count:  parseInt(r.count,  10),
+    }));
+  }
+
+  /**
+   * Scalar count for a date range — used to compute the trend percentage.
+   */
+  async countTripsInPeriod(start: Date, end: Date): Promise<number> {
+    return this.tripModel.count({
+      where: {
+        createdAt: { [Op.between]: [start, end] },
+        deletedAt: null,
+      },
+    });
+  }
 }

@@ -14,7 +14,7 @@ import { CngStation } from '../entities/cng-station.entity';
 import { CngFuelingStation } from '../entities/cng-fueling-station.entity';
 import { ChargingStation } from '../entities/charging-station.entity';
 import { StationSource } from '../dto/station.dto';
-import { StationCursor } from '../utils/station-cursor.util';
+import { StationCursor, encodeStationCursor, } from '../utils/station-cursor.util';
 
 type AnyStation = Record<string, any>;
 
@@ -105,8 +105,7 @@ export class StationRepository {
     badge?: string;
     cursor?: StationCursor;
   }): Promise<{
-    items: AnyStation[];
-    total: number;
+    data: AnyStation[];
     nextCursor: string | null;
   }> {
     const { source, limit, search, isActive, badge, cursor } = params;
@@ -143,12 +142,12 @@ export class StationRepository {
               {
                 [Op.or]: [
                   {
-                    updatedAt: {
-                      [Op.lt]: new Date(cursor.updatedAt),
+                    createdAt: {
+                      [Op.lt]: new Date(cursor.createdAt),
                     },
                   },
                   {
-                    updatedAt: new Date(cursor.updatedAt),
+                    createdAt: new Date(cursor.createdAt),
                     id: { [Op.lt]: cursor.id },
                   },
                 ],
@@ -158,15 +157,15 @@ export class StationRepository {
         : {}),
     } as any;
 
-    const { rows, count } = await model.findAndCountAll({
+    const rows = await model.findAll({
       where,
 
       order: [
-        ['updatedAt', 'DESC'],
+        ['createdAt', 'DESC'],
         ['id', 'DESC'],
       ],
 
-      limit,
+      limit: limit + 1,
 
       attributes: [
         'id',
@@ -176,31 +175,38 @@ export class StationRepository {
         'address',
         'isActive',
         'stationBadge',
+        'createdAt',
         'updatedAt',
       ],
 
       raw: true,
     });
 
-    const last = rows[rows.length - 1];
+    const hasMore = rows.length > limit;
+
+    const trimmedRows = hasMore
+      ? rows.slice(0, limit)
+      : rows;
+
+    const last =
+      trimmedRows[trimmedRows.length - 1];
 
     const nextCursor =
-      rows.length === limit && last
-        ? Buffer.from(
-            JSON.stringify({
-              updatedAt: last.updatedAt,
-              id: last.id,
-            }),
-          ).toString('base64')
+      hasMore && last
+        ? encodeStationCursor({
+            createdAt: new Date(
+              last.createdAt,
+            ).toISOString(),
+            id: last.id,
+            source,
+          })
         : null;
 
     return {
-      items: (rows as any[]).map((r) => ({
+      data: (trimmedRows as any[]).map((r) => ({
         ...r,
         __source: source,
       })),
-
-      total: count,
 
       nextCursor,
     };

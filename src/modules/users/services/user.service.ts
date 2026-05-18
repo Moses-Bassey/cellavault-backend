@@ -74,8 +74,8 @@ export class UserService {
     const cursor = decodeCursor(params.cursor);
     const search = params.search?.trim();
 
-    // ── 1. Paginated users + total count (2 queries in parallel) ─────────────
-    const { users, nextCursor, total } = await this.userRepository.findAll({
+    // ── 1. Paginated users ) ─────────────
+    const { users, nextCursor } = await this.userRepository.findAll({
       search,
       status: params.status,
       limit,
@@ -106,11 +106,9 @@ export class UserService {
       };
     });
 
-
     return {
       items,
       nextCursor,
-      total,
     };
   }
 
