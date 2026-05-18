@@ -90,7 +90,4 @@ export class UserListPageDto {
 
   @ApiPropertyOptional()
   nextCursor: string | null;
-
-  @ApiProperty()
-  total: number;
 }

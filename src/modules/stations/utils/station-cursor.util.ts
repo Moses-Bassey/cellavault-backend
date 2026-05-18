@@ -2,7 +2,7 @@ import { BadRequestException } from '@nestjs/common';
 import { StationSource } from '../dto/station.dto';
 
 export type StationCursor = {
-  updatedAt: string;
+  createdAt: string;
   id: string;
   source: StationSource;
 };
@@ -17,7 +17,11 @@ export function decodeStationCursor(
   if (!cursor) return undefined;
   try {
     const decoded = JSON.parse(Buffer.from(cursor, 'base64').toString('utf8'));
-    if (!decoded?.updatedAt || !decoded?.id || !decoded?.source) {
+    console.log(
+      Buffer.from(cursor, 'base64').toString(),
+    );
+    console.log('Decoded: ', decoded);
+    if (!decoded?.createdAt || !decoded?.id || !decoded?.source) {
       throw new Error('bad cursor');
     }
     return decoded as StationCursor;

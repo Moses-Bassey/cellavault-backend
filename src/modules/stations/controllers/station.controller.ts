@@ -113,65 +113,65 @@ export class StationController {
     );
   }
 
-  @Patch(':source/:id')
-  @ApiOperation({ summary: 'Update station details' })
-  @ApiResponse({
-    status: 200,
-    description: 'Stations details updated successfully',
-  })
-  @ApiResponse({ status: 404, description: 'Station not found' })
-  async update(
-    @Param('source') source: StationSource,
-    @Param('id', UuidValidationPipe) id: string,
-    @Body() body: any,
-  ) {
-    const data = await this.stationService.updateStation(source, id, body);
-    return ResponseUtil.handleResponse(
-      data,
-      "Station's details updated successfully",
-      HttpStatus.OK,
-    );
-  }
+  // @Patch(':source/:id')
+  // @ApiOperation({ summary: 'Update station details' })
+  // @ApiResponse({
+  //   status: 200,
+  //   description: 'Stations details updated successfully',
+  // })
+  // @ApiResponse({ status: 404, description: 'Station not found' })
+  // async update(
+  //   @Param('source') source: StationSource,
+  //   @Param('id', UuidValidationPipe) id: string,
+  //   @Body() body: any,
+  // ) {
+  //   const data = await this.stationService.updateStation(source, id, body);
+  //   return ResponseUtil.handleResponse(
+  //     data,
+  //     "Station's details updated successfully",
+  //     HttpStatus.OK,
+  //   );
+  // }
 
-  @Post(':source/:id/activate')
-  @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Activate station' })
-  @ApiResponse({
-    status: 200,
-    description: 'Stations activated successfully',
-  })
-  @ApiResponse({ status: 404, description: 'Station not found' })
-  @ApiResponse({ status: 400, description: 'Failed to activate station' })
-  async activate(
-    @Param('source') source: StationSource,
-    @Param('id', UuidValidationPipe) id: string,
-  ) {
-    const data = await this.stationService.setStationActive(source, id, true);
-    return ResponseUtil.handleResponse(
-      data,
-      'Station activated successfully',
-      HttpStatus.OK,
-    );
-  }
+  // @Post(':source/:id/activate')
+  // @HttpCode(HttpStatus.OK)
+  // @ApiOperation({ summary: 'Activate station' })
+  // @ApiResponse({
+  //   status: 200,
+  //   description: 'Stations activated successfully',
+  // })
+  // @ApiResponse({ status: 404, description: 'Station not found' })
+  // @ApiResponse({ status: 400, description: 'Failed to activate station' })
+  // async activate(
+  //   @Param('source') source: StationSource,
+  //   @Param('id', UuidValidationPipe) id: string,
+  // ) {
+  //   const data = await this.stationService.setStationActive(source, id, true);
+  //   return ResponseUtil.handleResponse(
+  //     data,
+  //     'Station activated successfully',
+  //     HttpStatus.OK,
+  //   );
+  // }
 
-  @Post(':source/:id/deactivate')
-  @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Deactivate station' })
-  @ApiResponse({
-    status: 200,
-    description: 'Stations deactivated successfully',
-  })
-  @ApiResponse({ status: 404, description: 'Station not found' })
-  @ApiResponse({ status: 400, description: 'Failed to deactivate station' })
-  async deactivate(
-    @Param('source') source: StationSource,
-    @Param('id', UuidValidationPipe) id: string,
-  ) {
-    const data = await this.stationService.setStationActive(source, id, false);
-    return ResponseUtil.handleResponse(
-      data,
-      'Station deactivated successfully',
-      HttpStatus.OK,
-    );
-  }
+  // @Post(':source/:id/deactivate')
+  // @HttpCode(HttpStatus.OK)
+  // @ApiOperation({ summary: 'Deactivate station' })
+  // @ApiResponse({
+  //   status: 200,
+  //   description: 'Stations deactivated successfully',
+  // })
+  // @ApiResponse({ status: 404, description: 'Station not found' })
+  // @ApiResponse({ status: 400, description: 'Failed to deactivate station' })
+  // async deactivate(
+  //   @Param('source') source: StationSource,
+  //   @Param('id', UuidValidationPipe) id: string,
+  // ) {
+  //   const data = await this.stationService.setStationActive(source, id, false);
+  //   return ResponseUtil.handleResponse(
+  //     data,
+  //     'Station deactivated successfully',
+  //     HttpStatus.OK,
+  //   );
+  // }
 }
