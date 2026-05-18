@@ -87,11 +87,12 @@ export class AuthService {
       | string
       | undefined;
 
+    if (!clientDeviceToken) {
+      throw new UnauthorizedException('OTP_REQUIRED');
+    }
     // console.log('clientDeviceToken:', clientDeviceToken);
 
-    if (clientDeviceToken) {
-      await this.validateClientDevice(admin, clientDeviceToken);
-    }
+    await this.validateClientDevice(admin, clientDeviceToken);
 
     // Generate JWT & response
     return this.createAuthPayload(admin, rememberMe);

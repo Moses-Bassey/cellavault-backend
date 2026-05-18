@@ -3,6 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import moment from 'moment';
 import { Trip } from '../entities/trip.entity';
 import { TripRepository } from '../repositories/trip.repository';
 import {
@@ -11,6 +12,7 @@ import {
   TripListRowDto,
   TripsSummaryDto,
 } from '../dto/trip.dto';
+import { TripAnalyticsPeriod } from '../../../enums/trip-analytics.enum';
 import { PaymentType } from 'src/enums/trip-payment-type.enum';
 import { TripStatus } from 'src/enums/ride-status.enum';
 import { TripFilterStatus } from 'src/enums/trip-filter-status.enum';
@@ -311,5 +313,108 @@ export class TripService {
     riderIds: string[],
   ): Promise<Map<string, RiderStats>> {
     return this.tripRepository.getStatsByRiderIds(riderIds);
+  }
+
+  // ====== For dashboard trip analytics ======== //
+  async getTripAnalytics(period: TripAnalyticsPeriod): Promise<{
+    totalTrips: number;
+    trend: number;
+    trendDirection: 'up' | 'down' | 'neutral';
+    dataPoints: { label: string; count: number }[];
+  }> {
+    const now = moment();
+
+    // ── Window boundaries & group function ────────────────────────────────────
+    let currentStart: Date;
+    let prevStart:    Date;
+    let prevEnd:      Date;
+    let groupFn:      'HOUR' | 'DAY' | 'DAYOFWEEK';
+
+    switch (period) {
+      case TripAnalyticsPeriod.WEEK:
+        currentStart = moment().startOf('isoWeek').toDate();
+        prevStart    = moment().subtract(1, 'week').startOf('isoWeek').toDate();
+        prevEnd      = moment().subtract(1, 'week').endOf('isoWeek').toDate();
+        groupFn      = 'DAYOFWEEK';
+        break;
+
+      case TripAnalyticsPeriod.MONTH:
+        currentStart = moment().startOf('month').toDate();
+        prevStart    = moment().subtract(1, 'month').startOf('month').toDate();
+        prevEnd      = moment().subtract(1, 'month').endOf('month').toDate();
+        groupFn      = 'DAY';
+        break;
+
+      default: // 'today'
+        currentStart = moment().startOf('day').toDate();
+        prevStart    = moment().subtract(1, 'day').startOf('day').toDate();
+        prevEnd      = moment().subtract(1, 'day').endOf('day').toDate();
+        groupFn      = 'HOUR';
+    }
+
+    // ── Parallel DB round-trip ────────────────────────────────────────────────
+    const [rawBuckets, prevTotal] = await Promise.all([
+      this.tripRepository.getTripCountByBucket(currentStart, now.toDate(), groupFn),
+      this.tripRepository.countTripsInPeriod(prevStart, prevEnd),
+    ]);
+
+    const currentTotal = rawBuckets.reduce((s, r) => s + r.count, 0);
+
+    // ── Trend ─────────────────────────────────────────────────────────────────
+    const trend =
+      prevTotal > 0
+        ? parseFloat(
+            (((currentTotal - prevTotal) / prevTotal) * 100).toFixed(1),
+          )
+        : 0;
+
+    const trendDirection =
+      trend > 0 ? 'up' : trend < 0 ? 'down' : 'neutral';
+
+    // ── Fill zero-padded buckets ──────────────────────────────────────────────
+    const dataPoints = this.fillBuckets(rawBuckets, period, now);
+
+    return { totalTrips: currentTotal, trend, trendDirection, dataPoints };
+  }
+
+  // ── Private helpers ──────────────────────────────────────────────────────────
+
+  private fillBuckets(
+    raw: { bucket: number; count: number }[],
+    period: TripAnalyticsPeriod,
+    now: moment.Moment,
+  ): { label: string; count: number }[] {
+    const find = (bucket: number) =>
+      raw.find((r) => r.bucket === bucket)?.count ?? 0;
+
+    switch (period) {
+      case TripAnalyticsPeriod.WEEK: {
+        // MySQL DAYOFWEEK: 1 = Sun … 7 = Sat; display Mon → Sun
+        const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+        return days.map((label, i) => {
+          const mysqlDow = i === 6 ? 1 : i + 2; // Mon→2, …, Sat→7, Sun→1
+          return { label, count: find(mysqlDow) };
+        });
+      }
+
+      case TripAnalyticsPeriod.MONTH: {
+        const days = now.daysInMonth();
+        return Array.from({ length: days }, (_, i) => ({
+          label: `${i + 1}`,
+          count: find(i + 1), // MySQL DAY() is 1-indexed
+        }));
+      }
+
+      default: { // today → 24 hourly buckets
+        return Array.from({ length: 24 }, (_, h) => {
+          const label =
+            h === 0  ? '12 AM' :
+            h < 12   ? `${h} AM` :
+            h === 12 ? '12 PM' :
+                      `${h - 12} PM`;
+          return { label, count: find(h) };
+        });
+      }
+    }
   }
 }
