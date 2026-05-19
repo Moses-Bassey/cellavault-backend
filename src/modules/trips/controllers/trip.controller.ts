@@ -76,6 +76,19 @@ export class TripController {
     );
   }
 
+  @Get('analytics')
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(AuthGuard)
+  @Roles(UserType.PEPP_ADMIN, UserType.SUPER_ADMIN, UserType.PEPP_MANAGER)
+  async getTripAnalytics(@Query() dto: GetTripAnalyticsDto) {
+    const data = await this.tripService.getTripAnalytics(dto.period);
+    return ResponseUtil.handleResponse(
+      data,
+      'Trip analytics retrieved successfully',
+      HttpStatus.OK,
+    );
+  }
+
   @Get(':tripId')
   @ApiOperation({ summary: 'Get trip by id' })
   @ApiResponse({
@@ -88,19 +101,6 @@ export class TripController {
     return ResponseUtil.handleResponse(
       data,
       'Trip details retrieved successfully',
-      HttpStatus.OK,
-    );
-  }
-
-  @Get('analytics')
-  @HttpCode(HttpStatus.OK)
-  @UseGuards(AuthGuard)
-  @Roles(UserType.PEPP_ADMIN, UserType.SUPER_ADMIN, UserType.PEPP_MANAGER)
-  async getTripAnalytics(@Query() dto: GetTripAnalyticsDto) {
-    const data = await this.tripService.getTripAnalytics(dto.period);
-    return ResponseUtil.handleResponse(
-      data,
-      'Trip analytics retrieved successfully',
       HttpStatus.OK,
     );
   }

@@ -843,6 +843,7 @@ export class TripRepository {
       raw: true,
     })) as unknown as { bucket: string; count: string }[];
 
+    // console.log('Rows: ', rows);
     return rows.map((r) => ({
       bucket: parseInt(r.bucket, 10),
       count:  parseInt(r.count,  10),
