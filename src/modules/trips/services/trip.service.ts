@@ -331,25 +331,32 @@ export class TripService {
     let groupFn:      'HOUR' | 'DAY' | 'DAYOFWEEK';
 
     switch (period) {
+      case TripAnalyticsPeriod.YESTERDAY:
+        currentStart = moment().subtract(1, 'day').startOf('day').toDate();
+        prevStart = moment().subtract(2, 'day').startOf('day').toDate();
+        prevEnd = moment().subtract(2, 'day').endOf('day').toDate();
+        groupFn = 'HOUR';
+        break;
+
       case TripAnalyticsPeriod.WEEK:
         currentStart = moment().startOf('isoWeek').toDate();
-        prevStart    = moment().subtract(1, 'week').startOf('isoWeek').toDate();
-        prevEnd      = moment().subtract(1, 'week').endOf('isoWeek').toDate();
-        groupFn      = 'DAYOFWEEK';
+        prevStart = moment().subtract(1, 'week').startOf('isoWeek').toDate();
+        prevEnd = moment().subtract(1, 'week').endOf('isoWeek').toDate();
+        groupFn = 'DAYOFWEEK';
         break;
 
       case TripAnalyticsPeriod.MONTH:
         currentStart = moment().startOf('month').toDate();
-        prevStart    = moment().subtract(1, 'month').startOf('month').toDate();
-        prevEnd      = moment().subtract(1, 'month').endOf('month').toDate();
-        groupFn      = 'DAY';
+        prevStart = moment().subtract(1, 'month').startOf('month').toDate();
+        prevEnd = moment().subtract(1, 'month').endOf('month').toDate();
+        groupFn = 'DAY';
         break;
 
       default: // 'today'
         currentStart = moment().startOf('day').toDate();
-        prevStart    = moment().subtract(1, 'day').startOf('day').toDate();
-        prevEnd      = moment().subtract(1, 'day').endOf('day').toDate();
-        groupFn      = 'HOUR';
+        prevStart = moment().subtract(1, 'day').startOf('day').toDate();
+        prevEnd = moment().subtract(1, 'day').endOf('day').toDate();
+        groupFn = 'HOUR';
     }
 
     // ── Parallel DB round-trip ────────────────────────────────────────────────
@@ -357,6 +364,7 @@ export class TripService {
       this.tripRepository.getTripCountByBucket(currentStart, now.toDate(), groupFn),
       this.tripRepository.countTripsInPeriod(prevStart, prevEnd),
     ]);
+    // console.log('Query: ', rawBuckets, '\nqu: ', prevTotal);
 
     const currentTotal = rawBuckets.reduce((s, r) => s + r.count, 0);
 
