@@ -11,6 +11,7 @@ import {
   PasswordChangedEmailEvent,
   NewLoginEmailEvent,
   NewDeviceLoginOtpEmailEvent,
+  AdminInviteEmailEvent,
 } from '../events/email.events';
 
 @Injectable()
@@ -194,6 +195,35 @@ export class EmailEventListener {
     } catch (error) {
       this.logger.error(
         `Failed to send new login email to ${event.email}:`,
+        error,
+      );
+    }
+  }
+
+  @OnEvent('email.new-admin-invite')
+  async handleNewAdminInviteEvent(event: AdminInviteEmailEvent) {
+    try {
+      this.logger.log(`Sending new admin invitation email to ${event.email}`);
+
+      const firstName = event.fullName.trim().split(' ')[0];
+      await this.mailerService.sendMail({
+        to: event.email,
+        subject: MAIL_SUBJECT.NEW_ADMIN_INVITE,
+        template: 'admin-invitation',
+        context: {
+          firstName,
+          email: event.email,
+          inviteUrl: event.inviteUrl,
+          role: event.role,
+        },
+      });
+
+      this.logger.log(
+        `New admin invitation email sent successfully to ${event.email}`,
+      );
+    } catch (error) {
+      this.logger.error(
+        `Failed to send new admin invitation  email to ${event.email}:`,
         error,
       );
     }

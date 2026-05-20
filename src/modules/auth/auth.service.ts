@@ -7,6 +7,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import moment from 'moment';
+import { ConfigService } from '@nestjs/config';
 import { JwtSignOptions } from '@nestjs/jwt';
 import { TokenService } from 'src/services/token/token.service';
 import { TokenSubject } from 'src/enums/token.enum';
@@ -19,9 +20,11 @@ import { IAdminLoginData } from '../../shared/interfaces/auth.interface';
 import { UserType } from '../../enums/user-type.enum';
 import { EmailEventService } from 'src/services/mail/email-event.service';
 import { PasswordUtil } from '../../utils/password.util';
-import { CreateAdminDto, AdminLoginDto, LoginOtpDto } from './dto/auth.dto';
+import { Utils } from 'src/utils/utils';
+import { CreateAdminDto, InviteAdminDto, AdminLoginDto, LoginOtpDto, CompleteAdminOnboardingDto } from './dto/auth.dto';
 import { Validators } from '../../utils/validators.utils';
 import { JwtAuthPayload } from './auth.interface';
+import { InvitationStatus } from '../../enums/invite-status.enum';
 
 @Injectable()
 export class AuthService {
@@ -32,6 +35,7 @@ export class AuthService {
     private readonly emailEventService: EmailEventService,
     private readonly tokenService: TokenService,
     private readonly clientDeviceEventEmitter: ClientDeviceEventEmitter,
+    private readonly configService: ConfigService,
   ) {}
 
   // async create(data: CreateAdminDto): Promise<Admin> {
@@ -52,6 +56,95 @@ export class AuthService {
   //   });
   //   return admin;
   // }
+  async inviteAdmin(inviterId: string, dto: InviteAdminDto) {
+    const { fullName, email, phoneNo, role } = dto;
+
+    const phone = this.normalizePhone(phoneNo);
+
+    const [existingAdmin, adminUser] = await Promise.all([
+      this.checkEmailExist(email),
+      this.adminRepository.findById(inviterId),
+    ]);
+
+    if (!adminUser) throw new NotFoundException('Admin not found');
+
+    if (existingAdmin) {
+      throw new ConflictException('Admin already exists');
+    }
+
+    const existingInvite = await this.adminRepository.findPendingByEmail(email);
+
+    if (existingInvite) {
+      throw new ConflictException('Pending invitation already exists');
+    }
+
+    const invitation = await this.adminRepository.create({
+      fullName,
+      email: Validators.validateEmail(email),
+      phoneNo: phone,
+      role,
+      inviteStatus: InvitationStatus.PENDING,
+    });
+
+    const token = await this.tokenService.generateInviteToken({
+      email: invitation.email,
+      phoneNo: invitation.phoneNo,
+      expiry: moment().add(3, 'days').toDate(),
+      subject: TokenSubject.ADMIN_INVITE,
+      inviteeId: invitation.id,
+    });
+
+    const inviteUrl =
+      `${this.configService.get<string>('app.adminWebUrl')}` +
+      `/onboarding/admin/accept?token=${token.token}`;
+
+    await this.emailEventService.sendAdminInviteEmail({
+      email,
+      fullName,
+      inviteUrl,
+      role,
+    });
+
+    return {
+      dto,
+    };
+  }
+
+  async completeAdminOnboarding(
+    dto: CompleteAdminOnboardingDto,
+  ) {
+    const payload = await this.tokenService.verifyInviteToken({
+      token: dto.token,
+      subject: TokenSubject.ADMIN_INVITE,
+    });
+    console.log('Payload service: ', payload);
+
+    if (payload.type !== TokenSubject.ADMIN_INVITE) {
+      throw new UnauthorizedException();
+    }
+
+    const invitation = await this.adminRepository.findById(
+      payload.inviteeId,
+    );
+
+    if (!invitation) {
+      throw new NotFoundException(
+        'Invitation not found',
+      );
+    }
+
+    if (invitation.inviteStatus !== InvitationStatus.PENDING) {
+      throw new BadRequestException(
+        'Invitation already used',
+      );
+    }
+
+    const passwordHash = await PasswordUtil.hashPassword(dto.password);
+
+    await this.adminRepository.markAccepted(invitation.id, passwordHash);
+
+    return 'Account setup complete. Please login.';
+  }
 
   async login(
     data: AdminLoginDto,
@@ -71,6 +164,7 @@ export class AuthService {
         'Account creation request not approved, please contact support team.',
       );
     }
+    if (!admin.password) throw new BadRequestException('Password not set, complete account verification');
 
     // Verify password
     const isPasswordValid = await PasswordUtil.verifyPassword(
@@ -103,6 +197,7 @@ export class AuthService {
 
     const admin = await this.checkEmailExist(email);
     if (!admin) throw new NotFoundException('Account not found');
+    if (!admin.password) throw new BadRequestException('Password not set, complete account verification');
 
     // const verifyOtp = await this.tokenService.verifyOTP({
     //   email: admin.email,
@@ -271,4 +366,20 @@ export class AuthService {
       ? remoteAddress.replace('::ffff:', '')
       : remoteAddress ?? undefined;
   }
+
+  private normalizePhone(phone: string): string {
+    const cleaned = phone.trim();
+    
+    if (cleaned.startsWith('+234')) {
+        return cleaned.slice(1);
+    }
+    
+    if (cleaned.startsWith('0')) {
+        return '234' + cleaned.slice(1);
+    }
+    
+    console.log('Phone: ', cleaned);
+    return cleaned;
+  }
+
 }

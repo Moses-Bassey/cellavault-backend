@@ -11,6 +11,34 @@ export class AdminRepository {
     private readonly adminModel: typeof Admin,
   ) {}
 
+  async create(data: Partial<Admin>) {
+    return this.adminModel.create(data as any);
+  }
+
+  async markAccepted(id: string, password: string) {
+    await this.adminModel.update(
+      {
+        password,
+        isVerified: true,
+        isActive: true,
+        inviteStatus: InvitationStatus.ACTIVE,
+        invitedAcceptedAt: new Date(),
+      },
+      {
+        where: { id },
+      },
+    );
+  }
+
+  async findPendingByEmail(email: string) {
+    return this.adminModel.findOne({
+      where: {
+        email,
+        inviteStatus: InvitationStatus.PENDING,
+      },
+    });
+  }
+
   async findById(id: string): Promise<Admin | null> {
     try {
       return await this.adminModel.findByPk(id);

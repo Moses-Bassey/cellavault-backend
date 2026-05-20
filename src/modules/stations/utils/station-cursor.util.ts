@@ -17,10 +17,10 @@ export function decodeStationCursor(
   if (!cursor) return undefined;
   try {
     const decoded = JSON.parse(Buffer.from(cursor, 'base64').toString('utf8'));
-    console.log(
-      Buffer.from(cursor, 'base64').toString(),
-    );
-    console.log('Decoded: ', decoded);
+    // console.log(
+    //   Buffer.from(cursor, 'base64').toString(),
+    // );
+    // console.log('Decoded: ', decoded);
     if (!decoded?.createdAt || !decoded?.id || !decoded?.source) {
       throw new Error('bad cursor');
     }

@@ -116,8 +116,8 @@ export class StationService {
         ? 'CNG'
         : params.stationType;
 
-    console.log('Incoming params:', params);
-    console.log('Decoded cursor:', cursor);
+    // console.log('Incoming params:', params);
+    // console.log('Decoded cursor:', cursor);
     const { data, nextCursor } = await this.stationRepository.fetchBatch({
       source,
       limit,

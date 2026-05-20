@@ -135,7 +135,6 @@ export class TripService {
 
     /* ---------- SEARCH STRATEGY ---------- */
 
-    
     if (search) {
       if (isUuid(search)) {
         // Direct trip lookup

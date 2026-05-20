@@ -9,7 +9,7 @@ import {
   MaxLength,
   IsObject,
 } from 'class-validator';
-import { AdminType } from '../../../enums/user-type.enum';
+import { UserType } from '../../../enums/user-type.enum';
 export class CreateAdminDto {
   @ApiProperty({
     description: "Admin's fullname",
@@ -24,6 +24,27 @@ export class CreateAdminDto {
 
   @ApiProperty({ description: "Admin's password", example: '32rvn39nved' })
   @IsString()
+  password: string;
+}
+
+export class InviteAdminDto {
+  @IsString()
+  fullName: string;
+
+  @IsEmail()
+  email: string;
+
+  @IsString()
+  phoneNo: string;
+
+  @IsEnum(UserType)
+  role: UserType;
+}
+export class CompleteAdminOnboardingDto {
+  @IsString()
+  token: string;
+
+  @MinLength(8)
   password: string;
 }
 

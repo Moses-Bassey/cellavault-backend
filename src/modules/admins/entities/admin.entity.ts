@@ -47,8 +47,11 @@ export class Admin extends Model<Admin> {
   @Column(DataType.STRING(300))
   declare phoneNo: string;
 
-  @Column(DataType.STRING(1000))
-  declare password: string;
+  @Column({
+    type: DataType.STRING(1000),
+    allowNull: true,
+  })
+  declare password: string | null;
 
   @Column({
     type: DataType.ENUM,

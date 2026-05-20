@@ -62,6 +62,17 @@ export class TokenRepository {
     });
   }
 
+  async findByEmailAndSubject(
+    email: string,
+    subject: TokenSubject,
+  ): Promise<Token | null> {
+    return await this.tokenModel.findOne({
+      where: { email, subject },
+      attributes: ['id', 'expiry', 'email', 'phoneNo', 'token'],
+      raw: true,
+    });
+  }
+
   async findByPhoneToken(
     token: string,
     phoneNo: string,
