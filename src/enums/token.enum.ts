@@ -2,6 +2,7 @@ export enum TokenType {
   OTP = 'OTP',
   JWT = 'JWT',
   REFRESH = 'REFRESH',
+  INVITATION = 'INVITATION',
 }
 
 export enum TokenSubject {
@@ -10,4 +11,5 @@ export enum TokenSubject {
   SIGN_UP_EMAIL = 'SIGN_UP_EMAIL',
   NEW_DEVICE_LOGIN_OTP = 'NEW_DEVICE_LOGIN_OTP',
   RESET_PASSCODE = 'RESET_PASSCODE',
+  ADMIN_INVITE = 'ADMIN_INVITE',
 }

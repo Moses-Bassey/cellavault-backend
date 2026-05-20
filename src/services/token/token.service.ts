@@ -13,6 +13,7 @@ import * as randomstring from 'randomstring';
 import { IOTPInterface } from './interface/IOTP.interface';
 import { TokenSubject, TokenType } from 'src/enums/token.enum';
 import { Token } from './entities/token.entity';
+import { PasswordUtil } from '../../utils/password.util';
 
 @Injectable()
 export class TokenService {
@@ -166,6 +167,93 @@ export class TokenService {
       ...created,
       token: token, // Include the actual token for SMS/Email
     };
+  }
+
+  async generateInviteToken(
+    payload: CreateTokenDto,
+  ): Promise<ITokenInterface & { token: string }> {
+    const token = await this.jwtService.signAsync(
+      {
+        inviteeId: payload.inviteeId,
+        email: payload.email,
+        type: TokenSubject.ADMIN_INVITE,
+      },
+      {
+        expiresIn: '3d',
+      },
+    );
+    console.log('Token: ', token);
+
+    const hashedToken = await PasswordUtil.hashPassword(token);
+
+    console.log('Hashed Token: ', hashedToken);
+
+    const created = await this.tokenRepository.create({
+      ...payload,
+      token: hashedToken,
+      tokenType: TokenType.JWT,
+    });
+
+    // Return with the actual token for SMS/Email sending
+    return {
+      ...created,
+      token: token, // Include the actual token for SMS/Email
+    };
+  }
+
+  public async verifyInviteToken(input: IOTPInterface) {
+    const {
+      token,
+      subject = TokenSubject.ADMIN_INVITE,
+    } = input;
+
+    // Verify JWT first
+    const payload = await this.verifyJWTtoken(token);
+
+    // Fetch stored hashed token
+    const adminToken =
+      await this.tokenRepository.findByEmailAndSubject(
+        payload.email,
+        subject,
+      );
+
+    if (!adminToken) {
+      throw new BadRequestException(
+        'Invalid invitation token',
+      );
+    }
+
+    // Check expiry
+    const isExpired = isAfter(
+      new Date(),
+      adminToken.expiry,
+    );
+
+    if (isExpired) {
+      await this.deleteOTPtoken(adminToken.id);
+
+      throw new BadRequestException(
+        'Invitation token expired',
+      );
+    }
+
+    // Verify raw JWT against stored hash
+    const isValid =
+      await PasswordUtil.verifyPassword(
+        token,
+        adminToken.token,
+      );
+
+    if (!isValid) {
+      throw new BadRequestException(
+        'Invalid invitation token',
+      );
+    }
+
+    // Optional: single-use token
+    await this.deleteOTPtoken(adminToken.id);
+
+    return payload;
   }
 
   async generateJWTtoken<T extends object>(

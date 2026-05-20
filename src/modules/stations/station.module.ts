@@ -17,6 +17,7 @@ import { StationController } from './controllers/station.controller';
     ]),
   ],
   providers: [StationRepository, StationService],
+  exports: [StationRepository],
   controllers: [StationController],
 })
 export class StationsModule {}

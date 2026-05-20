@@ -9,6 +9,7 @@ import {
   PasswordChangedEmailEvent,
   NewLoginEmailEvent,
   NewDeviceLoginOtpEmailEvent,
+  AdminInviteEmailEvent,
 } from './events/email.events';
 
 @Injectable()
@@ -91,5 +92,16 @@ export class EmailEventService {
   async emitNewDeviceLoginOtpEmail(email: string, otpCode: string) {
     const event = new NewDeviceLoginOtpEmailEvent(email, otpCode);
     this.eventEmitter.emit('email.new-device-login-otp', event);
+  }
+
+  async sendAdminInviteEmail(payload: {
+    email: string,
+    fullName: string,
+    inviteUrl: string,
+    role: string,
+  }) {
+    const { email, fullName, inviteUrl, role } = payload;
+    const event = new AdminInviteEmailEvent(email, fullName, inviteUrl, role);
+    this.eventEmitter.emit('email.new-admin-invite', event);
   }
 }

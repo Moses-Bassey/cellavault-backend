@@ -15,6 +15,7 @@ import { ClientDevicesModule } from './modules/client-devices/client-devices.mod
 import { AdminModule } from './modules/admins/admins.module';
 import { TripsModule } from './modules/trips/trips.module';
 import { StationsModule } from './modules/stations/station.module';
+// import { SearchModule } from './modules/search/search.module';
 import { PeppcoinModule } from './modules/peppcoin/peppcoin.module';
 import { FeesModule } from './modules/fees/fees.module';
 import { TokenModule } from './services/token/token.module';
@@ -89,6 +90,7 @@ import { Token } from './services/token/entities';
     AdminModule,
     TripsModule,
     StationsModule,
+    // SearchModule,
     PeppcoinModule,
     FeesModule,
     TokenModule,

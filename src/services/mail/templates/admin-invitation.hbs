@@ -1,0 +1,340 @@
+<html lang='en'>
+  <head>
+    <meta charset='UTF-8' />
+    <meta name='viewport' content='width=device-width, initial-scale=1.0' />
+    <title>Admin Invitation - PeppCruise</title>
+
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        padding: 24px 16px;
+        background-color: #f4f7fb;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: #1f2937;
+      }
+
+      .wrapper {
+        width: 100%;
+        background-color: #f4f7fb;
+      }
+
+      .container {
+        max-width: 620px;
+        margin: 0 auto;
+        background: #ffffff;
+        border-radius: 18px;
+        overflow: hidden;
+        box-shadow: 0 10px 35px rgba(15, 23, 42, 0.08);
+      }
+
+      .header {
+        background: linear-gradient(135deg, #5f3df4 0%, #7c4dff 100%);
+        padding: 40px 32px;
+        text-align: center;
+      }
+
+      .brand {
+        font-size: 14px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.8);
+        margin-bottom: 12px;
+        font-weight: 600;
+      }
+
+      .header h1 {
+        margin: 0;
+        color: #ffffff;
+        font-size: 30px;
+        font-weight: 700;
+        line-height: 1.2;
+      }
+
+      .header p {
+        margin: 14px 0 0;
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 15px;
+        line-height: 1.6;
+      }
+
+      .content {
+        padding: 40px 32px;
+      }
+
+      .greeting {
+        font-size: 20px;
+        font-weight: 600;
+        color: #111827;
+        margin-top: 0;
+        margin-bottom: 18px;
+      }
+
+      .content p {
+        font-size: 15px;
+        line-height: 1.8;
+        color: #4b5563;
+        margin: 16px 0;
+      }
+
+      .invite-card {
+        margin: 30px 0;
+        padding: 28px;
+        border-radius: 16px;
+        background: linear-gradient(
+          180deg,
+          rgba(95, 61, 244, 0.05) 0%,
+          rgba(95, 61, 244, 0.02) 100%
+        );
+        border: 1px solid rgba(95, 61, 244, 0.12);
+      }
+
+      .invite-card-label {
+        margin: 0 0 18px;
+        color: #5f3df4;
+        font-size: 14px;
+        font-weight: 700;
+        letter-spacing: 0.3px;
+        text-transform: uppercase;
+      }
+
+      .detail-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 12px 0;
+        border-bottom: 1px solid #e5e7eb;
+      }
+
+      .detail-row:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+      }
+
+      .detail-label {
+        color: #6b7280;
+        font-size: 14px;
+        font-weight: 600;
+      }
+
+      .detail-value {
+        color: #111827;
+        font-size: 14px;
+        font-weight: 600;
+        text-align: right;
+      }
+
+      .button-wrapper {
+        text-align: center;
+        margin: 36px 0 24px;
+      }
+
+      .button {
+        display: inline-block;
+        background: linear-gradient(135deg, #5f3df4 0%, #7c4dff 100%);
+        color: #ffffff !important;
+        text-decoration: none;
+        padding: 15px 28px;
+        border-radius: 12px;
+        font-size: 15px;
+        font-weight: 700;
+        box-shadow: 0 10px 24px rgba(95, 61, 244, 0.28);
+      }
+
+      .fallback-link {
+        margin-top: 22px;
+        padding: 16px;
+        border-radius: 12px;
+        background-color: #f9fafb;
+        border: 1px dashed #d1d5db;
+        word-break: break-word;
+      }
+
+      .fallback-link p {
+        margin: 0 0 8px;
+        font-size: 13px;
+        color: #6b7280;
+      }
+
+      .fallback-link a {
+        color: #5f3df4;
+        text-decoration: none;
+        font-size: 13px;
+      }
+
+      .notice {
+        margin-top: 28px;
+        padding: 18px 20px;
+        border-left: 4px solid #f59e0b;
+        background-color: #fffbeb;
+        border-radius: 10px;
+      }
+
+      .notice p {
+        margin: 0;
+        color: #92400e;
+        font-size: 14px;
+        line-height: 1.7;
+      }
+
+      .footer {
+        padding: 28px 32px 36px;
+        text-align: center;
+        border-top: 1px solid #edf2f7;
+        background-color: #fafbff;
+      }
+
+      .footer p {
+        margin: 6px 0;
+        font-size: 13px;
+        color: #6b7280;
+      }
+
+      .footer .team {
+        color: #5f3df4;
+        font-weight: 700;
+      }
+
+      @media screen and (max-width: 640px) {
+        body {
+          padding: 12px;
+        }
+
+        .header {
+          padding: 32px 22px;
+        }
+
+        .content {
+          padding: 30px 22px;
+        }
+
+        .footer {
+          padding: 24px 22px 30px;
+        }
+
+        .header h1 {
+          font-size: 24px;
+        }
+
+        .greeting {
+          font-size: 18px;
+        }
+
+        .invite-card {
+          padding: 22px 18px;
+        }
+
+        .detail-row {
+          flex-direction: column;
+          gap: 6px;
+        }
+
+        .detail-value {
+          text-align: left;
+        }
+
+        .button {
+          width: 100%;
+          padding: 16px 20px;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class='wrapper'>
+      <div class='container'>
+        <div class='header'>
+          <div class='brand'>PeppCruise Admin Portal</div>
+
+          <h1>Admin Invitation</h1>
+
+          <p>
+            You’ve been invited to join the PeppCruise administrative platform.
+          </p>
+        </div>
+
+        <div class='content'>
+          <p class='greeting'>
+            Hello
+            {{firstName}},
+          </p>
+
+          <p>
+            You’ve been invited to join the
+            <strong>PeppCruise Admin Portal</strong>
+            as a
+            <strong>{{role}}</strong>.
+          </p>
+
+          <p>
+            Click the secure button below to complete your account setup and
+            create your administrator credentials.
+          </p>
+
+          <div class='invite-card'>
+            <p class='invite-card-label'>Invitation Details</p>
+
+            <div class='detail-row'>
+              <span class='detail-label'>Admin Role</span>
+              <span class='detail-value'>{{role}}</span>
+            </div>
+
+            <div class='detail-row'>
+              <span class='detail-label'>Email Address</span>
+              <span class='detail-value'>{{email}}</span>
+            </div>
+
+            <div class='detail-row'>
+              <span class='detail-label'>Invitation Expires</span>
+              <span class='detail-value'>3 days from now</span>
+            </div>
+          </div>
+
+          <div class='button-wrapper'>
+            <a href='{{inviteUrl}}' class='button'>
+              Complete Account Setup
+            </a>
+          </div>
+
+          <div class='fallback-link'>
+            <p>
+              If the button above does not work, copy and paste this link into
+              your browser:
+            </p>
+
+            <a href='{{inviteUrl}}'>
+              {{inviteUrl}}
+            </a>
+          </div>
+
+          <div class='notice'>
+            <p>
+              <strong>Security Notice:</strong>
+              This invitation link is private and expires after 3 days. If you
+              were not expecting this invitation, you can safely ignore this
+              email.
+            </p>
+          </div>
+
+          <p>
+            We’re excited to have you onboard and look forward to working with
+            you on the PeppCruise platform.
+          </p>
+        </div>
+
+        <div class='footer'>
+          <p>Best regards,</p>
+          <p class='team'>The PeppCruise Team</p>
+
+          <p style='margin-top: 14px;'>
+            © 2026 PeppCruise. All rights reserved.
+          </p>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

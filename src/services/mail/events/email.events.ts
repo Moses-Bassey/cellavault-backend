@@ -63,3 +63,12 @@ export class NewDeviceLoginOtpEmailEvent {
     public readonly otpCode: string,
   ) {}
 }
+
+export class AdminInviteEmailEvent {
+  constructor(
+    public readonly email: string,
+    public readonly fullName: string,
+    public readonly inviteUrl: string,
+    public readonly role: string,
+  ) {}
+}

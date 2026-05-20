@@ -10,7 +10,6 @@ import { TripStatus } from 'src/enums/ride-status.enum';
 import { UserRepository } from '../repositories/user.repository';
 import { TripRepository } from '../../trips/repositories/trip.repository';
 import { TripService } from '../../trips/services/trip.service';
-import { PaymentRepository } from '../../payment/repositories/payment.repository';
 import { PeppcoinService } from '../../peppcoin/services/peppcoin.service';
 import {
   PassengerAccountDto,

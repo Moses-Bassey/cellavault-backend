@@ -8,4 +8,5 @@ export const MAIL_SUBJECT = {
   PASSWORD_CHANGED: 'Password Changed - PeppCruise',
   NEW_LOGIN: 'New Login Detected - PeppCruise',
   NEW_DEVICE_LOGIN_OTP: 'New Device Login Verification - PeppCruise',
+  NEW_ADMIN_INVITE: 'Admin Invitation - PeppCruise',
 };
