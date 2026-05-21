@@ -216,9 +216,9 @@ export class StationRepository {
 
   async createStation(source: StationSource, payload: Record<string, any>) {
     switch (source) {
-      case 'CNG':
-        return this.cngStationModel.create(payload as any);
       case 'CNG_CONVERSION':
+        return this.cngStationModel.create(payload as any);
+      case 'CNG':
         return this.cngFuelingModel.create(payload as any);
       case 'EV_CHARGING':
         return this.chargingModel.create(payload as any);

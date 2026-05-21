@@ -46,9 +46,8 @@ export class StationService {
     const address = dto.address.trim();
 
     if (!name) throw new BadRequestException('Station name is required');
-    if (!address) throw new BadRequestException('Address is required');
+    if (!address) throw new BadRequestException('Station address is required');
 
-    // Optional: prevent duplicates (simple heuristic)
     const exists = await this.stationRepository.existsByNameAndAddress(
       dto.stationType,
       name,
@@ -56,29 +55,91 @@ export class StationService {
     );
     if (exists) throw new BadRequestException('Station already exists');
 
-    const created = await this.stationRepository.createStation(
-      dto.stationType,
-      {
-        name,
-        address,
-        state: dto.state?.trim() || null,
-        country: dto.country?.trim() || 'Nigeria',
-        // set defaults
-        openingTime: '08:00:00',
-        closingTime: '18:00:00',
-      },
+
+    // ─────────────────────────────────────────────
+    // Normalize + defaults
+    // ─────────────────────────────────────────────
+    const stationType = dto.stationType;
+
+    const payload: Record<string, any> = {
+      name,
+      address,
+      state: dto.state?.trim() || null,
+      country: dto.country?.trim() || 'Nigeria',
+      contactPhone: dto.phoneNo.trim(),
+      contactEmail: dto.contactEmail.trim().toLowerCase(),
+      stationBadge: dto.stationBadge ?? StationBadge.DISCOVERY_ONLY,
+      openingTime: dto.openingTime || '08:00:00',
+      closingTime: dto.closingTime || '19:00:00',
+      amountPerUnit: dto.amountPerUnit ?? 0.00,
+      currency: dto.currency || 'NGN',
+      amountPerUnitType:
+        dto.amountPerUnitType ||
+        (stationType === 'EV_CHARGING'
+          ? 'kwh'
+          : 'kg'),
+      longitude: dto.longitude ?? null,
+      latitude: dto.latitude ?? null,
+      stationImage:
+        dto.stationImage || 'default.png',
+    };
+
+    // ─────────────────────────────────────────────
+    // Fueling/CNG-specific fields
+    // ─────────────────────────────────────────────
+    // if (
+    //   stationType === 'CNG' ||
+    //   stationType === 'CNG_CONVERSION'
+    // ) {
+    //   payload.dispenserCount =
+    //     dto.dispenserCount ?? null;
+
+    //   payload.storageCapacity =
+    //     dto.storageCapacity ?? null;
+
+    //   payload.operatorName =
+    //     dto.operatorName?.trim() || null;
+
+    //   payload.safetyCertifications =
+    //     dto.safetyCertifications?.trim() ||
+    //     null;
+    // }
+
+    if (
+      payload.openingTime >=
+      payload.closingTime
+    ) {
+      throw new BadRequestException(
+        'Closing time must be later than opening time',
+      );
+    }
+
+    if (
+      stationType === 'EV_CHARGING' &&
+      payload.amountPerUnitType !== 'kwh'
+    ) {
+      throw new BadRequestException(
+        'EV charging stations must use kwh as amountPerUnitType',
+      );
+    }
+
+    if (
+      (stationType === 'CNG' ||
+        stationType ===
+          'CNG_CONVERSION') &&
+      payload.amountPerUnitType !== 'kg'
+    ) {
+      throw new BadRequestException(
+        'CNG stations must use kg as amountPerUnitType',
+      );
+    }
+
+    const data = await this.stationRepository.createStation(
+      stationType,
+      payload,
     );
 
-    return {
-      id: created.id,
-      source: dto.stationType,
-      name: created.name,
-      address: created.address,
-      state: created.state ?? null,
-      country: created.country ?? null,
-      isActive: created.isActive,
-      createdAt: created.createdAt,
-    };
+    return dto;
   }
 
   async getSummary(): Promise<StationsSummaryDto> {
