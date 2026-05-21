@@ -1,112 +1,222 @@
-<html lang='en'>
+<!DOCTYPE html>
+<html lang="en">
   <head>
-    <meta charset='UTF-8' />
-    <meta name='viewport' content='width=device-width, initial-scale=1.0' />
-    <title>Admin Invitation - PeppCruise</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Invitation — PeppCruise</title>
+
+    <!--
+      Preview text: shown in inbox snippet before the email is opened.
+      Hidden visually but read by mail clients.
+    -->
+    <div style="display:none;max-height:0;overflow:hidden;mso-hide:all;">
+      You've been invited to join the PeppCruise Admin Portal. Complete your
+      account setup before this link expires.&nbsp;‌&nbsp;‌&nbsp;‌
+    </div>
 
     <style>
-      * {
-        box-sizing: border-box;
+      :root {
+        --pc-bg-dark: #12101c;
+        --pc-bg-card: #1c182b;
+
+        --pc-purple: #8247e5;
+        --pc-purple-light: #a855f7;
+        --pc-purple-soft: #c084fc;
+
+        --pc-purple-deep: #6d28d9;
+        --pc-purple-darker: #5b21b6;
+
+        --pc-border: rgba(130, 71, 229, 0.18);
+
+        --pc-shadow: rgba(130, 71, 229, 0.32);
       }
 
-      body {
+      /* ── Reset ──────────────────────────────────────────────────────────── */
+      * {
+        box-sizing: border-box;
         margin: 0;
-        padding: 24px 16px;
-        background-color: #f4f7fb;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        padding: 0;
+      }
+
+      img {
+        display: block;
+        max-width: 100%;
+        border: 0;
+      }
+
+      /* ── Page shell ─────────────────────────────────────────────────────── */
+      body {
+        background-color: #ece9fb;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Helvetica, Arial, sans-serif;
+        -webkit-text-size-adjust: 100%;
         color: #1f2937;
+        padding: 36px 16px;
       }
 
       .wrapper {
         width: 100%;
-        background-color: #f4f7fb;
+        background-color: #ece9fb;
       }
 
+      /* ── Card container ─────────────────────────────────────────────────── */
       .container {
-        max-width: 620px;
+        max-width: 600px;
+        width: 100%;
         margin: 0 auto;
         background: #ffffff;
-        border-radius: 18px;
+        border-radius: 20px;
         overflow: hidden;
-        box-shadow: 0 10px 35px rgba(15, 23, 42, 0.08);
+        box-shadow:
+          0 24px 80px rgba(130, 71, 229, 0.16),
+          0 8px 24px rgba(0, 0, 0, 0.08);
       }
 
+      /* ── Header ─────────────────────────────────────────────────────────── */
       .header {
-        background: linear-gradient(135deg, #5f3df4 0%, #7c4dff 100%);
-        padding: 40px 32px;
+        background: linear-gradient(
+          145deg,
+          #1c182b 0%,
+          #2a1f45 28%,
+          #8247e5 68%,
+          #a855f7 100%
+        );
+        padding: 48px 36px 44px;
         text-align: center;
       }
 
-      .brand {
-        font-size: 14px;
-        letter-spacing: 2px;
+      /* Brand mark circle */
+      .brand-mark {
+        display: inline-block;
+        width: 56px;
+        height: 56px;
+        line-height: 56px;
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.15);
+        border: 1.5px solid rgba(255, 255, 255, 0.25);
+        font-size: 22px;
+        font-weight: 900;
+        color: #ffffff;
+        text-align: center;
+        margin-bottom: 20px;
+        letter-spacing: -1px;
+      }
+
+      .brand-label {
+        font-size: 11px;
+        letter-spacing: 2.5px;
         text-transform: uppercase;
-        color: rgba(255, 255, 255, 0.8);
-        margin-bottom: 12px;
-        font-weight: 600;
+        color: rgba(255, 255, 255, 0.65);
+        font-weight: 700;
+        margin-bottom: 14px;
       }
 
       .header h1 {
-        margin: 0;
         color: #ffffff;
         font-size: 30px;
-        font-weight: 700;
+        font-weight: 800;
         line-height: 1.2;
+        letter-spacing: -0.4px;
       }
 
-      .header p {
-        margin: 14px 0 0;
-        color: rgba(255, 255, 255, 0.9);
+      .header-subtitle {
+        margin-top: 12px;
+        color: rgba(255, 255, 255, 0.82);
         font-size: 15px;
-        line-height: 1.6;
+        line-height: 1.65;
       }
 
+      /* Decorative pill divider */
+      .header-divider {
+        margin-top: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+      }
+
+      .div-dot {
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.3);
+      }
+
+      .div-dot.large {
+        width: 28px;
+        height: 5px;
+        border-radius: 3px;
+        background: rgba(255, 255, 255, 0.55);
+      }
+
+      /* ── Body content ───────────────────────────────────────────────────── */
       .content {
-        padding: 40px 32px;
+        padding: 44px 36px 16px;
       }
 
       .greeting {
         font-size: 20px;
-        font-weight: 600;
+        font-weight: 700;
         color: #111827;
-        margin-top: 0;
-        margin-bottom: 18px;
+        margin-bottom: 20px;
       }
 
-      .content p {
+      .body-text {
         font-size: 15px;
         line-height: 1.8;
         color: #4b5563;
-        margin: 16px 0;
+        margin-bottom: 16px;
       }
 
+      /* ── Invite detail card ─────────────────────────────────────────────── */
       .invite-card {
-        margin: 30px 0;
-        padding: 28px;
+        margin: 32px 0;
         border-radius: 16px;
+        overflow: hidden;
+        border: 1px solid rgba(130, 71, 229, 0.16);
+      }
+
+      .invite-card-strip {
+        padding: 13px 22px;
+        background: linear-gradient(
+          135deg,
+          #1f1830 0%,
+          #8247e5 58%,
+          #a855f7 100%
+        );
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .strip-icon {
+        font-size: 16px;
+      }
+
+      .strip-label {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 1.8px;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.9);
+      }
+
+      .invite-card-body {
         background: linear-gradient(
           180deg,
-          rgba(95, 61, 244, 0.05) 0%,
-          rgba(95, 61, 244, 0.02) 100%
+          #fcfbff 0%,
+          #f6f2ff 100%
         );
-        border: 1px solid rgba(95, 61, 244, 0.12);
-      }
-
-      .invite-card-label {
-        margin: 0 0 18px;
-        color: #5f3df4;
-        font-size: 14px;
-        font-weight: 700;
-        letter-spacing: 0.3px;
-        text-transform: uppercase;
+        padding: 6px 22px 14px;
       }
 
       .detail-row {
         display: flex;
         justify-content: space-between;
+        align-items: flex-start;
         gap: 16px;
-        padding: 12px 0;
-        border-bottom: 1px solid #e5e7eb;
+        padding: 14px 0;
+        border-bottom: 1px solid rgba(82, 40, 220, 0.08);
       }
 
       .detail-row:last-child {
@@ -116,224 +226,404 @@
 
       .detail-label {
         color: #6b7280;
-        font-size: 14px;
-        font-weight: 600;
+        font-size: 13.5px;
+        font-weight: 500;
+        flex-shrink: 0;
       }
 
       .detail-value {
         color: #111827;
-        font-size: 14px;
-        font-weight: 600;
-        text-align: right;
-      }
-
-      .button-wrapper {
-        text-align: center;
-        margin: 36px 0 24px;
-      }
-
-      .button {
-        display: inline-block;
-        background: linear-gradient(135deg, #5f3df4 0%, #7c4dff 100%);
-        color: #ffffff !important;
-        text-decoration: none;
-        padding: 15px 28px;
-        border-radius: 12px;
-        font-size: 15px;
+        font-size: 13.5px;
         font-weight: 700;
-        box-shadow: 0 10px 24px rgba(95, 61, 244, 0.28);
-      }
-
-      .fallback-link {
-        margin-top: 22px;
-        padding: 16px;
-        border-radius: 12px;
-        background-color: #f9fafb;
-        border: 1px dashed #d1d5db;
+        text-align: right;
         word-break: break-word;
       }
 
-      .fallback-link p {
-        margin: 0 0 8px;
-        font-size: 13px;
-        color: #6b7280;
+      /* Inline badges on detail values */
+      .badge-role {
+        display: inline-block;
+        padding: 3px 11px;
+        border-radius: 20px;
+        background: rgba(130, 71, 229, 0.12);
+        color: #6d28d9;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.2px;
       }
 
-      .fallback-link a {
-        color: #5f3df4;
-        text-decoration: none;
-        font-size: 13px;
-      }
-
-      .notice {
-        margin-top: 28px;
-        padding: 18px 20px;
-        border-left: 4px solid #f59e0b;
-        background-color: #fffbeb;
-        border-radius: 10px;
-      }
-
-      .notice p {
-        margin: 0;
+      .badge-expiry {
+        display: inline-block;
+        padding: 3px 11px;
+        border-radius: 20px;
+        background: rgba(245, 158, 11, 0.1);
         color: #92400e;
-        font-size: 14px;
-        line-height: 1.7;
-      }
-
-      .footer {
-        padding: 28px 32px 36px;
-        text-align: center;
-        border-top: 1px solid #edf2f7;
-        background-color: #fafbff;
-      }
-
-      .footer p {
-        margin: 6px 0;
-        font-size: 13px;
-        color: #6b7280;
-      }
-
-      .footer .team {
-        color: #5f3df4;
+        font-size: 12px;
         font-weight: 700;
       }
 
-      @media screen and (max-width: 640px) {
+      /* ── Primary CTA button ─────────────────────────────────────────────── */
+      .button-wrapper {
+        text-align: center;
+        margin: 36px 0 28px;
+      }
+
+      .cta-button {
+        display: inline-block;
+        background: linear-gradient(
+          135deg,
+          #6d28d9 0%,
+          #8247e5 52%,
+          #a855f7 100%
+        );
+        color: #ffffff !important;
+        text-decoration: none;
+        padding: 16px 40px;
+        border-radius: 12px;
+        font-size: 15.5px;
+        font-weight: 700;
+        letter-spacing: 0.15px;
+        box-shadow: 0 12px 34px rgba(130, 71, 229, 0.32);
+      }
+
+      /* ── Fallback link section ──────────────────────────────────────────── */
+      .fallback-section {
+        margin-top: 20px;
+        border-radius: 14px;
+        border: 1px dashed rgba(130, 71, 229, 0.24);
+        background-color: #f9f8ff;
+        overflow: hidden;
+      }
+
+      .fallback-header-bar {
+        padding: 10px 18px;
+        border-bottom: 1px solid rgba(82, 40, 220, 0.1);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: #8247e5;
+        background: rgba(130, 71, 229, 0.05);
+      }
+
+      .fallback-body {
+        padding: 16px 18px 18px;
+      }
+
+      .fallback-intro {
+        font-size: 13px;
+        color: #6b7280;
+        margin-bottom: 12px;
+        line-height: 1.5;
+      }
+
+      /* URL + copy row */
+      .url-row {
+        display: flex;
+        align-items: stretch;
+        gap: 10px;
+      }
+
+      .url-masked-wrap {
+        flex: 1;
+        min-width: 0; /* critical — prevents overflow */
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 9px;
+        padding: 9px 13px;
+        display: flex;
+        align-items: center;
+        overflow: hidden;
+      }
+
+      .url-masked-text {
+        font-family: "SFMono-Regular", "Fira Code", "Courier New", Courier,
+          monospace;
+        font-size: 12px;
+        color: #374151;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: block;
+        max-width: 100%;
+      }
+
+      .url-copy-btn {
+        display: inline-block;
+        flex-shrink: 0;
+        padding: 9px 16px;
+        border-radius: 9px;
+        background: linear-gradient(
+          135deg,
+          #6d28d9 0%,
+          #8247e5 60%,
+          #a855f7 100%
+        );
+        color: #ffffff !important;
+        text-decoration: none;
+        font-size: 12.5px;
+        font-weight: 700;
+        letter-spacing: 0.1px;
+        white-space: nowrap;
+        box-shadow: 0 4px 12px rgba(82, 40, 220, 0.28);
+      }
+
+      .fallback-note {
+        margin-top: 11px;
+        font-size: 12px;
+        color: #9ca3af;
+        line-height: 1.55;
+      }
+
+      /* ── Security notice ────────────────────────────────────────────────── */
+      .notice {
+        margin-top: 28px;
+        padding: 17px 20px;
+        border-left: 4px solid #f59e0b;
+        background-color: #fffbeb;
+        border-radius: 0 10px 10px 0;
+      }
+
+      .notice p {
+        font-size: 13.5px;
+        line-height: 1.75;
+        color: #78350f;
+      }
+
+      .closing {
+        margin-top: 28px;
+        font-size: 15px;
+        line-height: 1.8;
+        color: #4b5563;
+        padding-bottom: 36px;
+      }
+
+      /* ── Footer ─────────────────────────────────────────────────────────── */
+      .footer {
+        border-top: 1px solid #ede9fe;
+        background: linear-gradient(
+          180deg,
+          #f7f4ff 0%,
+          #efe8ff 100%
+        );
+        padding: 28px 36px 36px;
+        text-align: center;
+      }
+
+      .footer-regards {
+        font-size: 14px;
+        color: #6b7280;
+        margin-bottom: 5px;
+      }
+
+      .footer-team {
+        font-size: 15px;
+        font-weight: 800;
+        color: #8247e5;
+        margin-bottom: 0;
+      }
+
+      .footer-rule {
+        width: 36px;
+        height: 3px;
+        background: linear-gradient(
+          135deg,
+          #8247e5,
+          #a855f7
+        );
+        border-radius: 2px;
+        margin: 18px auto 16px;
+      }
+
+      .footer-copy {
+        font-size: 12px;
+        color: #9ca3af;
+      }
+
+      /* ── Responsive — mobile ────────────────────────────────────────────── */
+      @media screen and (max-width: 600px) {
         body {
-          padding: 12px;
+          padding: 16px 8px;
+        }
+
+        .container {
+          border-radius: 16px;
         }
 
         .header {
-          padding: 32px 22px;
-        }
-
-        .content {
-          padding: 30px 22px;
-        }
-
-        .footer {
-          padding: 24px 22px 30px;
+          padding: 36px 22px 32px;
         }
 
         .header h1 {
           font-size: 24px;
         }
 
+        .content {
+          padding: 32px 20px 12px;
+        }
+
+        .footer {
+          padding: 24px 20px 28px;
+        }
+
         .greeting {
           font-size: 18px;
         }
 
-        .invite-card {
-          padding: 22px 18px;
+        .invite-card-body {
+          padding: 4px 16px 12px;
         }
 
+        /* Stack detail rows on small screens */
         .detail-row {
           flex-direction: column;
-          gap: 6px;
+          gap: 5px;
         }
 
         .detail-value {
           text-align: left;
         }
 
-        .button {
-          width: 100%;
+        /* Full-width button on mobile */
+        .cta-button {
+          display: block;
+          text-align: center;
           padding: 16px 20px;
+          transition: all 0.2s ease;
+        }
+
+        .cta-button:hover {
+          opacity: 0.96;
+        }
+
+        /* Stack URL row vertically */
+        .url-row {
+          flex-direction: column;
+          gap: 10px;
+        }
+
+        .url-copy-btn {
+          text-align: center;
+          padding: 12px 16px;
+        }
+
+        /* Ensure masked URL never overflows */
+        .url-masked-wrap {
+          min-width: 0;
+          max-width: 100%;
+        }
+
+        .url-masked-text {
+          max-width: 100%;
         }
       }
     </style>
   </head>
 
   <body>
-    <div class='wrapper'>
-      <div class='container'>
-        <div class='header'>
-          <div class='brand'>PeppCruise Admin Portal</div>
+    <div class="wrapper">
+      <div class="container">
 
+        <!-- ── Header ───────────────────────────────────────────────────── -->
+        <div class="header">
+          <div class="brand-mark">PC</div>
+          <div class="brand-label">PeppCruise Admin Portal</div>
           <h1>Admin Invitation</h1>
-
-          <p>
-            You’ve been invited to join the PeppCruise administrative platform.
+          <p class="header-subtitle">
+            You've been invited to join the PeppCruise administrative platform.
           </p>
+          {{!-- <div class="header-divider">
+            <span class="div-dot"></span>
+            <span class="div-dot large"></span>
+            <span class="div-dot"></span>
+          </div> --}}
         </div>
 
-        <div class='content'>
-          <p class='greeting'>
-            Hello
-            {{firstName}},
+        <!-- ── Body content ─────────────────────────────────────────────── -->
+        <div class="content">
+
+          <p class="greeting">Hello {{firstName}},</p>
+
+          <p class="body-text">
+            You've been invited to join the <strong>PeppCruise Admin Portal</strong> as a <strong>{{role}}</strong>. We're glad to have you on the team.
           </p>
 
-          <p>
-            You’ve been invited to join the
-            <strong>PeppCruise Admin Portal</strong>
-            as a
-            <strong>{{role}}</strong>.
+          <p class="body-text">
+            Click the button below to complete your account setup and create your administrator credentials.
           </p>
 
-          <p>
-            Click the secure button below to complete your account setup and
-            create your administrator credentials.
-          </p>
-
-          <div class='invite-card'>
-            <p class='invite-card-label'>Invitation Details</p>
-
-            <div class='detail-row'>
-              <span class='detail-label'>Admin Role</span>
-              <span class='detail-value'>{{role}}</span>
+          <!-- Invite detail card -->
+          <div class="invite-card">
+            <div class="invite-card-strip">
+              {{!-- <span class="strip-icon">🔐</span> --}}
+              <span class="strip-label">Invitation Details</span>
             </div>
-
-            <div class='detail-row'>
-              <span class='detail-label'>Email Address</span>
-              <span class='detail-value'>{{email}}</span>
-            </div>
-
-            <div class='detail-row'>
-              <span class='detail-label'>Invitation Expires</span>
-              <span class='detail-value'>3 days from now</span>
+            <div class="invite-card-body">
+              <div class="detail-row">
+                <span class="detail-label">Admin Role </span>
+                <span class="detail-value">
+                  <span class="badge-role">{{role}}</span>
+                </span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Email Address </span>
+                <span class="detail-value">{{email}}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Invitation Expires </span>
+                <span class="detail-value">
+                  <span class="badge-expiry">3 days from now</span>
+                </span>
+              </div>
             </div>
           </div>
 
-          <div class='button-wrapper'>
-            <a href='{{inviteUrl}}' class='button'>
-              Complete Account Setup
-            </a>
+          <!-- Primary CTA -->
+          <div class="button-wrapper">
+            <a href="{{inviteUrl}}" class="cta-button">Complete Account Setup →</a>
           </div>
 
-          <div class='fallback-link'>
+          <!-- Fallback link section -->
+          <div class="fallback-section">
+            <div class="fallback-header-bar">If the button above doesn't work</div>
+            <div class="fallback-body">
+              <p class="fallback-intro">
+                Your invitation contains a secure, one-time link. Use the button below to open it directly in your browser.
+              </p>
+              <div class="url-row">
+                <div class="url-masked-wrap">
+                  <span class="url-masked-text">
+                    {{appUrl}}/onboarding/admin/accept?token=••••••••••••
+                  </span>
+                </div>
+                <a href="{{inviteUrl}}" class="url-copy-btn">Open Link</a>
+              </div>
+              <p class="fallback-note">
+                To copy the full link, right-click <strong>Open Link</strong> and select <em>"Copy link address"</em> — the token is not displayed here for security.
+              </p>
+            </div>
+          </div>
+
+          <!-- Security notice -->
+          <div class="notice">
             <p>
-              If the button above does not work, copy and paste this link into
-              your browser:
-            </p>
-
-            <a href='{{inviteUrl}}'>
-              {{inviteUrl}}
-            </a>
-          </div>
-
-          <div class='notice'>
-            <p>
-              <strong>Security Notice:</strong>
-              This invitation link is private and expires after 3 days. If you
-              were not expecting this invitation, you can safely ignore this
-              email.
+              <strong>Security notice:</strong> This invitation link is private and expires after 3 days. If you were not expecting this invitation, you can safely ignore this email — no account will be created without your action.
             </p>
           </div>
 
-          <p>
-            We’re excited to have you onboard and look forward to working with
-            you on the PeppCruise platform.
+          <p class="closing">
+            We're looking forward to working with you on the PeppCruise platform. If you have any questions, reach out to your administrator.
           </p>
+
         </div>
 
-        <div class='footer'>
-          <p>Best regards,</p>
-          <p class='team'>The PeppCruise Team</p>
-
-          <p style='margin-top: 14px;'>
-            © 2026 PeppCruise. All rights reserved.
-          </p>
+        <!-- ── Footer ───────────────────────────────────────────────────── -->
+        <div class="footer">
+          <p class="footer-regards">Best regards,</p>
+          <p class="footer-team">The PeppCruise Team</p>
+          <div class="footer-rule"></div>
+          <p class="footer-copy">© 2026 PeppCruise. All rights reserved.</p>
         </div>
+
       </div>
     </div>
   </body>

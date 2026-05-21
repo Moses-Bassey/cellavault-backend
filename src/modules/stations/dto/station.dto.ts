@@ -13,8 +13,12 @@ import {
   IsNumber,
   Min,
   IsNotEmpty,
+  IsPhoneNumber,
+  IsTimeZone,
+  Matches,
+  Max,
 } from 'class-validator';
-import { Transform } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import { StationBadge } from 'src/enums/station-badge.enum';
 import { Station_Source } from 'src/enums/station-source.enum';
 
@@ -83,33 +87,212 @@ export class StationDetailsDto {
 }
 
 export class CreateStationDto {
-  @ApiProperty({ description: "Station's name", example: 'Pepp CNG station' })
+  @ApiProperty({
+    description: "Station's name",
+    example: 'Pepp CNG Station Calabar',
+  })
   @IsString()
   @IsNotEmpty()
   @MaxLength(100)
   name: string;
 
-  @ApiProperty({ description: 'Filter by station type', example: 'CNG' })
+  @ApiProperty({
+    description: 'Station type',
+    enum: Station_Source,
+    example: Station_Source.CNG,
+  })
   @IsEnum(Station_Source)
   stationType: Station_Source;
 
-  @ApiProperty({ description: "Station's address", example: '123 Main street' })
+  @ApiProperty({
+    description: "Station's address",
+    example: '123 Murtala Mohammed Highway, Calabar',
+  })
   @IsString()
   @IsNotEmpty()
-  @MaxLength(100)
+  @MaxLength(255)
   address: string;
 
-  @ApiProperty({ description: "Station's state", example: 'Cross River' })
-  @IsString()
+  @ApiPropertyOptional({
+    description: "Station's state",
+    example: 'Cross River',
+  })
   @IsOptional()
+  @IsString()
   @MaxLength(100)
   state?: string;
 
-  @ApiProperty({ description: "Station's country", example: 'Nigeria' })
-  @IsString()
+  @ApiPropertyOptional({
+    description: "Station's country",
+    example: 'Nigeria',
+  })
   @IsOptional()
+  @IsString()
   @MaxLength(100)
   country?: string;
+
+  @ApiProperty({
+    description: 'Official station contact phone number',
+    example: '+2348012345678',
+  })
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(20)
+  phoneNo: string;
+
+  @ApiProperty({
+    description: 'Official station contact email',
+    example: 'station@peppcruise.com',
+  })
+  @IsEmail()
+  @IsNotEmpty()
+  contactEmail: string;
+
+  @ApiPropertyOptional({
+    description: 'Station badge',
+    enum: StationBadge,
+    example: StationBadge.PEPP_OWNED,
+    default: StationBadge.DISCOVERY_ONLY,
+  })
+  @IsOptional()
+  @IsEnum(StationBadge)
+  stationBadge?: StationBadge;
+
+  @ApiPropertyOptional({
+    description: 'Daily opening time (24hr format)',
+    example: '06:00',
+  })
+  @IsOptional()
+  @Matches(/^([01]\d|2[0-3]):([0-5]\d)$/, {
+    message: 'openingTime must be in HH:mm format',
+  })
+  openingTime: string;
+
+  @ApiPropertyOptional({
+    description: 'Daily closing time (24hr format)',
+    example: '22:00',
+  })
+  @IsOptional()
+  @Matches(/^([01]\d|2[0-3]):([0-5]\d)$/, {
+    message: 'closingTime must be in HH:mm format',
+  })
+  closingTime: string;
+
+  @ApiPropertyOptional({
+    description: 'Price per unit',
+    example: 950,
+  })
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber({ maxDecimalPlaces: 2 })
+  @Min(0)
+  amountPerUnit: number;
+
+  @ApiPropertyOptional({
+    description: 'Currency code',
+    example: 'NGN',
+    default: 'NGN',
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(10)
+  currency?: string;
+
+  @ApiPropertyOptional({
+    description:
+      'Measurement unit. Usually "kg" for CNG and "kwh" for EV charging',
+    example: 'kg',
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(20)
+  amountPerUnitType?: string;
+
+  @ApiPropertyOptional({
+    description: 'Whether station is active',
+    example: true,
+    default: true,
+  })
+  @IsOptional()
+  @Transform(({ value }) => {
+    if (value === 'true') return true;
+    if (value === 'false') return false;
+    return value;
+  })
+  @IsBoolean()
+  isActive?: boolean;
+
+  @ApiPropertyOptional({
+    description: 'Station longitude coordinate',
+    example: 8.341429,
+  })
+  @IsOptional()
+  @Type(() => Number)
+  @IsLongitude()
+  longitude?: number;
+
+  @ApiPropertyOptional({
+    description: 'Station latitude coordinate',
+    example: 5.013869,
+  })
+  @IsOptional()
+  @Type(() => Number)
+  @IsLatitude()
+  latitude?: number;
+
+  @ApiPropertyOptional({
+    description: 'Station image URL',
+    example:
+      'https://cdn.peppcruise.com/stations/calabar-cng-station.png',
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(500)
+  stationImage?: string;
+
+  /**
+   * ============================================================
+   * CNG / Fueling-specific optional fields
+   * ============================================================
+   */
+
+  @ApiPropertyOptional({
+    description: 'Number of dispensers available',
+    example: 6,
+  })
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  @Min(0)
+  dispenserCount?: number;
+
+  @ApiPropertyOptional({
+    description: 'Storage capacity',
+    example: 5000,
+  })
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  @Min(0)
+  storageCapacity?: number;
+
+  @ApiPropertyOptional({
+    description: 'Station operator/company name',
+    example: 'Pepp Energy Ltd',
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(100)
+  operatorName?: string;
+
+  @ApiPropertyOptional({
+    description: 'Safety certifications',
+    example: 'ISO 9001, SON Certified',
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(500)
+  safetyCertifications?: string;
 }
 
 export class UpdateStationDto {
