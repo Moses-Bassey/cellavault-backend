@@ -123,6 +123,7 @@ export class StationService {
       );
     }
 
+    if (stationType !== 'CNG_CONVERSION') payload.stationBadge = dto.stationBadge ?? StationBadge.DISCOVERY_ONLY;
     if (
       (stationType === 'CNG' ||
         stationType ===
@@ -250,7 +251,7 @@ export class StationService {
       contactPhone: station.contactPhone,
       contactEmail: station.contactEmail,
 
-      stationBadge: station.stationBadge,
+      stationBadge: 'stationBadge' in station ? (station.stationBadge ?? null) : null,
 
       openingTime: station.openingTime,
       closingTime: station.closingTime,

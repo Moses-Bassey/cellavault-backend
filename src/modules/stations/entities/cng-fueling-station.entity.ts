@@ -13,7 +13,7 @@ import {
 import { StationBadge } from 'src/enums/station-badge.enum';
 
 @Table({
-  tableName: 'cng_fueling_stations',
+  tableName: 'cng_stations',
   timestamps: true,
   paranoid: true,
   defaultScope: {
@@ -22,7 +22,7 @@ import { StationBadge } from 'src/enums/station-badge.enum';
     },
   },
 })
-export class CngFuelingStation extends Model<CngFuelingStation> {
+export class CngStation extends Model<CngStation> {
   @PrimaryKey
   @Default(DataType.UUIDV4)
   @Column(DataType.UUID)
@@ -159,33 +159,33 @@ export class CngFuelingStation extends Model<CngFuelingStation> {
   })
   declare stationImage?: string;
 
-  @AllowNull(true)
-  @Column({
-    type: DataType.INTEGER,
-    allowNull: true,
-  })
-  declare dispenserCount?: number;
+  // @AllowNull(true)
+  // @Column({
+  //   type: DataType.INTEGER,
+  //   allowNull: true,
+  // })
+  // declare dispenserCount?: number;
 
-  @AllowNull(true)
-  @Column({
-    type: DataType.INTEGER,
-    allowNull: true,
-  })
-  declare storageCapacity?: number;
+  // @AllowNull(true)
+  // @Column({
+  //   type: DataType.INTEGER,
+  //   allowNull: true,
+  // })
+  // declare storageCapacity?: number;
 
-  @AllowNull(true)
-  @Column({
-    type: DataType.STRING(100),
-    allowNull: true,
-  })
-  declare operatorName?: string;
+  // @AllowNull(true)
+  // @Column({
+  //   type: DataType.STRING(100),
+  //   allowNull: true,
+  // })
+  // declare operatorName?: string;
 
-  @AllowNull(true)
-  @Column({
-    type: DataType.STRING(500),
-    allowNull: true,
-  })
-  declare safetyCertifications?: string;
+  // @AllowNull(true)
+  // @Column({
+  //   type: DataType.STRING(500),
+  //   allowNull: true,
+  // })
+  // declare safetyCertifications?: string;
 
   @CreatedAt
   @AllowNull(false)

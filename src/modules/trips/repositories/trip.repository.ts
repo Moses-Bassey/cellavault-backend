@@ -861,4 +861,54 @@ export class TripRepository {
       },
     });
   }
+
+  async findSharedTripById(id: string) {
+    const trip = await this.tripModel.findOne({
+      where: {
+        id,
+      },
+
+      attributes: [
+        'id',
+
+        'estimatedFee',
+        'finalFee',
+
+        'paymentType',
+        'paymentStatus',
+
+        'pickupAddress',
+        'dropoffAddress',
+
+        'pickupLocation',
+        'dropoffLocation',
+
+        'distanceCovered',
+        'distanceToPickup',
+
+        'status',
+
+        'startTime',
+        'endTime',
+
+        'driverArrivalTime',
+
+        'completedAt',
+
+        'createdAt',
+      ],
+
+      include: [
+        {
+          model: Driver,
+
+          attributes: ['id', 'fullName', 'profileImageUrl'],
+
+          required: false,
+        },
+      ],
+    });
+    console.log('trip: ', trip);
+    return trip;
+  }
 }
