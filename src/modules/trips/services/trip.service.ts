@@ -3,9 +3,11 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import moment from 'moment';
 import { Trip } from '../entities/trip.entity';
 import { TripRepository } from '../repositories/trip.repository';
+import {  TripShareService } from './trip-share.service';
 import {
   CursorPageDto,
   TripDetailsDto,
@@ -57,7 +59,11 @@ function isUuid(value?: string): boolean {
 
 @Injectable()
 export class TripService {
-  constructor(private readonly tripRepository: TripRepository) {}
+  constructor(
+    private readonly tripRepository: TripRepository,
+    private readonly tripShareService: TripShareService,
+    private readonly configService: ConfigService,
+  ) {}
 
   /* ========================= SUMMARY ========================= */
 
@@ -259,7 +265,9 @@ export class TripService {
       trip.dropoffLatitude,
       trip.dropoffLongitude,
     );
-    // console.log('Distance: ', distanceCovered);
+    console.log('Distance from db: ', trip.distanceCovered);
+    console.log('Distance from calculation: ', distanceCovered);
+
 
     return {
       id: trip.id,
@@ -274,7 +282,7 @@ export class TripService {
       pickupLocation: trip.pickupLocation ?? null,
       dropoffLocation: trip.dropoffLocation ?? null,
       tripType: deriveTripType(trip),
-      distanceCovered,
+      distanceCovered: trip.distanceCovered ?? distanceCovered,
 
       startTime: trip.startTime ? trip.startTime.toISOString() : null,
       arrivalTime: trip.driverArrivalTime ? trip.driverArrivalTime.toISOString() : null,
@@ -423,5 +431,81 @@ export class TripService {
         });
       }
     }
+  }
+
+  async generateShareLink(tripId: string) {
+    const trip = await this.tripRepository.findById(tripId);
+
+    if (!trip)
+      throw new NotFoundException('Trip not found');
+
+    const token = this.tripShareService.generateShareToken(trip.id);
+
+    return {
+      url: `${this.configService.get<string>('app.clientUrl')}/trips/${token}`,
+    };
+  }
+
+  async getSharedTrip(token: string) {
+    let payload: { tripId: string, type: string, v: number };
+
+    try {
+      payload =
+        this.tripShareService.verifyShareToken(
+          token,
+        );
+        console.log('Payload: ', payload);
+      if (payload.type !== 'PUBLIC_SHARE')
+        throw new BadRequestException(
+          'Invalid share link',
+        );
+    } catch {
+      throw new BadRequestException(
+        'Invalid or expired share link',
+      );
+    }
+
+    const trip =
+      await this.tripRepository.findSharedTripById(payload.tripId);
+
+    if (!trip) {
+      throw new NotFoundException(
+        'Trip not found',
+      );
+    }
+
+    const distanceCovered = calculateTripDistanceKm(
+      trip.pickupLatitude,
+      trip.pickupLongitude,
+      trip.dropoffLatitude,
+      trip.dropoffLongitude,
+    );
+    return {
+      // tripReference: trip.tripReference,
+
+      pickupAddress: trip.pickupAddress,
+
+      destinationAddress: trip.dropoffAddress,
+
+      fare: trip.estimatedFee,
+
+      distanceCovered: trip.distanceCovered ?? distanceCovered,
+
+      status: trip.status,
+      tripType: deriveTripType(trip),
+
+      tripDate: trip.createdAt,
+
+      // vehicleType: trip.vehicleType,
+
+      driver: trip.driver
+        ? {
+            name: trip.driver.fullName,
+            imageUrl: trip.driver.profileImageUrl,
+            // vehicle:
+            //   trip.driver.vehicleName,
+          }
+        : null,
+    };
   }
 }

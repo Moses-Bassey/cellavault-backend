@@ -64,7 +64,7 @@ export class StationDetailsDto {
   contactPhone: string;
   contactEmail: string;
 
-  stationBadge: StationBadge;
+  stationBadge: StationBadge | null;
 
   openingTime: string;
   closingTime: string;

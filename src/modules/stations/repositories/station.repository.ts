@@ -10,8 +10,8 @@ import {
 } from 'sequelize';
 import { Model } from 'sequelize-typescript';
 
-import { CngStation } from '../entities/cng-station.entity';
-import { CngFuelingStation } from '../entities/cng-fueling-station.entity';
+import { CngConversionStation } from '../entities/cng-station.entity';
+import { CngStation } from '../entities/cng-fueling-station.entity';
 import { ChargingStation } from '../entities/charging-station.entity';
 import { StationSource } from '../dto/station.dto';
 import { StationCursor, encodeStationCursor, } from '../utils/station-cursor.util';
@@ -24,7 +24,7 @@ type StationRowCount = {
   inactive: string | number;
 };
 
-export type StationEntity = CngStation | CngFuelingStation | ChargingStation;
+export type StationEntity = CngConversionStation | CngStation | ChargingStation;
 
 // base static model type for safe calls (prevents “this context” overload union issues)
 type BaseModelStatic = SequelizeModelStatic<Model<any, any>>;
@@ -32,11 +32,11 @@ type BaseModelStatic = SequelizeModelStatic<Model<any, any>>;
 @Injectable()
 export class StationRepository {
   constructor(
-    @InjectModel(CngStation)
-    private readonly cngStationModel: typeof CngStation,
+    @InjectModel(CngConversionStation)
+    private readonly conversionStationModel: typeof CngConversionStation,
 
-    @InjectModel(CngFuelingStation)
-    private readonly cngFuelingModel: typeof CngFuelingStation,
+    @InjectModel(CngStation)
+    private readonly cngFuelingModel: typeof CngStation,
 
     @InjectModel(ChargingStation)
     private readonly chargingModel: typeof ChargingStation,
@@ -52,7 +52,7 @@ export class StationRepository {
     evChargingStations: number;
   }> {
     const [cng, fueling, ev] = await Promise.all([
-      this.countTable(this.cngStationModel as unknown as BaseModelStatic),
+      this.countTable(this.conversionStationModel as unknown as BaseModelStatic),
       this.countTable(this.cngFuelingModel as unknown as BaseModelStatic),
       this.countTable(this.chargingModel as unknown as BaseModelStatic),
     ]);
@@ -157,6 +157,22 @@ export class StationRepository {
         : {}),
     } as any;
 
+    const allowedAttributes = [
+      'id',
+      'name',
+      'state',
+      'country',
+      'address',
+      'isActive',
+      'createdAt',
+      'updatedAt',
+    ];
+
+    // Only push 'stationBadge' if it physically exists in this model's schema
+    if (model.rawAttributes && 'stationBadge' in model.rawAttributes) {
+      allowedAttributes.push('stationBadge');
+    }
+
     const rows = await model.findAll({
       where,
 
@@ -167,17 +183,7 @@ export class StationRepository {
 
       limit: limit + 1,
 
-      attributes: [
-        'id',
-        'name',
-        'state',
-        'country',
-        'address',
-        'isActive',
-        'stationBadge',
-        'createdAt',
-        'updatedAt',
-      ],
+      attributes: allowedAttributes,
 
       raw: true,
     });
@@ -217,7 +223,7 @@ export class StationRepository {
   async createStation(source: StationSource, payload: Record<string, any>) {
     switch (source) {
       case 'CNG_CONVERSION':
-        return this.cngStationModel.create(payload as any);
+        return this.conversionStationModel.create(payload as any);
       case 'CNG':
         return this.cngFuelingModel.create(payload as any);
       case 'EV_CHARGING':
@@ -236,7 +242,7 @@ export class StationRepository {
     // return typed instances, not Model<any,any>
     switch (source) {
       case 'CNG_CONVERSION':
-        return this.cngStationModel.findByPk(id);
+        return this.conversionStationModel.findByPk(id);
       case 'CNG':
         return this.cngFuelingModel.findByPk(id);
       case 'EV_CHARGING':
@@ -255,11 +261,11 @@ export class StationRepository {
   ): Promise<StationEntity | null> {
     switch (source) {
       case 'CNG_CONVERSION': {
-        const [affected] = await this.cngStationModel.update(patch as any, {
+        const [affected] = await this.conversionStationModel.update(patch as any, {
           where: { id },
         });
         if (!affected) return null;
-        return this.cngStationModel.findByPk(id);
+        return this.conversionStationModel.findByPk(id);
       }
 
       case 'CNG': {
@@ -291,13 +297,13 @@ export class StationRepository {
   private getModel(source: StationSource): BaseModelStatic {
     switch (source) {
       case 'CNG_CONVERSION':
-        return this.cngStationModel as unknown as BaseModelStatic;
+        return this.conversionStationModel as unknown as BaseModelStatic;
       case 'CNG':
         return this.cngFuelingModel as unknown as BaseModelStatic;
       case 'EV_CHARGING':
         return this.chargingModel as unknown as BaseModelStatic;
       default:
-        return this.cngStationModel as unknown as BaseModelStatic;
+        return this.conversionStationModel as unknown as BaseModelStatic;
     }
   }
 
@@ -307,16 +313,16 @@ export class StationRepository {
    */
   private getTypedModel(
     source: StationSource,
-  ): typeof CngStation | typeof CngFuelingStation | typeof ChargingStation {
+  ): typeof CngConversionStation | typeof CngStation | typeof ChargingStation {
     switch (source) {
       case 'CNG_CONVERSION':
-        return this.cngStationModel;
+        return this.conversionStationModel;
       case 'CNG':
         return this.cngFuelingModel;
       case 'EV_CHARGING':
         return this.chargingModel;
       default:
-        return this.cngStationModel;
+        return this.conversionStationModel;
     }
   }
 
@@ -328,7 +334,7 @@ export class StationRepository {
     switch (source) {
       case 'CNG_CONVERSION':
         return (
-          (await this.cngStationModel.count({ where: { name, address } })) > 0
+          (await this.conversionStationModel.count({ where: { name, address } })) > 0
         );
       case 'CNG':
         return (

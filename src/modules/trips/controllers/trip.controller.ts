@@ -1,5 +1,6 @@
 import {
   Controller,
+  Post,
   Get,
   Param,
   Query,
@@ -13,6 +14,8 @@ import {
   ApiResponse,
   ApiBearerAuth,
 } from '@nestjs/swagger';
+import { Request as ExpressRequest } from 'express';
+import { JwtAuthPayload } from '../../auth/auth.interface';
 import { TripService } from '../services/trip.service';
 import { GetTripsQueryDto } from '../dto/trip.dto';
 import { GetTripAnalyticsDto } from '../dto/trip-analytics.dto';
@@ -98,6 +101,16 @@ export class TripController {
   @ApiResponse({ status: 404, description: 'Trip not found' })
   async getTripDetails(@Param('tripId', UuidValidationPipe) tripId: string) {
     const data = await this.tripService.getTripDetails(tripId);
+    return ResponseUtil.handleResponse(
+      data,
+      'Trip details retrieved successfully',
+      HttpStatus.OK,
+    );
+  }
+
+  @Post(':tripId/share')
+  async generateShareLink(@Param('tripId', UuidValidationPipe) tripId: string) {
+    const data = await this.tripService.generateShareLink(tripId);
     return ResponseUtil.handleResponse(
       data,
       'Trip details retrieved successfully',

@@ -18,24 +18,6 @@ import { TripStatus } from 'src/enums/ride-status.enum';
 import { TripPaymentStatus } from 'src/enums/trip-payment-status.enum';
 import { PeppcruiseFees } from '../../fees/entities/peppcruise-fees.entity';
 
-// export enum PaymentType {
-//   PEPP_COIN = 'PEPP_COIN',
-//   CASH = 'CASH',
-//   PI_COIN = 'PI_COIN',
-//   CARD = 'CARD',
-//   WALLET = 'WALLET',
-// }
-
-// export enum TripStatus {
-//   PENDING = 'PENDING',
-//   ASSIGNED = 'ASSIGNED',
-//   ACCEPTED = 'ACCEPTED',
-//   COMPLETED = 'COMPLETED',
-//   CANCELLED = 'CANCELLED',
-//   ON_THE_WAY = 'ON_THE_WAY',
-//   ARRIVED = 'ARRIVED',
-// }
-
 @Table({
   tableName: 'trips',
   timestamps: true,

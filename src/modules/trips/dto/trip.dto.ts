@@ -65,7 +65,7 @@ export class TripDetailsDto {
   pickupLocation?: string | null;
   dropoffLocation?: string | null;
   tripType?: string; // derived for now
-  distanceCovered?: number; // in km, 
+  distanceCovered?: number | string; // in km, 
 
   startTime?: string | null;
   arrivalTime?: string | null;
@@ -131,4 +131,37 @@ export class GetTripsQueryDto {
   })
   @IsOptional()
   withDelta?: string;
+}
+
+export class SharedTripDto {
+  id: string;
+
+  pickupAddress?: string;
+
+  dropoffAddress?: string;
+
+  estimatedFee: number;
+
+  finalFee?: number;
+
+  paymentType?: PaymentType;
+
+  paymentStatus: TripPaymentStatus;
+
+  status: TripStatus;
+
+  distanceCovered?: string;
+
+  startTime?: Date;
+
+  endTime?: Date;
+
+  createdAt: Date;
+
+  completedAt?: Date;
+
+  driver?: {
+    fullName: string;
+    imageUrl?: string;
+  } | null;
 }
