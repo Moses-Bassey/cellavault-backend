@@ -107,14 +107,4 @@ export class TripController {
       HttpStatus.OK,
     );
   }
-
-  @Post(':tripId/share')
-  async generateShareLink(@Param('tripId', UuidValidationPipe) tripId: string) {
-    const data = await this.tripService.generateShareLink(tripId);
-    return ResponseUtil.handleResponse(
-      data,
-      'Trip details retrieved successfully',
-      HttpStatus.OK,
-    );
-  }
 }

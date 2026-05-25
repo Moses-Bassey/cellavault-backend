@@ -2,6 +2,7 @@ import {
   Injectable,
   NotFoundException,
   BadRequestException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { User } from '../entities/user.entity';
@@ -23,6 +24,7 @@ import { UserStatusFilter } from '../../../enums/user-status.enum';
 // import { PasswordUtil } from 'src/utils/password.util';
 import { decodeCursor } from '../../../utils/cursor.util';
 import { parseISODateOrUndefined } from '../../../utils/date.util';
+import { PasswordUtil } from '../../../utils/password.util';
 
 @Injectable()
 export class UserService {
@@ -317,4 +319,37 @@ export class UserService {
   //   return user;
   // }
 
+  async deleteUserAccount(email: string, password: string): Promise<null> {
+    try {
+      // Step 1: Find user
+      const user = await this.userRepository.findByEmail(email);
+      if (!user) {
+        throw new NotFoundException('User not found');
+      }
+
+      // Step 2: Verify password
+      const verifyPassword = await PasswordUtil.verifyPassword(password, user.password);
+      if (!verifyPassword) {
+        throw new UnauthorizedException('Invalid credentials');
+      }
+
+      // Step 4: Update email to email-uuid
+      const newEmail = `${user.email}-${user.id}`;
+      const newPhoneNo = `${user.phoneNo}-${user.id}`;
+
+      const updatedDriver = await this.userRepository.update(user.id, { email: newEmail, phoneNo: newPhoneNo });
+      if (!updatedDriver) {
+        throw new NotFoundException('User not found after deletion');
+      }
+
+      await this.userRepository.delete(user.id);
+
+      return null;
+    } catch (error: unknown) {
+      if (error instanceof NotFoundException || error instanceof UnauthorizedException) {
+        throw error;
+      }
+      throw new NotFoundException('Failed to delete driver account');
+    }
+  }
 }

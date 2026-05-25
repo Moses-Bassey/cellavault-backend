@@ -22,6 +22,7 @@ import { TokenModule } from './services/token/token.module';
 import { MailModule } from './services/mail/mail.module';
 import { SmsModule } from './services/sms/sms.module';
 import { AxiosModule } from './services/axios/axios.module';
+// import { RedisModule } from './services/redis/redis.module';
 import { ApiKeyInterceptor } from './interceptors/api-key.interceptors';
 
 import { User } from './modules/users/entities';
@@ -94,6 +95,7 @@ import { Token } from './services/token/entities';
     PeppcoinModule,
     FeesModule,
     TokenModule,
+    // RedisModule,
     MailModule,
     SmsModule,
     AxiosModule,

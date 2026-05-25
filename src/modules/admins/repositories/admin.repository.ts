@@ -242,4 +242,10 @@ export class AdminRepository {
       }
     }
   }
+
+  async delete(id: string): Promise<number> {
+    return await this.adminModel.destroy({
+      where: { id },
+    });
+  }
 }

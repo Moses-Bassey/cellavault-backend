@@ -83,19 +83,19 @@ export class AuthController {
     return ResponseUtil.handleResponse(data, 'Login successful', HttpStatus.OK);
   }
 
-  // @Auth()
-  // @ApiBearerAuth()
-  // @UseGuards(AuthGuard)
-  // @Roles(UserType.PEPP_ADMIN, UserType.SUPER_ADMIN)
-  // @Delete()
-  // @HttpCode(HttpStatus.OK)
-  // async delete(@Body() userCredentials: { email: string; password: string }) {
-  //   const { email, password } = userCredentials;
-  //   const data = await this.authService.deleteAdminAccount(email, password);
-  //   return ResponseUtil.handleResponse(
-  //     {},
-  //     'Admin account deleted successfully',
-  //     HttpStatus.OK,
-  //   );
-  // }
+  @Auth()
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard)
+  @Roles(UserType.PEPP_ADMIN, UserType.SUPER_ADMIN)
+  @Delete()
+  @HttpCode(HttpStatus.OK)
+  async delete(@Body() userCredentials: { email: string; password: string }) {
+    const { email, password } = userCredentials;
+    const data = await this.authService.deleteAdminAccount(email, password);
+    return ResponseUtil.handleResponse(
+      {},
+      'Admin account deleted successfully',
+      HttpStatus.OK,
+    );
+  }
 }
