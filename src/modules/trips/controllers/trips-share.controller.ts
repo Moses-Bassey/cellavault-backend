@@ -21,7 +21,7 @@ import { ResponseUtil } from 'src/utils/response.utils';
 import { UuidValidationPipe } from '../../../shared/pipes/uuid.validator.pipe';
 
 @ApiTags('Share Trips')
-@Controller('trips/share')
+@Controller('trips')
 export class TripsShareController {
   constructor(private readonly tripService: TripService) {}
 
@@ -38,7 +38,7 @@ export class TripsShareController {
     );
   }
 
-  @Get(':token')
+  @Get('share/:token')
   @ApiOperation({ summary: 'Get shared trip details' })
   @ApiResponse({
     status: 200,
