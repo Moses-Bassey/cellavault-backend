@@ -100,12 +100,25 @@ export class DriverRepository {
     return driver?.toJSON() ?? null;
   }
 
+  async findByEmail(email: string): Promise<Driver | null> {
+    const driver = await this.driverModel.findOne({
+      where: { email },
+    });
+    return driver ? (driver.toJSON() as Driver) : null;
+  }
+
   async updateById(driverId: string, patch: Partial<Driver>) {
     const [affected] = await this.driverModel.update(patch, {
       where: { id: driverId },
     });
     if (!affected) return null;
     return this.findById(driverId);
+  }
+
+  async delete(id: string): Promise<number> {
+    return await this.driverModel.destroy({
+      where: { id },
+    });
   }
 
   async listDrivers(params: {

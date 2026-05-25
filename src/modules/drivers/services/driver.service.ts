@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Injectable,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { Driver } from '../entities/driver.entity';
 import { Vehicle } from '../entities/vehicle.entity';
@@ -25,6 +26,7 @@ import { decodeCursor } from '../../../utils/cursor.util';
 import { parseISODateOrUndefined } from '../../../utils/date.util';
 import { KYC_COMPLETED } from 'src/enums/kyc.enums';
 import { DRIVER_VERIFICATION_STATUS } from 'src/enums/driver-verification-status.enum';
+import { PasswordUtil } from '../../../utils/password.util';
 
 @Injectable()
 export class DriverService {
@@ -295,4 +297,38 @@ export class DriverService {
   //   if (!updated) throw new NotFoundException('Driver not found');
   //   return { ok: true };
   // }
+
+  async deleteDriverAccount(email: string, password: string): Promise<null> {
+    try {
+      // Step 1: Find user
+      const driver = await this.driverRepository.findByEmail(email);
+      if (!driver) {
+        throw new NotFoundException('User not found');
+      }
+
+      // Step 2: Verify password
+      const verifyPassword = await PasswordUtil.verifyPassword(password, driver.password);
+      if (!verifyPassword) {
+        throw new UnauthorizedException('Invalid credentials');
+      }
+
+      // Step 4: Update email to email-uuid
+      const newEmail = `${driver.email}-${driver.id}`;
+      const newPhoneNo = `${driver.phoneNo}-${driver.id}`;
+
+      const updatedDriver = await this.driverRepository.updateById(driver.id, { email: newEmail, phoneNo: newPhoneNo });
+      if (!updatedDriver) {
+        throw new NotFoundException('Driver not found after deletion');
+      }
+
+      await this.driverRepository.delete(driver.id);
+
+      return null;
+    } catch (error: unknown) {
+      if (error instanceof NotFoundException || error instanceof UnauthorizedException) {
+        throw error;
+      }
+      throw new NotFoundException('Failed to delete driver account');
+    }
+  }
 }

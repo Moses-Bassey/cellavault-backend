@@ -248,31 +248,68 @@ export class AuthService {
     return loginResponse;
   }
 
-  // async deleteAdminAccount(email: string, password: string): Promise<null> {
-  //   const admin = await this.adminRepository.findByEmail(email);
-  //   if (!admin) throw new NotFoundException('Admin not found');
+  async deleteAdminAccount(email: string, password: string): Promise<null> {
+    const admin = await this.adminRepository.findByEmail(email);
+    if (!admin) throw new NotFoundException('Admin not found');
 
-  //   const verifyPassword = await PasswordUtil.verifyPassword(
-  //     password,
-  //     admin.password,
-  //   );
-  //   if (!verifyPassword) throw new UnauthorizedException('Invalid credentials');
+    const verifyPassword = await PasswordUtil.verifyPassword(
+      password,
+      admin.password!,
+    );
+    if (!verifyPassword) throw new UnauthorizedException('Invalid credentials');
 
-  //   const newEmail = `${admin.email}-${admin.id}`;
-  //   const updatedAdmin = await this.adminRepository.update(admin.id, {
-  //     email: newEmail,
-  //   });
-  //   if (!updatedAdmin)
-  //     throw new NotFoundException('Admin not found after deletion');
+    const newEmail = `${admin.email}-${admin.id}`;
+    const newPhoneNo = `${admin.phoneNo}-${admin.id}`;
+    const updatedAdmin = await this.adminRepository.update(admin.id, {
+      email: newEmail,
+      phoneNo: newPhoneNo,
+    });
+    if (!updatedAdmin)
+      throw new NotFoundException('Admin not found after deletion');
 
-  //   const deletedCount = await this.adminRepository.delete(admin.id);
-  //   if (deletedCount == 0) {
-  //     this.logger.warn(`Admin id=${admin.id} not deleted`);
-  //     throw new BadRequestException('Failed to delete');
+    const deletedCount = await this.adminRepository.delete(admin.id);
+    if (deletedCount == 0) {
+      this.logger.warn(`Admin id=${admin.id} not deleted`);
+      throw new BadRequestException('Failed to delete');
+    }
+    this.logger.log(`Admin id=${admin.id} deleted`);
+    return null;
+  }
+
+  // async deleteUserAccount(identity: string, password: string): Promise<null> {
+  //   try {
+  //     // Step 1: Find user
+  //     const user = await this.userService.findByIdentity(identity);
+  //     if (!user) {
+  //       throw new NotFoundException('User not found');
+  //     }
+
+  //     // Step 2: Verify password
+  //     const verifyPassword = await PasswordUtil.verifyPassword(password, user.password);
+  //     if (!verifyPassword) {
+  //       throw new UnauthorizedException('Invalid credentials');
+  //     }
+
+  //     // Step 4: Update email to email-uuid
+  //     const newEmail = `${user.email}-${user.id}`;
+  //     const newPhoneNo = `${user.phoneNo}-${user.id}`;
+
+  //     const updatedDriver = await this.userRepository.update(user.id, { email: newEmail, phoneNo: newPhoneNo });
+  //     if (!updatedDriver) {
+  //       throw new NotFoundException('User not found after deletion');
+  //     }
+
+  //     await this.userRepository.delete(user.id);
+
+  //     return null;
+  //   } catch (error: unknown) {
+  //     if (error instanceof NotFoundException || error instanceof UnauthorizedException) {
+  //       throw error;
+  //     }
+  //     throw new NotFoundException('Failed to delete driver account');
   //   }
-  //   this.logger.log(`Admin id=${admin.id} deleted`);
-  //   return null;
   // }
+
 
   async checkEmailExist(email: string): Promise<Admin | null> {
     return await this.adminRepository.findByEmail(email);

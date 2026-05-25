@@ -100,6 +100,12 @@ export class UserRepository {
     return user ? (user.toJSON() as User) : null;
   }
 
+  async delete(id: string): Promise<number> {
+    return await this.userModel.destroy({
+      where: { id },
+    });
+  }
+
   async findActiveUsers(isDisabled: boolean): Promise<User[] | null> {
     return await this.userModel.findAll({
       where: { isDisabled },

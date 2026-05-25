@@ -30,13 +30,13 @@ async function bootstrap() {
   });
 
   // API versioning
-  app.enableVersioning({
-    type: VersioningType.URI,
-    defaultVersion: '1',
-  });
+  // app.enableVersioning({
+  //   type: VersioningType.URI,
+  //   defaultVersion: '1',
+  // });
 
   // Global prefix
-  app.setGlobalPrefix(configService.get<string>('app.apiPrefix') || 'api');
+  // app.setGlobalPrefix(configService.get<string>('app.apiPrefix') || 'api');
 
   // Global validation pipe
   app.useGlobalPipes(
