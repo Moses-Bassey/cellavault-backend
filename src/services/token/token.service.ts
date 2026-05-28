@@ -182,11 +182,11 @@ export class TokenService {
         expiresIn: '3d',
       },
     );
-    console.log('Token: ', token);
+    // console.log('Token: ', token);
 
     const hashedToken = await PasswordUtil.hashPassword(token);
 
-    console.log('Hashed Token: ', hashedToken);
+    // console.log('Hashed Token: ', hashedToken);
 
     const created = await this.tokenRepository.create({
       ...payload,

@@ -6,6 +6,7 @@ import {
   UnauthorizedException,
   Logger,
 } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import moment from 'moment';
 import { ConfigService } from '@nestjs/config';
 import { JwtSignOptions } from '@nestjs/jwt';
@@ -21,7 +22,7 @@ import { UserType } from '../../enums/user-type.enum';
 import { EmailEventService } from 'src/services/mail/email-event.service';
 import { PasswordUtil } from '../../utils/password.util';
 import { Utils } from 'src/utils/utils';
-import { CreateAdminDto, InviteAdminDto, AdminLoginDto, LoginOtpDto, CompleteAdminOnboardingDto } from './dto/auth.dto';
+import { InviteAdminDto, AdminLoginDto, LoginOtpDto, CompleteAdminOnboardingDto } from './dto/auth.dto';
 import { Validators } from '../../utils/validators.utils';
 import { JwtAuthPayload } from './auth.interface';
 import { InvitationStatus } from '../../enums/invite-status.enum';
@@ -35,27 +36,10 @@ export class AuthService {
     private readonly emailEventService: EmailEventService,
     private readonly tokenService: TokenService,
     private readonly clientDeviceEventEmitter: ClientDeviceEventEmitter,
+    private readonly eventEmitter: EventEmitter2,
     private readonly configService: ConfigService,
   ) {}
 
-  // async create(data: CreateAdminDto): Promise<Admin> {
-  //   data.email = Validators.validateEmail(data.email);
-
-  //   const emailUser = await this.checkEmailExist(data.email);
-  //   if (emailUser) {
-  //     throw new ConflictException('Admin with email already exists');
-  //   }
-
-  //   const hashedPassword = await PasswordUtil.hashPassword(data.password);
-
-  //   const admin = await this.adminRepository.create({
-  //     fullName: data.fullName,
-  //     email: data.email,
-  //     password: hashedPassword,
-  //     role: UserType.PEPP_ADMIN,
-  //   });
-  //   return admin;
-  // }
   async inviteAdmin(inviterId: string, dto: InviteAdminDto) {
     const { fullName, email, phoneNo, role } = dto;
 
@@ -117,7 +101,7 @@ export class AuthService {
       token: dto.token,
       subject: TokenSubject.ADMIN_INVITE,
     });
-    console.log('Payload service: ', payload);
+    // console.log('Payload service: ', payload);
 
     if (payload.type !== TokenSubject.ADMIN_INVITE) {
       throw new UnauthorizedException();
@@ -164,7 +148,8 @@ export class AuthService {
         'Account creation request not approved, please contact support team.',
       );
     }
-    if (!admin.password) throw new BadRequestException('Password not set, complete account verification');
+    if (!admin.password)
+      throw new BadRequestException('Password not set, complete account verification');
 
     // Verify password
     const isPasswordValid = await PasswordUtil.verifyPassword(
@@ -197,7 +182,8 @@ export class AuthService {
 
     const admin = await this.checkEmailExist(email);
     if (!admin) throw new NotFoundException('Account not found');
-    if (!admin.password) throw new BadRequestException('Password not set, complete account verification');
+    if (!admin.password)
+      throw new BadRequestException('Password not set, complete account verification');
 
     // const verifyOtp = await this.tokenService.verifyOTP({
     //   email: admin.email,
@@ -361,6 +347,7 @@ export class AuthService {
       tokenOptions,
     );
 
+    this.eventEmitter.emit('newLoginEvent', admin.id);
     return {
       token,
       user: {
@@ -406,16 +393,16 @@ export class AuthService {
 
   private normalizePhone(phone: string): string {
     const cleaned = phone.trim();
-    
+
     if (cleaned.startsWith('+234')) {
         return cleaned.slice(1);
     }
-    
+
     if (cleaned.startsWith('0')) {
         return '234' + cleaned.slice(1);
     }
-    
-    console.log('Phone: ', cleaned);
+
+    // console.log('Phone: ', cleaned);
     return cleaned;
   }
 

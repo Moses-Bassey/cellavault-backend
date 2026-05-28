@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -15,6 +16,7 @@ import { ClientDevicesModule } from './modules/client-devices/client-devices.mod
 import { AdminModule } from './modules/admins/admins.module';
 import { TripsModule } from './modules/trips/trips.module';
 import { StationsModule } from './modules/stations/station.module';
+import { MapModule } from './modules/map/map.module';
 // import { SearchModule } from './modules/search/search.module';
 import { PeppcoinModule } from './modules/peppcoin/peppcoin.module';
 import { FeesModule } from './modules/fees/fees.module';
@@ -22,7 +24,7 @@ import { TokenModule } from './services/token/token.module';
 import { MailModule } from './services/mail/mail.module';
 import { SmsModule } from './services/sms/sms.module';
 import { AxiosModule } from './services/axios/axios.module';
-// import { RedisModule } from './services/redis/redis.module';
+import { RedisModule } from './services/redis/redis.module';
 import { ApiKeyInterceptor } from './interceptors/api-key.interceptors';
 
 import { User } from './modules/users/entities';
@@ -41,6 +43,7 @@ import { Token } from './services/token/entities';
 
 @Module({
   imports: [
+    EventEmitterModule.forRoot(),
     ConfigModule.forRoot({
       isGlobal: true,
       load: [appConfig],
@@ -91,11 +94,12 @@ import { Token } from './services/token/entities';
     AdminModule,
     TripsModule,
     StationsModule,
+    MapModule,
     // SearchModule,
     PeppcoinModule,
     FeesModule,
     TokenModule,
-    // RedisModule,
+    RedisModule,
     MailModule,
     SmsModule,
     AxiosModule,
