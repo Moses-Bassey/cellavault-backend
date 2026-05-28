@@ -15,7 +15,7 @@ async function bootstrap() {
 
   // CORS configuration
   app.enableCors({
-    origin: ['http://localhost:3001', 'http://localhost:3000', 'https://peppcruise-admin.vercel.app', 'https://pepp-cruise-admin-web.vercel.app', 'https://peppcruise.com'],
+    origin: ['http://localhost:3001', 'http://localhost:3000', 'https://peppcruise-admin.vercel.app', 'https://pepp-cruise-admin-web.vercel.app', 'https://peppcruise.com', 'https://pepp-cruise-website.vercel.app'],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: [
