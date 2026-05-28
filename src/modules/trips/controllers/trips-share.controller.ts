@@ -46,7 +46,7 @@ export class TripsShareController {
   })
   @ApiResponse({ status: 404, description: 'Shared trip not found' })
   async getSharedTrip(@Param('token') token: string) {
-    console.log('token: ', token);
+    // console.log('token: ', token);
     const data = await this.tripService.getSharedTrip(
       token,
     );

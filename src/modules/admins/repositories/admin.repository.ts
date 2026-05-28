@@ -226,11 +226,10 @@ export class AdminRepository {
   async update(
     id: string,
     updates: Partial<Admin>,
-  ): Promise<[number, Admin[]]> {
+  ): Promise<[number]> {
     try {
       return await this.adminModel.update(updates, {
         where: { id },
-        returning: true,
       });
     } catch (error: unknown) {
       if (error instanceof Error) {

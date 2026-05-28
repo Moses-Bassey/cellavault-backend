@@ -265,8 +265,8 @@ export class TripService {
       trip.dropoffLatitude,
       trip.dropoffLongitude,
     );
-    console.log('Distance from db: ', trip.distanceCovered);
-    console.log('Distance from calculation: ', distanceCovered);
+    // console.log('Distance from db: ', trip.distanceCovered);
+    // console.log('Distance from calculation: ', distanceCovered);
 
 
     return {
@@ -454,7 +454,7 @@ export class TripService {
         this.tripShareService.verifyShareToken(
           token,
         );
-        console.log('Payload: ', payload);
+        // console.log('Payload: ', payload);
       if (payload.type !== 'PUBLIC_SHARE')
         throw new BadRequestException(
           'Invalid share link',

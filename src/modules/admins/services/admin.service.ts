@@ -85,6 +85,14 @@ export class AdminService {
     };
   }
 
+  async updateNewLogin(adminId: string) {
+    const [affectedCount] = await this.adminRepository.update(adminId, {
+      lastLogin: new Date(),
+    });
+    if (affectedCount === 0) throw new NotFoundException('Admin not found for update');
+    return null;
+  }
+
   /* -------------------------------------------------------------------------- */
   /*                               HELPER METHODS                               */
   /* -------------------------------------------------------------------------- */
