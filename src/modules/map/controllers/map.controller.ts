@@ -1,7 +1,9 @@
 import {
   Controller,
   Get,
+  Query,
   HttpStatus,
+  HttpCode,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -50,5 +52,38 @@ export class MapController {
       'Driver locations retrieved successfully',
       HttpStatus.OK,
     );
+  }
+
+  /**
+   * GET /admin/map/search?query=:query&limit=10
+   *
+   * Searches online drivers by name, plate number, or vehicle make.
+   * Results are drawn from a 15-second Redis cache — 0 extra DB or
+   * GEO queries. The first call after a cache miss costs the same
+   * as a regular map load (HGETALL + pipeline); every subsequent
+   * call within the TTL window is free.
+   */
+  @Get('search')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Search drivers for the admin map' })
+  async searchDrivers(
+    @Query('query') query: string,
+    @Query('limit') limit?: string,
+  ) {
+    // Return empty early — avoids any Redis work for trivial queries
+    if (!query || query.trim().length < 2) {
+      return ResponseUtil.handleResponse(
+        { results: [], total: 0 },
+        "Search results",
+      );
+    }
+
+    const parsedLimit = Math.min(
+      parseInt(limit ?? "10", 10) || 10,
+      50, // hard cap — prevent accidentally returning 10 000 results
+    );
+
+    const data = await this.mapService.searchDrivers(query.trim(), parsedLimit);
+    return ResponseUtil.handleResponse(data, "Search results");
   }
 }

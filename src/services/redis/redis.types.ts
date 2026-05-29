@@ -1,3 +1,4 @@
+import { DriverTripStatus } from 'src/enums/driver-trip-status.enum';
 /**
  * Shape of the driver document stored in Redis when a driver goes online.
  * Used for addDriver and returned by getAvailableDrivers / getClosestAvailableDriver.
@@ -21,3 +22,26 @@ export interface RedisDriver {
 
 /** @deprecated Use RedisDriver for new code. Kept for backward compatibility. */
 export interface Driver extends RedisDriver {}
+
+
+// ─── Cached result shape ─────────────────────────────────────────────────────
+
+export interface CachedMapResult {
+  drivers: RawDriverMapEntry[];
+  totalOnTrip: number;
+  totalOnline: number;
+  totalOffline: number;
+}
+
+export interface RawDriverMapEntry {
+  id: string;
+  driverName: string;
+  driverPhoto: string | null;
+  phoneNo: string;
+  plateNo: string;
+  makeOfVehicle: string;
+  carColor: string;
+  latitude: number;
+  longitude: number;
+  tripStatus: DriverTripStatus;
+}

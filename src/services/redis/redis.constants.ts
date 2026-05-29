@@ -112,3 +112,10 @@ export const DRIVER_STATUS = {
   OFFLINE: 'offline',
   BUSY: 'busy',
 } as const;
+
+// ─── Cache constants ──────────────────────────────────────────────────────────
+// Shared between getDriverLocations and searchDrivers.
+// One HGETALL every 15 s regardless of how many map loads or searches happen.
+
+export const MAP_CACHE_KEY     = "admin:map:drivers:cache";
+export const MAP_CACHE_TTL_SEC = 15; // matches frontend polling interval

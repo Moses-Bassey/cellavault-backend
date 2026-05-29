@@ -62,3 +62,31 @@ export class DriversMapDataDto {
   @ApiProperty({ example: 2 })
   totalOffline: number;
 }
+
+export class MapSearchResultDto {
+  @ApiProperty()
+  id: string;
+
+  @ApiProperty({ example: "John Doe" })
+  fullName: string;
+
+  @ApiProperty({ nullable: true })
+  driverPhoto: string | null;
+
+  @ApiProperty({ nullable: true, example: "ABI 234 XY" })
+  plateNumber: string | null;
+
+  @ApiProperty({ enum: DriverTripStatus })
+  tripStatus: DriverTripStatus;
+
+  @ApiProperty({ type: DriverCoordinatesDto })
+  coordinates: DriverCoordinatesDto;
+}
+
+export class MapSearchDataDto {
+  @ApiProperty({ type: [MapSearchResultDto] })
+  results: MapSearchResultDto[];
+
+  @ApiProperty({ example: 3 })
+  total: number;
+}

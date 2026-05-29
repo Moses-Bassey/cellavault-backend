@@ -5,6 +5,8 @@ import {
   DriverMapEntryDto,
   DriverVehicleMapDto,
   DriverCoordinatesDto,
+  MapSearchDataDto,
+  MapSearchResultDto,
 } from '../dto/map.dto';
 
 @Injectable()
@@ -48,5 +50,24 @@ export class MapService {
     });
 
     return { drivers: mapped, totalOnTrip, totalOnline, totalOffline };
+  }
+
+  /**
+   * Map search endpoint handler.
+   * Delegates to Redis service which returns from cache when warm.
+   */
+  async searchDrivers(query: string, limit: number,): Promise<MapSearchDataDto> {
+    const raw = await this.redisService.searchDrivers(query, limit);
+
+    const results: MapSearchResultDto[] = raw.map((d) => ({
+      id:          d.id,
+      fullName:    d.driverName,
+      driverPhoto: d.driverPhoto,
+      plateNumber: d.plateNo || null,
+      tripStatus:  d.tripStatus,
+      coordinates: { latitude: d.latitude, longitude: d.longitude },
+    }));
+
+    return { results, total: results.length };
   }
 }

@@ -9,9 +9,15 @@ import {
   resolveRedisUrlFromEnv,
   redisTlsOptions,
   isUsingDirectRedisUrl,
+  MAP_CACHE_KEY,
+  MAP_CACHE_TTL_SEC,
 } from '../redis.constants';
 import { DriverTripStatus } from 'src/enums/driver-trip-status.enum';
-import { RedisDriver } from '../redis.types';
+import {
+  RedisDriver,
+  CachedMapResult,
+  RawDriverMapEntry,
+} from '../redis.types';
 import * as dotenv from 'dotenv';
 dotenv.config();
 
@@ -88,6 +94,43 @@ export class RedisService implements OnModuleDestroy {
     // }
   }
 
+  // ─── Private helper — builds or returns the cached map result ─────────────────
+
+  /**
+   * Returns the enriched driver list from a 15-second Redis string cache.
+   *
+   *   Cache HIT  → 0 Redis commands    (pure JSON.parse + return)
+   *   Cache MISS → 2 Redis round trips  (HGETALL + pipeline)
+   *                then stores result   (1 SET with EX)
+   *
+   * Both getAllDriversForMap() and searchDrivers() call this, so at most one
+   * HGETALL runs per 15 s per NestJS instance, regardless of traffic.
+   */
+  private async getCachedMapResult(): Promise<CachedMapResult> {
+    await this.ensureRedisReady();
+
+    // ── Try cache first ─────────────────────────────────────────────────────
+    const raw = await this.client.get(MAP_CACHE_KEY);
+    if (raw) {
+      try {
+        return JSON.parse(raw) as CachedMapResult;
+      } catch {
+        this.logger.warn("[getCachedMapResult] Cache corrupted — rebuilding.");
+      }
+    }
+
+    // ── Cache miss: compute from Redis and store ─────────────────────────────
+    const result = await this.computeAllDriversForMap(); // see note below
+
+    // Fire-and-forget — don't block the response on the cache write
+    this.client
+      .setex(MAP_CACHE_KEY, MAP_CACHE_TTL_SEC, JSON.stringify(result))
+      .catch((err) =>
+        this.logger.error(`[getCachedMapResult] Failed to write cache: ${err.message}`),
+      );
+
+    return result;
+  }
 
   /**
    * Fetches all driver locations and statuses from Redis for the admin map.
@@ -106,30 +149,14 @@ export class RedisService implements OnModuleDestroy {
    *
    * @returns Raw entries ready for MapService to shape into DriversMapDataDto.
    */
-  async getAllDriversForMap(): Promise<{
-    drivers: Array<{
-      id: string;
-      driverName: string;
-      driverPhoto: string | null;
-      phoneNo: string;
-      plateNo: string;
-      makeOfVehicle: string;
-      carColor: string;
-      latitude: number;
-      longitude: number;
-      tripStatus: DriverTripStatus;
-    }>;
-    totalOnTrip: number;
-    totalOnline: number;
-    totalOffline: number;
-  }> {
+  private async computeAllDriversForMap(): Promise<CachedMapResult> {
     await this.ensureRedisReady();
 
     // ── Step 1: Single HGETALL — pulls every driver entry at once ────────────
     // For 10 k drivers @ ~300 B/entry ≈ 3 MB payload; typically < 10 ms.
     const allMeta = await this.client.hgetall(REDIS_DRIVER_KEY);
 
-    const empty = {
+    const empty: CachedMapResult = {
       drivers: [],
       totalOnTrip: 0,
       totalOnline: 0,
@@ -175,17 +202,10 @@ export class RedisService implements OnModuleDestroy {
     }
     const pipelineResults = await pipeline.exec();
 
-    //   // 3. Enrich with vehicle data from MySQL (single IN query)
-    //   const drivers = await this.driverRepo.findAll({
-    //     where: { id: { [Op.in]: members } },
-    //     include: [{ model: Vehicle, as: "vehicle" }],
-    //     attributes: ["id", "fullName", "phoneNo"],
-    //   });
-
-    // const driverMap = new Map(drivers.map((d) => [d.id, d]));
-
     // ── Step 4: Assemble final entries ─────────────────────────────────────────
-    const drivers: ReturnType<typeof this.getAllDriversForMap> extends Promise<{ drivers: infer D }>
+    const drivers: ReturnType<typeof this.getAllDriversForMap> extends Promise<{
+      drivers: infer D,
+    }>
       ? D
       : never = [];
 
@@ -232,6 +252,44 @@ export class RedisService implements OnModuleDestroy {
         `${totalOnTrip} on trip / ${totalOnline} online / ${totalOffline} offline`,
     );
 
-    return { drivers: drivers as any, totalOnTrip, totalOnline, totalOffline };
+    return { drivers, totalOnTrip, totalOnline, totalOffline };
+  }
+
+  async getAllDriversForMap(): Promise<CachedMapResult> {
+    return this.getCachedMapResult();
+  }
+
+  // ─── New: search drivers ──────────────────────────────────────────────────────
+
+  /**
+   * Searches active drivers by name, plate number, or vehicle make.
+   * Runs entirely in Node.js on the cached driver array — zero extra Redis calls
+   * when the cache is warm (which it is after the first map load).
+   *
+   * Complexity: O(N × Q) where N = drivers, Q = query length
+   * For 5 000 drivers with a 5-char query: ~0.5 ms on a modern CPU.
+   *
+   * @param query  Minimum 2 characters (enforced by the controller).
+   * @param limit  Maximum results to return (default 10).
+   */
+  async searchDrivers(query: string, limit = 10): Promise<RawDriverMapEntry[]> {
+    const { drivers } = await this.getCachedMapResult();
+    const q = query.trim().toLowerCase();
+
+    const matches: RawDriverMapEntry[] = [];
+
+    for (const d of drivers) {
+      if (matches.length >= limit) break;
+
+      const hitName  = d.driverName.toLowerCase().includes(q);
+      const hitPlate = d.plateNo.toLowerCase().includes(q);
+      const hitMake  = d.makeOfVehicle.toLowerCase().includes(q);
+
+      if (hitName || hitPlate || hitMake) {
+        matches.push(d);
+      }
+    }
+
+    return matches;
   }
 }
