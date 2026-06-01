@@ -9,7 +9,7 @@ import { UserType } from '../../../enums/user-type.enum';
 import { USERTYPES_KEY } from '../decorators/roles.decorator';
 import { JwtAuthPayload } from '../auth.interface';
 
-interface AuthenticatedRequest extends Request {
+export interface AuthenticatedRequest extends Request {
   user: JwtAuthPayload;
 }
 
