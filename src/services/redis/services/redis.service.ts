@@ -25,6 +25,8 @@ dotenv.config();
 export class RedisService implements OnModuleDestroy {
   private readonly logger = new Logger(RedisService.name);
   private readonly client: Redis;
+  private static readonly ADMIN_ONLINE_TTL    = 300;    // 5 min → "online"
+  private static readonly ADMIN_LAST_SEEN_TTL = 7_200;  // 2 hr → "idle" window
 
   constructor() {
     const rawUrl = resolveRedisUrlFromEnv();
@@ -291,5 +293,69 @@ export class RedisService implements OnModuleDestroy {
     }
 
     return matches;
+  }
+
+  // ─── Admin activity tracking ──────────────────────────────────────────────────
+  // Two keys per admin:
+  //   admin:online:{id}     EX 300   — exists = "online" (active last 5 min)
+  //   admin:last_seen:{id}  EX 7200  — timestamp for "idle" detection (5–120 min)
+  //
+  // Called fire-and-forget from the global AdminActivityInterceptor on every
+  // authenticated admin API request — zero impact on response latency.
+
+  async refreshAdminActivity(adminId: string): Promise<void> {
+    const now = Date.now().toString();
+    this.client
+      .pipeline()
+      .setex(`admin:online:${adminId}`, RedisService.ADMIN_ONLINE_TTL,    now)
+      .setex(`admin:last_seen:${adminId}`, RedisService.ADMIN_LAST_SEEN_TTL, now)
+      .exec()
+      .catch((err) =>
+        this.logger.error(`[refreshAdminActivity] Failed for ${adminId}: ${err.message}`),
+      );
+    // Fire-and-forget — intentionally not awaited
+  }
+
+  /**
+   * Batch-fetch online + last-seen for all given admin IDs in ONE pipeline.
+   * 2N commands, 1 round trip.
+   */
+  async batchGetAdminActivity(adminIds: string[]): Promise<
+    Map<string, { status: 'online' | 'idle' | 'offline'; lastSeenAt: Date | null }>
+  > {
+    if (!adminIds.length) return new Map();
+
+    const pipeline = this.client.pipeline();
+    for (const id of adminIds) {
+      pipeline.get(`admin:online:${id}`);    // 1 = alive, null = expired
+      pipeline.get(`admin:last_seen:${id}`); // timestamp string or null
+    }
+    const results = await pipeline.exec();
+
+    const map = new Map<string, { status: 'online' | 'idle' | 'offline'; lastSeenAt: Date | null }>();
+
+    adminIds.forEach((id, i) => {
+      const onlineVal   = results?.[i * 2]?.[1]     as string | null;
+      const lastSeenVal = results?.[i * 2 + 1]?.[1] as string | null;
+
+      if (onlineVal) {
+        map.set(id, { status: 'online', lastSeenAt: new Date(parseInt(onlineVal, 10)) });
+        return;
+      }
+
+      if (lastSeenVal) {
+        const lastSeen = new Date(parseInt(lastSeenVal, 10));
+        const minsAgo  = (Date.now() - lastSeen.getTime()) / 60_000;
+        map.set(id, {
+          status:     minsAgo <= 60 ? 'idle' : 'offline',
+          lastSeenAt: lastSeen,
+        });
+        return;
+      }
+
+      // No Redis entry — fall through to DB-based derivation in service
+    });
+
+    return map;
   }
 }

@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { APP_INTERCEPTOR } from '@nestjs/core';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -17,6 +18,7 @@ import { AdminModule } from './modules/admins/admins.module';
 import { TripsModule } from './modules/trips/trips.module';
 import { StationsModule } from './modules/stations/station.module';
 import { MapModule } from './modules/map/map.module';
+import { ActivityModule } from './modules/activity/activity.module';
 // import { SearchModule } from './modules/search/search.module';
 import { PeppcoinModule } from './modules/peppcoin/peppcoin.module';
 import { FeesModule } from './modules/fees/fees.module';
@@ -26,6 +28,7 @@ import { SmsModule } from './services/sms/sms.module';
 import { AxiosModule } from './services/axios/axios.module';
 import { RedisModule } from './services/redis/redis.module';
 import { ApiKeyInterceptor } from './interceptors/api-key.interceptors';
+import { AdminActivityInterceptor } from './interceptors/admin-activity.interceptor';
 
 import { User } from './modules/users/entities';
 import { Driver } from './modules/drivers/entities';
@@ -95,6 +98,7 @@ import { Token } from './services/token/entities';
     TripsModule,
     StationsModule,
     MapModule,
+    ActivityModule,
     // SearchModule,
     PeppcoinModule,
     FeesModule,
@@ -105,6 +109,12 @@ import { Token } from './services/token/entities';
     AxiosModule,
   ],
   controllers: [AppController],
-  providers: [AppService, ApiKeyInterceptor],
+  providers: [
+    AppService,
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: AdminActivityInterceptor,
+    },
+  ],
 })
 export class AppModule {}
