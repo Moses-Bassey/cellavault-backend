@@ -119,3 +119,5 @@ export const DRIVER_STATUS = {
 
 export const MAP_CACHE_KEY     = "admin:map:drivers:cache";
 export const MAP_CACHE_TTL_SEC = 15; // matches frontend polling interval
+
+export const REDIS_FEES_KEY = 'fees:all';
