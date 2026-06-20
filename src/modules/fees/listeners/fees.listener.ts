@@ -22,6 +22,7 @@ export class FeeRedisListener {
   async handleCreate(
     payload: FeeChangedEvent,
   ) {
+    // this.logger.log('Listener reached -- create');
     await this.handleUpsert(
       payload.feeId,
     );
@@ -31,6 +32,7 @@ export class FeeRedisListener {
   async handleUpdate(
     payload: FeeChangedEvent,
   ) {
+    // this.logger.log('Listener reached -- update');
     await this.handleUpsert(
       payload.feeId,
     );
@@ -40,6 +42,7 @@ export class FeeRedisListener {
   async handleDelete(
     payload: FeeChangedEvent,
   ) {
+    // this.logger.log('Listener reached -- delete');
     const redis =
       this.redisService.getClient();
 
