@@ -2,9 +2,11 @@ import {
   Body,
   Controller,
   Get,
+  Delete,
   Param,
   Patch,
   Post,
+  Request,
   Query,
   UseGuards,
   HttpStatus,
@@ -26,6 +28,7 @@ import { Roles } from '../../auth/decorators/roles.decorator';
 import { UserType } from '../../../enums/user-type.enum';
 import { ResponseUtil } from 'src/utils/response.utils';
 import { UuidValidationPipe } from '../../../shared/pipes/uuid.validator.pipe';
+import { Validators } from 'src/utils/validators.utils';
 
 @ApiTags('Fees')
 @ApiBearerAuth()
@@ -113,6 +116,42 @@ export class FeesController {
     return ResponseUtil.handleResponse(
       data,
       'Fee updated successfully',
+      HttpStatus.OK,
+    );
+  }
+
+  @Delete(':id')
+  @ApiOperation({
+    summary: 'Delete fee',
+  })
+  @ApiResponse({
+    status: 200,
+    description:
+      'Fee deleted successfully',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Fee not found',
+  })
+  @HttpCode(HttpStatus.OK)
+  async deleteFee(
+    @Request() req: ExpressRequest & { user: JwtAuthPayload },
+    @Param(
+      'id',
+      UuidValidationPipe,
+    )
+    feeId: string,
+  ) {
+    const adminId = Validators.validateUuid(req.user.userId);
+    const data =
+      await this.feeService.deleteFee(
+        feeId,
+        adminId,
+      );
+
+    return ResponseUtil.handleResponse(
+      data,
+      'Fee deleted successfully',
       HttpStatus.OK,
     );
   }

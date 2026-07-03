@@ -123,4 +123,14 @@ export class FeesRepository {
       order: [['className', 'ASC']],
     });
   }
+
+  async deleteFee(
+    id: string,
+  ): Promise<boolean> {
+    const deleted = await this.feeModel.destroy({
+      where: { id },
+    });
+
+    return deleted > 0;
+  }
 }

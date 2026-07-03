@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { FeesRepository } from '../repositories/fees.repository';
+import { AdminService } from '../../admins/services/admin.service';
 import { CreateFeeDto, UpdateFeeDto } from '../dto/fees.dto';
 import {
   decodeCursor,
@@ -16,6 +17,7 @@ export class FeesService {
   constructor(
     private readonly feeRepository: FeesRepository,
     private readonly eventEmitter: EventEmitter2,
+    private readonly adminService: AdminService,
   ) {}
 
   async createFee(
@@ -104,5 +106,40 @@ export class FeesService {
         query.cursor,
       ),
     });
+  }
+
+  async deleteFee(id: string, adminId: string) {
+    const admin = await this.adminService.findById(adminId);
+    if (!admin) throw new NotFoundException('Admin not found');
+
+    const fee =
+      await this.feeRepository.findById(id);
+
+    if (!fee) {
+      throw new NotFoundException(
+        'Fee not found',
+      );
+    }
+
+    const deleted =
+      await this.feeRepository.deleteFee(id);
+
+    if (!deleted) {
+      throw new BadRequestException(
+        'Failed to delete fee',
+      );
+    }
+
+    await this.eventEmitter.emitAsync(
+      FEE_EVENTS.DELETED,
+      {
+        feeId: id,
+      },
+    );
+
+    return {
+      id,
+      deleted: true,
+    };
   }
 }
