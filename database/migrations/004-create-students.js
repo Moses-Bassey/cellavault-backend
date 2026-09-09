@@ -33,6 +33,19 @@ module.exports = {
         type: DataTypes.STRING(50),
         allowNull: true,
       },
+      role: {
+        type: DataTypes.STRING(100),
+        allowNull: false, // Super Admin, Admin, Student, Tutor
+      },
+      photoUrl: {
+        type: DataTypes.STRING(255),
+        allowNull: true,
+      },
+      isActive: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: true,
+      },
       createdAt: {
         type: DataTypes.DATE,
         allowNull: false,

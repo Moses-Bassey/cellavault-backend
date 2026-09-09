@@ -21,10 +21,6 @@ module.exports = {
         type: DataTypes.STRING(100),
         allowNull: true,
       },
-      photoUrl: {
-        type: DataTypes.STRING(255),
-        allowNull: true,
-      },
       password: {
         type: DataTypes.STRING(1000),
         allowNull: false,

@@ -21,6 +21,11 @@ module.exports = {
         type: DataTypes.STRING(100),
         allowNull: false, // Super Admin, Admin
       },
+      isActive: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: true,
+      },
       createdAt: {
         type: DataTypes.DATE,
         allowNull: false,

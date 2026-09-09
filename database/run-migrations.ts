@@ -4,14 +4,16 @@ import { config } from 'dotenv';
 // Load environment variables
 config();
 
-const sequelize = new Sequelize({
-  dialect: 'mysql',
-  host: process.env.DATABASE_HOST || 'localhost',
-  port: Number(process.env.DATABASE_PORT) || 3306,
-  username: process.env.DATABASE_USER || 'root',
-  password: process.env.DATABASE_PASSWORD || 'password',
-  database: process.env.DATABASE_NAME || 'peppcruise',
+// Initialize Sequelize using the PostgreSQL connection URI
+const sequelize = new Sequelize(process.env.DATABASE_URL || '', {
+  dialect: 'postgres',
   logging: process.env.NODE_ENV === 'development' ? console.log : false,
+  dialectOptions: {
+    ssl: {
+      require: true,
+      rejectUnauthorized: false, // Required for secure cloud hosts like Neon/Heroku
+    },
+  },
 });
 
 async function runMigrations() {
@@ -24,7 +26,6 @@ async function runMigrations() {
 
     // Run migrations
     const { execSync } = require('child_process');
-
     console.log('📦 Running migrations...');
     execSync('npx sequelize-cli db:migrate', { stdio: 'inherit' });
 

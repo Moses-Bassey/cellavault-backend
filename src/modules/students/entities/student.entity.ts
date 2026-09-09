@@ -68,6 +68,9 @@ export class Student extends Model<Student> {
   })
   declare role: UserType;
   
+  @Column(DataType.STRING(255))
+  declare photoUrl: string;
+  
   @Column({
     type: DataType.BOOLEAN,
     allowNull: false,

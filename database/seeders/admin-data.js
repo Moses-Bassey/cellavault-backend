@@ -10,9 +10,9 @@ module.exports = {
     await queryInterface.bulkInsert("admins", [
       {
         id: "7c2d3f2e-9a1b-4a9d-9f5b-3f1c2a8d9e10",
-        name: "Super Admin",
+        // name: "Super Admin",
         email: "admin@innovations.com",
-        phoneNo: "08106616246",
+        // phoneNo: "08106616246",
         password: passwordHash,
         role: "SUPER_ADMIN",
         isActive: true,

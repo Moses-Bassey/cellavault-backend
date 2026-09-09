@@ -1,7 +1,7 @@
 {
-  "name": "pepp-cruise-admin-server",
+  "name": "nugi-innovations-server",
   "version": "0.0.1",
-  "description": "PePP Cruise Server - Professional NestJS Application",
+  "description": "Nugi Innovations Server - Professional NestJS Application",
   "author": "",
   "private": true,
   "license": "UNLICENSED",
