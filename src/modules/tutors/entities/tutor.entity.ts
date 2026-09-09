@@ -11,10 +11,10 @@ import {
   Unique,
   AllowNull,
 } from 'sequelize-typescript';
-import { UserType } from 'src/enums';
+import { UserType } from 'src/enums/user-type.enum';
 
 @Table({
-  tableName: 'admins',
+  tableName: 'tutors',
   timestamps: true,
   paranoid: true,
   defaultScope: {
@@ -23,11 +23,14 @@ import { UserType } from 'src/enums';
     },
   },
 })
-export class Admin extends Model<Admin> {
+export class Tutor extends Model<Tutor> {
   @PrimaryKey
   @Default(DataType.UUIDV4)
   @Column(DataType.UUID)
   declare id: string;
+
+  @Column(DataType.STRING(150))
+  declare name: string;
 
   @Unique
   @Column({
@@ -39,16 +42,21 @@ export class Admin extends Model<Admin> {
   })
   declare email: string;
 
+  @AllowNull
+  @Column(DataType.STRING(100))
+  declare phone: string;
+
   @Column(DataType.STRING(1000))
   declare password: string;
-
+  
   @Column({
     type: DataType.ENUM,
     values: Object.values(UserType),
     allowNull: false,
+    defaultValue: UserType.TUTOR,
   })
   declare role: UserType;
-
+  
   @Column({
     type: DataType.BOOLEAN,
     allowNull: false,

@@ -29,7 +29,7 @@ import { ResponseUtil } from 'src/utils/response.utils';
 import { Validators } from 'src/utils/validators.utils';
 
 @ApiTags('Auth')
-@Controller('admin/auth')
+@Controller('student/auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
@@ -39,12 +39,5 @@ export class AuthController {
     const data = await this.authService.login(input);
     return ResponseUtil.handleResponse(data, 'Login successful', HttpStatus.OK);
   }
-
-  // @Post('login-otp')
-  // @HttpCode(HttpStatus.OK)
-  // async loginOtp(@Body() input: LoginOtpDto, @Req() request: ExpressRequest) {
-  //   const data = await this.authService.loginOtp(input, request);
-  //   return ResponseUtil.handleResponse(data, 'Login successful', HttpStatus.OK);
-  // }
 
 }

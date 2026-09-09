@@ -1,54 +1,93 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
-  IsEmail,
-  IsEnum,
-  IsBoolean,
   IsOptional,
   IsString,
-  MinLength,
-  MaxLength,
-  IsObject,
+  IsIn,
+  IsInt,
+  Min,
+  Max,
 } from 'class-validator';
-import { AdminType } from '../../../enums/user-type.enum';
+import { Transform, Type } from 'class-transformer';
+import type { UserStatusFilter } from '../../../enums/user-status.enum';
+import { UserStatus } from '../../../enums/user-status.enum';
 
-export class UpdateAdminDto {
-  @ApiProperty({
-    description: "Admin's fullname",
-    example: 'John Doe',
+export class GetUsersQueryDto {
+  @ApiPropertyOptional({
+    description: 'Search by name, phone, or email',
+    example: 'ada',
   })
   @IsOptional()
   @IsString()
-  fullName?: string;
+  search?: string;
 
-  @ApiProperty({ description: "Admin's Email", example: 'example@gmail.com' })
+  @ApiPropertyOptional({
+    description: 'Filter by derived status',
+    enum: ['active', 'inactive', 'pending', 'banned'],
+    example: 'active',
+  })
   @IsOptional()
-  @IsEmail()
-  email?: string;
+  @IsIn(['active', 'inactive', 'pending', 'banned'])
+  status?: UserStatusFilter;
 
-  @ApiProperty({ description: "Admin's password", example: '32rvn39nved' })
+  @ApiPropertyOptional({
+    description: 'Items per page (1–50, default 20)',
+    example: 10 ,
+  })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(50)
+  limit?: number;
+
+  @ApiPropertyOptional({ description: 'Opaque cursor from previous response' })
+  @IsOptional()
   @IsString()
-  @IsOptional()
-  password?: string;
+  cursor?: string;
+}
 
-  @ApiProperty({
-    description: "Admin's role",
-    example: 'John Doe',
-  })
-  @IsEnum(AdminType)
-  role: AdminType;
+export class UserListItemDto {
+  @ApiProperty()
+  id: string;
 
-  @ApiProperty({
-    description: "Admin account's verification status",
-    example: 'example@gmail.com',
-  })
-  @IsBoolean()
-  isVerified?: boolean;
+  @ApiProperty()
+  fullName: string;
 
-  @ApiProperty({
-    description: "Admin account's active status",
-    example: '32rvn39nved',
-  })
-  @IsString()
-  @IsOptional()
-  isActive?: boolean;
+  @ApiProperty()
+  phoneNo: string;
+
+  @ApiProperty()
+  email: string;
+
+  @ApiProperty({ enum: UserStatus })
+  status: UserStatus;
+
+  @ApiPropertyOptional()
+  imageUrl: string | null;
+
+  @ApiProperty()
+  totalRides: number;
+
+  @ApiPropertyOptional()
+  lastRide: string | null;
+
+  @ApiProperty()
+  joinDate: string;
+
+  @ApiProperty()
+  complaints: number;
+
+  @ApiProperty()
+  createdAt: Date;
+
+  @ApiProperty()
+  updatedAt: Date;
+}
+
+export class UserListPageDto {
+  @ApiProperty({ type: [UserListItemDto] })
+  items: UserListItemDto[];
+
+  @ApiPropertyOptional()
+  nextCursor: string | null;
 }

@@ -2,24 +2,32 @@ const { QueryInterface, DataTypes } = require('sequelize');
 
 module.exports = {
   up: async (queryInterface) => {
-    await queryInterface.createTable('admins', {
+    await queryInterface.createTable('tutors', {
       id: {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
         primaryKey: true,
+      },
+      name: {
+        type: DataTypes.STRING(150),
+        allowNull: false,
       },
       email: {
         type: DataTypes.STRING,
         allowNull: false,
         unique: true,
       },
+      phone: {
+        type: DataTypes.STRING(100),
+        allowNull: true,
+      },
+      photoUrl: {
+        type: DataTypes.STRING(255),
+        allowNull: true,
+      },
       password: {
         type: DataTypes.STRING(1000),
         allowNull: false,
-      },
-      role: {
-        type: DataTypes.STRING(100),
-        allowNull: false, // Super Admin, Admin
       },
       createdAt: {
         type: DataTypes.DATE,
@@ -35,10 +43,10 @@ module.exports = {
       },
     });
 
-    await queryInterface.addIndex('admins', ['email']);
+    await queryInterface.addIndex('tutors', ['email', 'name']);
   },
 
   down: async (queryInterface) => {
-    await queryInterface.dropTable('admins');
+    await queryInterface.dropTable('tutors');
   },
 };

@@ -1,8 +1,20 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { Admin } from '../entities/admin.entity';
+import { Model } from 'sequelize-typescript';
+import { Admin} from '../entities/admin.entity';
+import { UserType } from '../../../enums/user-type.enum';
 import { Op, WhereOptions } from 'sequelize';
-import { InvitationStatus } from '../../../enums/invite-status.enum';
+import { Country } from 'src/modules/countries/entities';
+import { UserStatusFilter } from '../../../enums/user-status.enum';
+import { encodeCursor } from '../../../utils/cursor.util';
+
+interface RepositoryParams {
+  search?: string;
+  status?: string;
+  limit: number;
+  offset: number;
+}
+
 
 @Injectable()
 export class AdminRepository {
@@ -11,235 +23,29 @@ export class AdminRepository {
     private readonly adminModel: typeof Admin,
   ) {}
 
-  async create(data: Partial<Admin>) {
-    return this.adminModel.create(data as any);
-  }
-
-  async markAccepted(id: string, password: string) {
-    await this.adminModel.update(
-      {
-        password,
-        isVerified: true,
-        isActive: true,
-        inviteStatus: InvitationStatus.ACTIVE,
-        invitedAcceptedAt: new Date(),
-      },
-      {
-        where: { id },
-      },
-    );
-  }
-
-  async findPendingByEmail(email: string) {
-    return this.adminModel.findOne({
-      where: {
-        email,
-        inviteStatus: InvitationStatus.PENDING,
-      },
-    });
-  }
-
   async findById(id: string): Promise<Admin | null> {
-    try {
-      return await this.adminModel.findByPk(id);
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        console.error(`Error finding admin by ID: ${error.message}`);
-        throw new Error(`Error finding admin by ID: ${error.message}`);
-      } else {
-        console.error(`Error finding admin by ID: ${error as any}`);
-        throw new Error(`Error finding admin by ID: ${error as any}`);
-      }
-    }
+    return await this.adminModel.findByPk(id, { raw: true });
+  }
+
+  async fetchUser(id: string): Promise<Admin | null> {
+    const user = await this.adminModel.findByPk(id, {
+      attributes: {
+        exclude: ['password', 'deletedAt', 'isDisabled'],
+      },
+      include: [
+        {
+          model: Country,
+        },
+      ],
+    });
+    return user ? (user.toJSON() as Admin) : null;
   }
 
   async findByEmail(email: string): Promise<Admin | null> {
-    try {
-      return await this.adminModel.findOne({
-        where: { email },
-      });
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        console.error(`Error finding admin by email: ${error.message}`);
-        throw new Error(`Error finding admin by email: ${error.message}`);
-      } else {
-        console.error(`Error finding admin by email: ${error as any}`);
-        throw new Error(`Error finding admin by email: ${error as any}`);
-      }
-    }
-  }
-
-  async findAll(options?: {
-    limit: number;
-    cursor?: { createdAt: Date; id: string };
-    search?: string;
-    role?: string;
-    status?: string;
-  }): Promise<{ admins: Admin[]; nextCursor: string | null }> {
-    const {
-      limit,
-      cursor,
-      search,
-      role,
-      status,
-    } = options || {};
-
-    try {
-      const andConditions: any[] = [];
-
-      /* ---------- CURSOR PAGINATION ---------- */
-
-      if (cursor) {
-        andConditions.push({
-          [Op.or]: [
-            { createdAt: { [Op.lt]: cursor.createdAt } },
-            {
-              createdAt: cursor.createdAt,
-              id: { [Op.lt]: cursor.id },
-            },
-          ],
-        });
-      }
-
-      /* ---------- SEARCH ---------- */
-
-      if (search?.trim()) {
-        andConditions.push({
-          [Op.or]: [
-            {
-              fullname: {
-                [Op.like]: `%${search.trim()}%`,
-              },
-            },
-            {
-              email: {
-                [Op.like]: `%${search.trim()}%`,
-              },
-            },
-            {
-              phoneNo: {
-                [Op.like]: `%${search.trim()}%`,
-              },
-            },
-          ],
-        });
-      }
-
-      /* ---------- ROLE FILTER ---------- */
-
-      if (role && role !== 'all') {
-        andConditions.push({
-          role,
-        });
-      }
-
-      /* ---------- STATUS FILTER ---------- */
-
-      if (status && status !== 'all') {
-        andConditions.push({
-          inviteStatus: status.toUpperCase(),
-        });
-      }
-
-      const where: WhereOptions =
-        andConditions.length > 0 ? { [Op.and]: andConditions } : {};
-
-      const rows = await this.adminModel.findAll({
-        where,
-        attributes: [
-          'id',
-          'fullName',
-          'email',
-          'phoneNo',
-          'imageUrl',
-          'role',
-          'inviteStatus',
-          'createdAt',
-          'invitedAcceptedAt',
-          'lastLogin',
-        ],
-        order: [
-          ['createdAt', 'DESC'],
-          ['id', 'DESC'],
-        ],
-        limit,
-      });
-
-      const last = rows[rows.length - 1];
-
-      const nextCursor =
-        rows.length === limit && last
-          ? Buffer.from(
-              JSON.stringify({
-                createdAt: last.createdAt,
-                id: last.id,
-              }),
-            ).toString('base64')
-          : null;
-
-      return {
-        admins: rows,
-        nextCursor,
-      };
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        console.error(`Error finding all admins: ${error.message}`);
-        throw new Error(`Error finding all admins: ${error.message}`);
-      }
-
-      console.error(`Error finding all admins: ${String(error)}`);
-      throw new Error(`Error finding all admins: ${String(error)}`);
-    }
-  }
-
-  async getAdminSummary() {
-    const [total, active, pendingInvite, expired] = await Promise.all([
-      this.adminModel.count(),
-
-      this.adminModel.count({
-        where: {
-          inviteStatus: InvitationStatus.ACTIVE,
-        },
-      }),
-
-      this.adminModel.count({
-        where: {
-          inviteStatus: InvitationStatus.PENDING,
-        },
-      }),
-
-      this.adminModel.count({
-        where: {
-          inviteStatus: InvitationStatus.EXPIRED,
-        },
-      }),
-    ]);
-
-    return {
-      total,
-      active,
-      pendingInvite,
-      expired,
-    };
-  }
-
-  async update(
-    id: string,
-    updates: Partial<Admin>,
-  ): Promise<[number]> {
-    try {
-      return await this.adminModel.update(updates, {
-        where: { id },
-      });
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        console.error(`Error updating admin: ${error.message}`);
-        throw new Error(`Error updating admin: ${error.message}`);
-      } else {
-        console.error(`Error updating admin: ${error as any}`);
-        throw new Error(`Error updating admin: ${error as any}`);
-      }
-    }
+    const user = await this.adminModel.findOne({
+      where: { email },
+    });
+    return user ? (user.toJSON() as Admin) : null;
   }
 
   async delete(id: string): Promise<number> {
@@ -247,4 +53,28 @@ export class AdminRepository {
       where: { id },
     });
   }
+
+  async findActiveUsers(isDisabled: boolean): Promise<Admin[] | null> {
+    return await this.adminModel.findAll({
+      where: { isActive: false },
+    });
+  }
+
+  // async create(userData: Partial<Admin>): Promise<Admin> {
+  //   const user = await this.adminModel.create(userData as any, {
+  //     raw: true,
+  //     returning: true,
+  //   });
+  //   return user.toJSON() as Admin;
+  // }
+
+  async update(id: string, userData: Partial<Admin>): Promise<number | null> {
+    const [affectedRows] = await this.adminModel.update(userData, {
+      where: { id },
+    });
+
+    if (affectedRows === 0) return null;
+    return affectedRows;
+  }
+
 }

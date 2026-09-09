@@ -6,7 +6,7 @@ import { AuthController } from './controllers/auth.controller';
 import { AuthListener } from './listeners/auth.listener';
 import { AuthService } from './auth.service';
 import { ClientDevicesModule } from '../client-devices/client-devices.module';
-import { AdminModule } from '../admins/admins.module';
+import { AdminModule } from '../admins/admin.module';
 
 @Module({
   imports: [

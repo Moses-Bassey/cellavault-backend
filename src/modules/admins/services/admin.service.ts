@@ -1,144 +1,86 @@
 import {
   Injectable,
-  Logger,
   NotFoundException,
+  BadRequestException,
+  UnauthorizedException,
 } from '@nestjs/common';
-import { AdminRepository } from '../repositories/admin.repository';
+import { ConfigService } from '@nestjs/config';
 import { Admin } from '../entities/admin.entity';
+import { AdminRepository } from '../repositories/admin.repository';
+import {
+  PassengerAccountDto,
+} from '../../../shared/dto/user.dto';
+import { deriveUserStatus } from '../../../utils/user-status.util';
+import { UserListItemDto, UserListPageDto } from '../dto/admin.dto';
+import { UserStatusFilter } from '../../../enums/user-status.enum';
+// import { PasswordUtil } from 'src/utils/password.util';
 import { decodeCursor } from '../../../utils/cursor.util';
-import { InvitationStatus } from '../../../enums/invite-status.enum';
+import { parseISODateOrUndefined } from '../../../utils/date.util';
+import { PasswordUtil } from '../../../utils/password.util';
 
 @Injectable()
 export class AdminService {
-  private readonly logger = new Logger(AdminService.name);
+  constructor(
+    private readonly adminRepository: AdminRepository,
+    private readonly configService: ConfigService,
+  ) {}
 
-  constructor(private readonly adminRepository: AdminRepository) {}
-
-  async findById(id: string): Promise<Admin | null> {
-    const admin = await this.adminRepository.findById(id);
-    if (!admin) {
-      this.logger.warn(`Admin with id=${id} not found`);
-      throw new NotFoundException('Admin not found');
-    }
-    return admin;
-  }
-
-  async getAdminSummary() {
-    const data = await this.adminRepository.getAdminSummary();
-    if (!data) throw new NotFoundException('Admin  summary not found');
-
-    return data;
-  }
-
-  async findAll(params?: {
-    limit?: number;
-    cursor?: string;
-    search?: string;
-    role?: string;
-    status?: string;
-  }): Promise<{ items: any[]; nextCursor: string | null }> {
-    const limit = Math.min(Math.max(Number(params?.limit ?? 20), 1), 50);
-
-    const decodedCursor = decodeCursor(params?.cursor);
-
-    const { admins, nextCursor } = await this.adminRepository.findAll({
-      limit,
-      cursor: decodedCursor,
-      search: params?.search,
-      role: params?.role,
-      status: params?.status,
-    });
-
-    const items = admins.map((admin) => {
-      const initials = this.getInitials(admin.fullName);
-
-      return {
-        id: admin.id,
-
-        initials,
-
-        name: admin.fullName,
-
-        email: admin.email,
-
-        phone: admin.phoneNo,
-
-        imageUrl: admin.imageUrl,
-
-        role: this.formatRole(admin.role),
-
-        roleKey: admin.role,
-
-        status: admin.inviteStatus.toLowerCase(),
-
-        activity: this.buildActivity(admin),
-      };
-    });
-
-    this.logger.log(
-      `Fetched ${admins.length} admins (cursor: ${params?.cursor ?? 'none'})`,
-    );
-
-    return {
-      items,
-      nextCursor,
-    };
-  }
-
-  async updateNewLogin(adminId: string) {
-    const [affectedCount] = await this.adminRepository.update(adminId, {
-      lastLogin: new Date(),
-    });
-    if (affectedCount === 0) throw new NotFoundException('Admin not found for update');
-    return null;
-  }
-
-  /* -------------------------------------------------------------------------- */
-  /*                               HELPER METHODS                               */
-  /* -------------------------------------------------------------------------- */
-
-  private getInitials(name: string): string {
-    return name
-      ?.split(' ')
-      ?.map((part) => part.charAt(0).toUpperCase())
-      ?.slice(0, 2)
-      ?.join('');
-  }
-
-  private formatRole(role: string): string {
-    return role
-      .split('_')
-      .map(
-        (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase(),
-      )
-      .join(' ');
-  }
-
-  private buildActivity(admin: Admin): string {
-    const formatDate = (date?: Date | null) => {
-      if (!date) return null;
-
-      return new Intl.DateTimeFormat('en-US', {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric',
-      }).format(new Date(date));
-    };
-
-    switch (admin.inviteStatus) {
-      case InvitationStatus.ACTIVE:
-        return admin.invitedAcceptedAt
-          ? `Joined ${formatDate(admin.invitedAcceptedAt)}`
-          : `Joined ${formatDate(admin.createdAt)}`;
-
-      case InvitationStatus.PENDING:
-        return `Invited ${formatDate(admin.createdAt)}`;
-
-      case InvitationStatus.EXPIRED:
-        return `Invite expired ${formatDate(admin.createdAt)}`;
-
-      default:
-        return '-';
+  async fetchAdmin(id: string): Promise<Admin | null> {
+    try {
+      const admin = await this.adminRepository.fetchUser(id);
+      if (!admin) {
+        throw new NotFoundException('User not found!');
+      }
+      return admin;
+    } catch (error: unknown) {
+      throw new NotFoundException('User not found!');
     }
   }
+
+  // async findAll(params: {
+  //   search?: string;
+  //   status?: UserStatusFilter;
+  //   limit?: number;
+  //   cursor?: string;
+  // }): Promise<UserListPageDto> {
+  //   const limit = Math.min(Math.max(Number(params.limit ?? 10), 1), 50);
+
+  //   const cursor = decodeCursor(params.cursor);
+  //   const search = params.search?.trim();
+
+  //   // ── 1. Paginated users ) ─────────────
+  //   const { admins, nextCursor } = await this.adminRepository.findAll({
+  //     search,
+  //     status: params.status,
+  //     limit,
+  //     cursor,
+  //   });
+
+  //   // ── 3. Merge + shape the response ─────────────────────────────────────────
+  //   const items: UserListItemDto[] = admins.map((admin) => {
+
+  //     return {
+  //       id: admin.id,
+  //       fullName: admin.fullName,
+  //       phoneNo: admin.phoneNo,
+  //       email: admin.email,
+  //       imageUrl: admin.imageUrl ?? null,
+  //       status: deriveUserStatus(admin),
+  //       joinDate: admin.createdAt.toISOString(),
+  //       createdAt: admin.createdAt,
+  //       updatedAt: admin.updatedAt,
+  //     };
+  //   });
+
+  //   return {
+  //     items,
+  //     nextCursor,
+  //   };
+  // }
+
+  // async findById(id: string) {
+  //   const user = await this.userService.fetchUser(id);
+  //   return user;
+  // }
+
 }

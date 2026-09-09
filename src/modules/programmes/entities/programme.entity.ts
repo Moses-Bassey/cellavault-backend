@@ -8,13 +8,14 @@ import {
   CreatedAt,
   UpdatedAt,
   DeletedAt,
-  Unique,
   AllowNull,
+  BelongsToMany,
 } from 'sequelize-typescript';
-import { UserType } from 'src/enums';
+import { Student } from '../../students/entities/student.entity';
+import { StudentProgramme } from '../../student-programme/entities/student-programme.entity';
 
 @Table({
-  tableName: 'admins',
+  tableName: 'programmes',
   timestamps: true,
   paranoid: true,
   defaultScope: {
@@ -23,38 +24,25 @@ import { UserType } from 'src/enums';
     },
   },
 })
-export class Admin extends Model<Admin> {
+export class Programme extends Model<Programme> {
   @PrimaryKey
   @Default(DataType.UUIDV4)
   @Column(DataType.UUID)
   declare id: string;
 
-  @Unique
-  @Column({
-    type: DataType.STRING,
-    allowNull: false,
-    validate: {
-      isEmail: true,
-    },
-  })
-  declare email: string;
+  @Column(DataType.STRING(255))
+  declare name: string;
 
-  @Column(DataType.STRING(1000))
-  declare password: string;
+  @AllowNull
+  @Column(DataType.TEXT)
+  declare description: string;
 
-  @Column({
-    type: DataType.ENUM,
-    values: Object.values(UserType),
-    allowNull: false,
-  })
-  declare role: UserType;
+  @AllowNull
+  @Column(DataType.INTEGER)
+  declare hours: number;
 
-  @Column({
-    type: DataType.BOOLEAN,
-    allowNull: false,
-    defaultValue: true,
-  })
-  declare isActive: boolean;
+  @BelongsToMany(() => Student, () => StudentProgramme)
+  declare students: Student[];
 
   @CreatedAt
   @Column({

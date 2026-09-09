@@ -14,10 +14,14 @@ import { TokenService } from 'src/services/token/token.service';
 import { TokenSubject } from 'src/enums/token.enum';
 import { Request as ExpressRequest, request } from 'express';
 import { AdminRepository } from '../admins/repositories/admin.repository';
+import { StudentRepository } from '../students/repositories/student.repository';
+import { TutorRepository } from '../tutors/repositories/tutor.repository';
 import { Admin } from '../admins/entities/admin.entity';
+import { Student } from '../students/entities/student.entity';
+import { Tutor } from '../tutors/entities/tutor.entity';
 import { ClientDeviceService } from '../client-devices/services/client-device.service';
 import { ClientDeviceEventEmitter } from '../client-devices/emitters/client-device.emitter';
-import { IAdminLoginData } from '../../shared/interfaces/auth.interface';
+import { ILoginData } from '../../shared/interfaces/auth.interface';
 import { UserType } from '../../enums/user-type.enum';
 import { EmailEventService } from 'src/services/mail/email-event.service';
 import { PasswordUtil } from '../../utils/password.util';
@@ -25,13 +29,14 @@ import { Utils } from 'src/utils/utils';
 import { InviteAdminDto, AdminLoginDto, LoginOtpDto, CompleteAdminOnboardingDto } from './dto/auth.dto';
 import { Validators } from '../../utils/validators.utils';
 import { JwtAuthPayload } from './auth.interface';
-import { InvitationStatus } from '../../enums/invite-status.enum';
 
 @Injectable()
 export class AuthService {
   private readonly logger = new Logger(AuthService.name);
   constructor(
     private readonly adminRepository: AdminRepository,
+    private readonly studentRepository: StudentRepository,
+    private readonly tutorRepository: TutorRepository,
     private readonly clientDeviceService: ClientDeviceService,
     private readonly emailEventService: EmailEventService,
     private readonly tokenService: TokenService,
@@ -40,370 +45,99 @@ export class AuthService {
     private readonly configService: ConfigService,
   ) {}
 
-  async inviteAdmin(inviterId: string, dto: InviteAdminDto) {
-    const { fullName, email, phoneNo, role } = dto;
-
-    const phone = this.normalizePhone(phoneNo);
-
-    const [existingAdmin, adminUser] = await Promise.all([
-      this.checkEmailExist(email),
-      this.adminRepository.findById(inviterId),
-    ]);
-
-    if (!adminUser) throw new NotFoundException('Admin not found');
-
-    if (existingAdmin) {
-      throw new ConflictException('Admin already exists');
-    }
-
-    const existingInvite = await this.adminRepository.findPendingByEmail(email);
-
-    if (existingInvite) {
-      throw new ConflictException('Pending invitation already exists');
-    }
-
-    const invitation = await this.adminRepository.create({
-      fullName,
-      email: Validators.validateEmail(email),
-      phoneNo: phone,
-      role,
-      inviteStatus: InvitationStatus.PENDING,
-    });
-
-    const token = await this.tokenService.generateInviteToken({
-      email: invitation.email,
-      phoneNo: invitation.phoneNo,
-      expiry: moment().add(3, 'days').toDate(),
-      subject: TokenSubject.ADMIN_INVITE,
-      inviteeId: invitation.id,
-    });
-
-    const inviteUrl =
-      `${this.configService.get<string>('app.adminWebUrl')}` +
-      `/onboarding/admin/accept?token=${token.token}`;
-
-    await this.emailEventService.sendAdminInviteEmail({
-      email,
-      fullName,
-      inviteUrl,
-      role,
-    });
-
-    return {
-      dto,
-    };
+  async login(data: AdminLoginDto): Promise<ILoginData> {
+    return this.handleLogin(data, UserType.ADMIN);
   }
 
-  async completeAdminOnboarding(
-    dto: CompleteAdminOnboardingDto,
-  ) {
-    const payload = await this.tokenService.verifyInviteToken({
-      token: dto.token,
-      subject: TokenSubject.ADMIN_INVITE,
-    });
-    // console.log('Payload service: ', payload);
-
-    if (payload.type !== TokenSubject.ADMIN_INVITE) {
-      throw new UnauthorizedException();
-    }
-
-    const invitation = await this.adminRepository.findById(
-      payload.inviteeId,
-    );
-
-    if (!invitation) {
-      throw new NotFoundException(
-        'Invitation not found',
-      );
-    }
-
-    if (invitation.inviteStatus !== InvitationStatus.PENDING) {
-      throw new BadRequestException(
-        'Invitation already used',
-      );
-    }
-
-    const passwordHash = await PasswordUtil.hashPassword(dto.password);
-
-    await this.adminRepository.markAccepted(invitation.id, passwordHash);
-
-    return 'Account setup complete. Please login.';
+  async loginStudent(data: AdminLoginDto): Promise<ILoginData> {
+    return this.handleLogin(data, UserType.STUDENT);
   }
 
-  async login(
+  async loginTutor(data: AdminLoginDto): Promise<ILoginData> {
+    return this.handleLogin(data, UserType.TUTOR);
+  }
+
+  /**
+   * Reusable login handler for all user types
+   */
+  private async handleLogin(
     data: AdminLoginDto,
-    request: ExpressRequest, // inject request properly
-  ): Promise<IAdminLoginData> {
+    userType: UserType,
+  ): Promise<ILoginData> {
     const { email, password, rememberMe } = data;
 
-    // Find admin
-    const admin = await this.checkEmailExist(email);
-    if (!admin) {
-      throw new NotFoundException('Account not found');
+    // Find user
+    const user = await this.checkEmailExist(email, userType);
+    if (!user) {
+      throw new NotFoundException(`${userType} account not found`);
     }
 
     // Check account status
-    if (!admin.isVerified || !admin.isActive) {
+    if (!user.isActive) {
       throw new UnauthorizedException(
-        'Account creation request not approved, please contact support team.',
+        `${userType} account is inactive, please contact support team.`,
       );
     }
-    if (!admin.password)
+    if (!user.password) {
       throw new BadRequestException('Password not set, complete account verification');
+    }
 
     // Verify password
-    const isPasswordValid = await PasswordUtil.verifyPassword(
-      password,
-      admin.password,
-    );
-
+    const isPasswordValid = await PasswordUtil.verifyPassword(password, user.password);
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    // Validate device (if token is provided)
-    const clientDeviceToken = request.headers['x-client-device-token'] as
-      | string
-      | undefined;
-
-    if (!clientDeviceToken) {
-      throw new UnauthorizedException('OTP_REQUIRED');
-    }
-    // console.log('clientDeviceToken:', clientDeviceToken);
-
-    await this.validateClientDevice(admin, clientDeviceToken);
-
     // Generate JWT & response
-    return this.createAuthPayload(admin, rememberMe);
+    return this.createAuthPayload(user, rememberMe);
   }
 
-  async loginOtp(input: LoginOtpDto, request: ExpressRequest) {
-    const { email, otp, password, rememberMe, deviceInfo } = input;
+  async checkEmailExist(
+    email: string,
+    userType: UserType,
+  ): Promise<Admin | Student | Tutor | null> {
+    switch (userType) {
+      case UserType.SUPER_ADMIN:
+      case UserType.ADMIN:
+        return await this.adminRepository.findByEmail(email);
 
-    const admin = await this.checkEmailExist(email);
-    if (!admin) throw new NotFoundException('Account not found');
-    if (!admin.password)
-      throw new BadRequestException('Password not set, complete account verification');
+      case UserType.STUDENT:
+        return await this.studentRepository.findByEmail(email);
 
-    // const verifyOtp = await this.tokenService.verifyOTP({
-    //   email: admin.email,
-    //   token: otp,
-    //   subject: TokenSubject.NEW_DEVICE_LOGIN_OTP,
-    // });
+      case UserType.TUTOR:
+        return await this.tutorRepository.findByEmail(email);
 
-    // if (!verifyOtp) {
-    //   throw new BadRequestException('Invalid OTP');
-    // }
-
-    if (otp !== '500500') {
-      throw new BadRequestException('Invalid OTP');
+      default:
+        throw new BadRequestException(`Unsupported user type: ${userType}`);
     }
-
-    const verifyPassword = await PasswordUtil.verifyPassword(
-      password,
-      admin.password,
-    );
-
-    if (!verifyPassword) {
-      throw new UnauthorizedException('Invalid Credentials');
-    }
-
-    const loginResponse = await this.createAuthPayload(admin, rememberMe);
-
-    const loginTime = moment().format('MMMM Do YYYY, h:mm A');
-
-    // Emit email event
-    this.emailEventService.emitNewLoginEmail(
-      admin.email,
-      admin.fullName,
-      deviceInfo.name || 'Unknown Device',
-      loginTime,
-    );
-
-    const ipAddress = this.getClientIp(request);
-
-    // Emit client device event asynchronously
-    this.clientDeviceEventEmitter.emitAddDeviceToken({
-      adminId: admin.id,
-      ipAddress: ipAddress ?? 'Unknown IP',
-      deviceFCMToken: deviceInfo.deviceFCMToken || null,
-      name: deviceInfo.name || null,
-      userType: admin.role,
-    });
-
-    return loginResponse;
   }
 
-  async deleteAdminAccount(email: string, password: string): Promise<null> {
-    const admin = await this.adminRepository.findByEmail(email);
-    if (!admin) throw new NotFoundException('Admin not found');
 
-    const verifyPassword = await PasswordUtil.verifyPassword(
-      password,
-      admin.password!,
-    );
-    if (!verifyPassword) throw new UnauthorizedException('Invalid credentials');
-
-    const newEmail = `${admin.email}-${admin.id}`;
-    const newPhoneNo = `${admin.phoneNo}-${admin.id}`;
-    const updatedAdmin = await this.adminRepository.update(admin.id, {
-      email: newEmail,
-      phoneNo: newPhoneNo,
-    });
-    if (!updatedAdmin)
-      throw new NotFoundException('Admin not found after deletion');
-
-    const deletedCount = await this.adminRepository.delete(admin.id);
-    if (deletedCount == 0) {
-      this.logger.warn(`Admin id=${admin.id} not deleted`);
-      throw new BadRequestException('Failed to delete');
-    }
-    this.logger.log(`Admin id=${admin.id} deleted`);
-    return null;
-  }
-
-  // async deleteUserAccount(identity: string, password: string): Promise<null> {
-  //   try {
-  //     // Step 1: Find user
-  //     const user = await this.userService.findByIdentity(identity);
-  //     if (!user) {
-  //       throw new NotFoundException('User not found');
-  //     }
-
-  //     // Step 2: Verify password
-  //     const verifyPassword = await PasswordUtil.verifyPassword(password, user.password);
-  //     if (!verifyPassword) {
-  //       throw new UnauthorizedException('Invalid credentials');
-  //     }
-
-  //     // Step 4: Update email to email-uuid
-  //     const newEmail = `${user.email}-${user.id}`;
-  //     const newPhoneNo = `${user.phoneNo}-${user.id}`;
-
-  //     const updatedDriver = await this.userRepository.update(user.id, { email: newEmail, phoneNo: newPhoneNo });
-  //     if (!updatedDriver) {
-  //       throw new NotFoundException('User not found after deletion');
-  //     }
-
-  //     await this.userRepository.delete(user.id);
-
-  //     return null;
-  //   } catch (error: unknown) {
-  //     if (error instanceof NotFoundException || error instanceof UnauthorizedException) {
-  //       throw error;
-  //     }
-  //     throw new NotFoundException('Failed to delete driver account');
-  //   }
-  // }
-
-
-  async checkEmailExist(email: string): Promise<Admin | null> {
-    return await this.adminRepository.findByEmail(email);
-  }
-
-  // helpers
-  private async validateClientDevice(
-    admin: Admin,
-    clientDeviceToken: string,
-  ): Promise<void> {
-    const clientDevice =
-      await this.clientDeviceService.findByUserIdAndDeviceToken(
-        admin.id,
-        clientDeviceToken,
-      );
-
-    // console.log('Client device: ', clientDevice, 'Id: ', admin.id);
-    if (clientDevice) return;
-
-    const otpToken = await this.tokenService.generateOTPtoken({
-      email: admin.email,
-      expiry: moment().add(5, 'minutes').toDate(),
-      subject: TokenSubject.NEW_DEVICE_LOGIN_OTP,
-    });
-
-    await this.emailEventService.emitNewDeviceLoginOtpEmail(
-      admin.email,
-      otpToken.token,
-    );
-
-    throw new UnauthorizedException('OTP_REQUIRED');
-  }
 
   private async createAuthPayload(
-    admin: Admin,
+    user: Admin | Student | Tutor,
     rememberMe: boolean,
-  ): Promise<IAdminLoginData> {
+  ): Promise<ILoginData> {
     const tokenOptions: JwtSignOptions = rememberMe ? { expiresIn: '7d' } : {};
 
     const payload: JwtAuthPayload = {
-      sub: admin.id,
-      userId: admin.id,
-      email: admin.email,
-      userType: admin.role, // TODO: remove later
+      sub: user.id,
+      userId: user.id,
+      email: user.email,
+      userType: user.role,
     };
 
-    const token = await this.tokenService.generateJWTtoken(
-      payload,
-      tokenOptions,
-    );
+    const token = await this.tokenService.generateJWTtoken(payload, tokenOptions);
 
-    this.eventEmitter.emit('newLoginEvent', admin.id);
+    this.eventEmitter.emit('newLoginEvent', user.id);
     return {
       token,
       user: {
-        id: admin.id,
-        role: admin.role,
-        email: admin.email,
-      }
+        id: user.id,
+        role: user.role,
+        email: user.email,
+      },
     };
   }
-
-  /**
-   * Safely extract the client IP address from a request
-   * @param request Express Request object
-   * @returns client IP as string or undefined
-   */
-  private getClientIp(request: ExpressRequest): string | undefined {
-    // Priority order: most-specific proxy headers first
-    const candidates = [
-      request.headers['cf-connecting-ip'], // Cloudflare (single trusted IP)
-      request.headers['x-real-ip'], // nginx / common reverse proxies
-      request.headers['x-forwarded-for'], // standard multi-hop header
-    ];
-
-    for (const candidate of candidates) {
-      if (!candidate) continue;
-      // x-forwarded-for can be "ip1, ip2, ip3" — the leftmost is the client
-      const ip = Array.isArray(candidate)
-        ? candidate[0]
-        : candidate.split(',')[0].trim();
-
-      if (ip) {
-        // Normalise IPv4-mapped IPv6 addresses
-        return ip.startsWith('::ffff:') ? ip.replace('::ffff:', '') : ip;
-      }
-    }
-
-    // Final fallback to socket
-    const remoteAddress = (request.socket as any)?.remoteAddress;
-    return remoteAddress?.startsWith('::ffff:')
-      ? remoteAddress.replace('::ffff:', '')
-      : remoteAddress ?? undefined;
-  }
-
-  private normalizePhone(phone: string): string {
-    const cleaned = phone.trim();
-
-    if (cleaned.startsWith('+234')) {
-        return cleaned.slice(1);
-    }
-
-    if (cleaned.startsWith('0')) {
-        return '234' + cleaned.slice(1);
-    }
-
-    // console.log('Phone: ', cleaned);
-    return cleaned;
-  }
-
 }
+

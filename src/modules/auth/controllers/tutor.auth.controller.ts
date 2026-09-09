@@ -29,7 +29,7 @@ import { ResponseUtil } from 'src/utils/response.utils';
 import { Validators } from 'src/utils/validators.utils';
 
 @ApiTags('Auth')
-@Controller('admin/auth')
+@Controller('tutor/auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
