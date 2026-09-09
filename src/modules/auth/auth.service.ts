@@ -19,8 +19,6 @@ import { TutorRepository } from '../tutors/repositories/tutor.repository';
 import { Admin } from '../admins/entities/admin.entity';
 import { Student } from '../students/entities/student.entity';
 import { Tutor } from '../tutors/entities/tutor.entity';
-import { ClientDeviceService } from '../client-devices/services/client-device.service';
-import { ClientDeviceEventEmitter } from '../client-devices/emitters/client-device.emitter';
 import { ILoginData } from '../../shared/interfaces/auth.interface';
 import { UserType } from '../../enums/user-type.enum';
 import { EmailEventService } from 'src/services/mail/email-event.service';
@@ -37,10 +35,8 @@ export class AuthService {
     private readonly adminRepository: AdminRepository,
     private readonly studentRepository: StudentRepository,
     private readonly tutorRepository: TutorRepository,
-    private readonly clientDeviceService: ClientDeviceService,
     private readonly emailEventService: EmailEventService,
     private readonly tokenService: TokenService,
-    private readonly clientDeviceEventEmitter: ClientDeviceEventEmitter,
     private readonly eventEmitter: EventEmitter2,
     private readonly configService: ConfigService,
   ) {}

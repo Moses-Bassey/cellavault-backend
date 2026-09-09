@@ -7,9 +7,6 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { Admin } from '../entities/admin.entity';
 import { AdminRepository } from '../repositories/admin.repository';
-import {
-  PassengerAccountDto,
-} from '../../../shared/dto/user.dto';
 import { deriveUserStatus } from '../../../utils/user-status.util';
 import { UserListItemDto, UserListPageDto } from '../dto/admin.dto';
 import { UserStatusFilter } from '../../../enums/user-status.enum';

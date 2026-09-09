@@ -15,12 +15,9 @@ import { StudentsModule } from './modules/students/student.module';
 import { StudentProgrammeModule } from './modules/student-programme/student-programme.module';
 import { ProgrammeModule } from './modules/programmes/programme.module';
 import { CountriesModule } from './modules/countries/countries.module';
-import { ClientDevicesModule } from './modules/client-devices/client-devices.module';
 import { TokenModule } from './services/token/token.module';
 import { MailModule } from './services/mail/mail.module';
 import { ApiKeyInterceptor } from './interceptors/api-key.interceptors';
-import { AdminActivityInterceptor } from './interceptors/admin-activity.interceptor';
-
 
 @Module({
   imports: [
@@ -59,7 +56,6 @@ import { AdminActivityInterceptor } from './interceptors/admin-activity.intercep
     StudentProgrammeModule,
     ProgrammeModule,
     CountriesModule,
-    ClientDevicesModule,
     TokenModule,
     MailModule,
   ],
