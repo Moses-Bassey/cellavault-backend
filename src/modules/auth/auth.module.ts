@@ -3,6 +3,8 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 import { MailModule } from 'src/services/mail/mail.module';
 import { TokenModule } from 'src/services/token/token.module';
 import { AuthController } from './controllers/auth.controller';
+import { StudentAuthController } from './controllers/student.auth.controller';
+import { TutorAuthController } from './controllers/tutor.auth.controller';
 import { AuthListener } from './listeners/auth.listener';
 import { AuthService } from './auth.service';
 import { AdminsModule } from '../admins/admin.module';
@@ -19,7 +21,7 @@ import { TutorsModule } from '../tutors/tutor.module';
     TutorsModule,
   ],
   providers: [AuthService, AuthListener],
-  controllers: [AuthController],
+  controllers: [AuthController, StudentAuthController, TutorAuthController],
   exports: [],
 })
 export class AuthModule {}

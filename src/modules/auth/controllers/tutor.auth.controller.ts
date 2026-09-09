@@ -29,11 +29,11 @@ import { ResponseUtil } from 'src/utils/response.utils';
 import { Validators } from 'src/utils/validators.utils';
 
 @ApiTags('Auth')
-@Controller('tutor/auth')
-export class AuthController {
+@Controller('auth/tutor')
+export class TutorAuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Post('login')
+  @Post()
   @HttpCode(HttpStatus.OK)
   async login(@Body() input: AdminLoginDto, @Req() request: ExpressRequest) {
     const data = await this.authService.login(input);
