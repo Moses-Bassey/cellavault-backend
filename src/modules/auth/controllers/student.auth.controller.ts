@@ -36,7 +36,7 @@ export class StudentAuthController {
   @Post()
   @HttpCode(HttpStatus.OK)
   async login(@Body() input: AdminLoginDto, @Req() request: ExpressRequest) {
-    const data = await this.authService.login(input);
+    const data = await this.authService.loginStudent(input);
     return ResponseUtil.handleResponse(data, 'Login successful', HttpStatus.OK);
   }
 

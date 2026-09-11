@@ -36,7 +36,7 @@ export class TutorAuthController {
   @Post()
   @HttpCode(HttpStatus.OK)
   async login(@Body() input: AdminLoginDto, @Req() request: ExpressRequest) {
-    const data = await this.authService.login(input);
+    const data = await this.authService.loginTutor(input);
     return ResponseUtil.handleResponse(data, 'Login successful', HttpStatus.OK);
   }
 
