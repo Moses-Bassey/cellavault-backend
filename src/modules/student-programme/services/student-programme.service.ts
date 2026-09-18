@@ -3,6 +3,8 @@ import { StudentProgrammeRepository } from '../repositories/student-programme.re
 import { IRegisterStudentProgrammeInput } from '../interfaces/student-programme.interface';
 import { StudentProgramme } from '../entities/student-programme.entity';
 import { StudentsService } from 'src/modules/students/services/student.service';
+import { QueryOptions } from 'src/shared/interfaces/query-options.interface';
+import { decodeCursor } from 'src/utils/cursor.util';
 
 @Injectable()
 export class StudentProgrammeService {
@@ -23,5 +25,45 @@ export class StudentProgrammeService {
       programmeId: input.programmeId
     });
     return data;
+  }
+
+  async getAllStudentProgrammes(
+    params: QueryOptions,
+  ): Promise<{ items: StudentProgramme[]; nextCursor: string | null }> {
+    const limit = Math.min(Math.max(Number(params.limit ?? 10), 1), 50);
+    const cursor = params.cursor ? decodeCursor(params.cursor) : undefined;
+
+    const { studentProgrammes, nextCursor } = await this.studentProgrammeRepository.findAll({
+      search: params.search?.trim(),
+      limit,
+      cursor,
+    });
+
+    return {
+      items: studentProgrammes,
+      nextCursor,
+    };
+  }
+
+  async getAllEnrolmentsForStudent(
+    studentId: string,
+    params: QueryOptions,
+  ): Promise<{ items: StudentProgramme[]; nextCursor: string | null }> {
+    const limit = Math.min(Math.max(Number(params.limit ?? 10), 1), 50);
+    const cursor = params.cursor ? decodeCursor(params.cursor) : undefined;
+
+    const { enrollments, nextCursor } = await this.studentProgrammeRepository.findAllByStudent(
+      studentId,
+      {
+        search: params.search?.trim(),
+        limit,
+        cursor,
+      },
+    );
+
+    return {
+      items: enrollments,
+      nextCursor,
+    };
   }
 }
