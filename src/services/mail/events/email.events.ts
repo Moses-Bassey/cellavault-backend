@@ -17,6 +17,7 @@ export class WelcomeEmailEvent {
   constructor(
     public readonly email: string,
     public readonly fullName: string,
+    public readonly loginUrl: string,
   ) {}
 }
 

@@ -77,6 +77,7 @@ export class EmailEventListener {
         context: {
           fullName: event.fullName,
           email: event.email,
+          loginUrl: event.loginUrl,
         },
       });
 

@@ -16,15 +16,18 @@ import { Request as ExpressRequest, request } from 'express';
 import { AdminRepository } from '../admins/repositories/admin.repository';
 import { StudentRepository } from '../students/repositories/student.repository';
 import { TutorRepository } from '../tutors/repositories/tutor.repository';
+import { StudentsService } from 'src/modules/students/services/student.service';
 import { Admin } from '../admins/entities/admin.entity';
 import { Student } from '../students/entities/student.entity';
 import { Tutor } from '../tutors/entities/tutor.entity';
 import { ILoginData } from '../../shared/interfaces/auth.interface';
+import { ICreateStudentInput } from '../students/interfaces/student.interface'
 import { UserType } from '../../enums/user-type.enum';
 import { EmailEventService } from 'src/services/mail/email-event.service';
 import { PasswordUtil } from '../../utils/password.util';
 import { Utils } from 'src/utils/utils';
 import { InviteAdminDto, LoginDto, LoginOtpDto, CompleteAdminOnboardingDto } from './dto/auth.dto';
+import { CreateStudentDto, StudentResponseDto } from '../students/dto/student.dto';
 import { Validators } from '../../utils/validators.utils';
 import { JwtAuthPayload } from './auth.interface';
 
@@ -35,6 +38,7 @@ export class AuthService {
     private readonly adminRepository: AdminRepository,
     private readonly studentRepository: StudentRepository,
     private readonly tutorRepository: TutorRepository,
+    private readonly studentsService: StudentsService,
     private readonly emailEventService: EmailEventService,
     private readonly tokenService: TokenService,
     private readonly eventEmitter: EventEmitter2,
@@ -86,6 +90,33 @@ export class AuthService {
 
     // Generate JWT & response
     return this.createAuthPayload(user, rememberMe);
+  }
+
+  /**
+   * Public registration endpoint for students.
+   * Returns created student (without password) and triggers email event if temporary password was generated.
+   */
+  async registerStudent(dto: CreateStudentDto) {
+    const input: ICreateStudentInput = {
+      name: dto.name,
+      email: dto.email,
+      phone: dto.phone ? Utils.normalizeCountryPhone('+234', dto.phone, 13) : null,
+      guardianPhoneOrEmail: dto.guardianPhoneOrEmail ?? null,
+      password: dto.password, // may be undefined -> service will generate
+      gender: dto.gender ?? null,
+    };
+
+    const student = await this.studentsService.createStudent(input);
+
+  
+    // Use centralized email event service to emit event (listener will send the email)
+    await this.emailEventService.emitWelcomeEmail(
+      student.email,
+      student.name,
+      `${process.env.APP_STUDENT_WEB_URL ?? 'https://nugiinnovations.com'}/login`,
+    );
+
+    return student;
   }
 
   async checkEmailExist(

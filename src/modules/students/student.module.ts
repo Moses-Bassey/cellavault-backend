@@ -1,14 +1,14 @@
 import { Module } from '@nestjs/common';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { Student } from './entities/student.entity';
-    // import { StudentController } from './controllers/student.controller';
-    // import { StudentService } from './services/student.service';
+import { StudentsController } from './controllers/student.controller';
+import { StudentsService } from './services/student.service';
 import { StudentRepository } from './repositories/student.repository';
 
 @Module({
   imports: [SequelizeModule.forFeature([Student])],
-  controllers: [], // [StudentController],
-  providers: [StudentRepository], // [StudentService, ],
-  exports: [SequelizeModule, StudentRepository], // [SequelizeModule, StudentService, StudentRepository],
+  controllers: [StudentsController],
+  providers: [StudentRepository, StudentsService],
+  exports: [SequelizeModule, StudentRepository, StudentsService],
 })
 export class StudentsModule {}

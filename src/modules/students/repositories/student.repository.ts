@@ -1,6 +1,9 @@
 import { Injectable, ConflictException, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Student } from '../entities/student.entity';
+import { Op, WhereOptions } from 'sequelize';
+import { PaginationOptions } from 'src/shared/interfaces/pagination-options.interface';
+import { encodeCursor } from 'src/utils/cursor.util';
 
 @Injectable()
 export class StudentRepository {
@@ -30,7 +33,7 @@ export class StudentRepository {
     return await this.studentModel.findByPk(id, { raw: true });
   }
 
-  async fetchUser(id: string): Promise<Student | null> {
+  async fetchStudent(id: string): Promise<Student | null> {
     const user = await this.studentModel.findByPk(id, {
       attributes: {
         exclude: ['password', 'deletedAt', 'isDisabled'],
@@ -65,5 +68,75 @@ export class StudentRepository {
 
     if (affectedRows === 0) return null;
     return affectedRows;
+  }
+
+  async findAll(
+    options: PaginationOptions,
+  ): Promise<{ students: Student[]; nextCursor: string | null }> {
+    const { search, limit, cursor, gender } = options;
+
+    // ── Base WHERE ───────────────────────────────
+    const baseConditions: WhereOptions[] = [];
+
+    if (search) {
+      baseConditions.push({
+        [Op.or]: [
+          { name: { [Op.like]: `%${search}%` } },
+          { phone: { [Op.like]: `%${search}%` } },
+          { email: { [Op.like]: `%${search}%` } },
+        ],
+      });
+    }
+
+    if (gender) {
+      baseConditions.push({ gender });
+    }
+
+    const baseWhere: WhereOptions = baseConditions.length
+      ? { [Op.and]: baseConditions }
+      : {};
+
+    // ── Cursor WHERE ─────────────────────────────
+    const pageWhere: WhereOptions = cursor
+      ? {
+          [Op.and]: [
+            baseWhere,
+            {
+              [Op.or]: [
+                { createdAt: { [Op.lt]: cursor.createdAt } },
+                {
+                  createdAt: cursor.createdAt,
+                  id: { [Op.lt]: cursor.id },
+                },
+              ],
+            },
+          ],
+        }
+      : baseWhere;
+
+    // ── Fetch rows ───────────────────────────────
+    const rows = await this.studentModel.findAll({
+      where: pageWhere,
+      attributes: { exclude: ['password', 'deletedAt'] },
+      order: [
+        ['createdAt', 'DESC'],
+        ['id', 'DESC'],
+      ],
+      limit: limit + 1,
+    });
+
+    const hasNextPage = rows.length > limit;
+    const pageRows = hasNextPage ? rows.slice(0, limit) : rows;
+
+    const last = pageRows[pageRows.length - 1];
+    const nextCursor =
+      hasNextPage && last
+        ? encodeCursor({ createdAt: last.createdAt, id: last.id })
+        : null;
+
+    return {
+      students: pageRows.map((r) => r.toJSON() as Student),
+      nextCursor,
+    };
   }
 }

@@ -24,8 +24,8 @@ export class EmailEventService {
     this.eventEmitter.emit('email.forget-password', event);
   }
 
-  async emitWelcomeEmail(email: string, fullName: string) {
-    const event = new WelcomeEmailEvent(email, fullName);
+  async emitWelcomeEmail(email: string, fullName: string, loginUrl: string) {
+    const event = new WelcomeEmailEvent(email, fullName, loginUrl);
     this.eventEmitter.emit('email.welcome', event);
   }
 

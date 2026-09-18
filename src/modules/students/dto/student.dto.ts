@@ -1,5 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsOptional, IsString, MinLength } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsEmail, IsOptional, IsString, MinLength, IsIn, IsInt, Min } from 'class-validator';
 
 export class CreateStudentDto {
   @ApiProperty({ example: 'Jane Doe', description: 'Full name of the student' })
@@ -56,4 +56,28 @@ export class StudentResponseDto {
 
   @ApiProperty({ example: '2026-09-18T15:00:00.000Z' })
   createdAt: Date;
+}
+
+export class GetStudentsQueryDto {
+  @ApiPropertyOptional({ description: 'Search term for name, email or phone', example: 'john' })
+  @IsOptional()
+  @IsString()
+  search?: string;
+
+  @ApiPropertyOptional({ description: 'Filter by gender', example: 'male' })
+  @IsOptional()
+  @IsString()
+  @IsIn(['male', 'female'], { each: false })
+  gender?: string;
+
+  @ApiPropertyOptional({ description: 'Page size (1-50)', example: 10 })
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  limit?: number;
+
+  @ApiPropertyOptional({ description: 'Cursor for pagination (opaque string)' })
+  @IsOptional()
+  @IsString()
+  cursor?: string;
 }

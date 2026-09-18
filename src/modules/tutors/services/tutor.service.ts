@@ -32,13 +32,6 @@ export class TutorService {
     private readonly tokenService: TokenService,
   ) {}
 
-
-//   async createTutor(data: ICreateTutorInput): Promise<ICreateTutorInput> {
-//     const tutor = await this.tutorRepository.create(data);
-//     if (!tutor) throw new InternalServerErrorException('Failed to create tutor');
-//     return data;
-//   }
-
   async getAllTutors(
     params: QueryOptions,
   ): Promise<{ items: Tutor[]; nextCursor: string | null }> {
