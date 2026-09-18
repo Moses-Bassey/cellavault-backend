@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, ConflictException, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Student } from '../entities/student.entity';
 
@@ -8,6 +8,23 @@ export class StudentRepository {
     @InjectModel(Student)
     private readonly studentModel: typeof Student,
   ) {}
+
+  async create(userData: Partial<Student>): Promise<Student> {
+    try {
+      const user = await this.studentModel.create(userData as any, {
+        raw: true,
+        returning: true,
+      });
+      return user.toJSON() as Student;
+    } catch (error: any) {
+      // Sequelize unique constraint
+      if (error.name === 'SequelizeUniqueConstraintError') {
+        throw new ConflictException('Student with this email already exists');
+      }
+      // Unexpected DB error
+      throw new InternalServerErrorException('Failed to create student');
+    }
+  }
 
   async findById(id: string): Promise<Student | null> {
     return await this.studentModel.findByPk(id, { raw: true });

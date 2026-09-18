@@ -6,12 +6,10 @@ import {
   SignUpOtpEmailEvent,
   ForgetPasswordEmailEvent,
   WelcomeEmailEvent,
-  BookingConfirmationEmailEvent,
-  DriverVerificationEmailEvent,
   PasswordChangedEmailEvent,
   NewLoginEmailEvent,
   NewDeviceLoginOtpEmailEvent,
-  AdminInviteEmailEvent,
+  TutorInviteEmailEvent,
 } from '../events/email.events';
 
 @Injectable()
@@ -91,61 +89,6 @@ export class EmailEventListener {
     }
   }
 
-  @OnEvent('email.booking-confirmation')
-  async handleBookingConfirmationEvent(event: BookingConfirmationEmailEvent) {
-    try {
-      this.logger.log(`Sending booking confirmation email to ${event.email}`);
-
-      await this.mailerService.sendMail({
-        to: event.email,
-        subject: MAIL_SUBJECT.BOOKING_CONFIRMATION,
-        template: 'booking-confirmation',
-        context: {
-          bookingId: event.bookingId,
-          driverName: event.driverName,
-          pickupTime: event.pickupTime,
-          pickupLocation: event.pickupLocation,
-        },
-      });
-
-      this.logger.log(
-        `Booking confirmation email sent successfully to ${event.email}`,
-      );
-    } catch (error) {
-      this.logger.error(
-        `Failed to send booking confirmation email to ${event.email}:`,
-        error,
-      );
-    }
-  }
-
-  @OnEvent('email.driver-verification')
-  async handleDriverVerificationEvent(event: DriverVerificationEmailEvent) {
-    try {
-      this.logger.log(`Sending driver verification email to ${event.email}`);
-
-      await this.mailerService.sendMail({
-        to: event.email,
-        subject: MAIL_SUBJECT.DRIVER_VERIFICATION,
-        template: 'driver-verification',
-        context: {
-          fullName: event.fullName,
-          verificationStatus: event.verificationStatus,
-          reason: event.reason,
-        },
-      });
-
-      this.logger.log(
-        `Driver verification email sent successfully to ${event.email}`,
-      );
-    } catch (error) {
-      this.logger.error(
-        `Failed to send driver verification email to ${event.email}:`,
-        error,
-      );
-    }
-  }
-
   @OnEvent('email.password-changed')
   async handlePasswordChangedEvent(event: PasswordChangedEmailEvent) {
     try {
@@ -200,35 +143,6 @@ export class EmailEventListener {
     }
   }
 
-  @OnEvent('email.new-admin-invite')
-  async handleNewAdminInviteEvent(event: AdminInviteEmailEvent) {
-    try {
-      this.logger.log(`Sending new admin invitation email to ${event.email}`);
-
-      const firstName = event.fullName.trim().split(' ')[0];
-      await this.mailerService.sendMail({
-        to: event.email,
-        subject: MAIL_SUBJECT.NEW_ADMIN_INVITE,
-        template: 'admin-invitation',
-        context: {
-          firstName,
-          email: event.email,
-          inviteUrl: event.inviteUrl,
-          role: event.role,
-        },
-      });
-
-      this.logger.log(
-        `New admin invitation email sent successfully to ${event.email}`,
-      );
-    } catch (error) {
-      this.logger.error(
-        `Failed to send new admin invitation  email to ${event.email}:`,
-        error,
-      );
-    }
-  }
-
   @OnEvent('email.new-device-login-otp')
   async handleNewDeviceLoginOtpEvent(event: NewDeviceLoginOtpEmailEvent) {
     try {
@@ -251,6 +165,32 @@ export class EmailEventListener {
         `Failed to send new device login OTP email to ${event.email}:`,
         error,
       );
+    }
+  }
+
+  @OnEvent('email.new-tutor-invite')
+  async handleTutorInviteEvent(event: TutorInviteEmailEvent) {
+    try {
+      this.logger.log(`Sending tutor invite email to ${event.email}`);
+
+      const firstName = event.name?.trim().split(' ')[0] ?? 'Tutor';
+
+      await this.mailerService.sendMail({
+        to: event.email,
+        subject: MAIL_SUBJECT.NEW_TUTOR_INVITE,
+        template: 'tutor-invitation', // template name to be implemented
+        context: {
+          firstName,
+          email: event.email,
+          loginUrl: event.loginUrl,
+          temporaryPassword: event.temporaryPassword,
+        },
+      });
+
+      this.logger.log(`Tutor invite email sent to ${event.email}`);
+    } catch (error) {
+      // Log errors but do not rethrow; listener should be resilient
+      this.logger.error(`Failed to send tutor invite email to ${event.email}`, error);
     }
   }
 }

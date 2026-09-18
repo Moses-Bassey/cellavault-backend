@@ -24,7 +24,7 @@ import { UserType } from '../../enums/user-type.enum';
 import { EmailEventService } from 'src/services/mail/email-event.service';
 import { PasswordUtil } from '../../utils/password.util';
 import { Utils } from 'src/utils/utils';
-import { InviteAdminDto, AdminLoginDto, LoginOtpDto, CompleteAdminOnboardingDto } from './dto/auth.dto';
+import { InviteAdminDto, LoginDto, LoginOtpDto, CompleteAdminOnboardingDto } from './dto/auth.dto';
 import { Validators } from '../../utils/validators.utils';
 import { JwtAuthPayload } from './auth.interface';
 
@@ -41,15 +41,15 @@ export class AuthService {
     private readonly configService: ConfigService,
   ) {}
 
-  async login(data: AdminLoginDto): Promise<ILoginData> {
+  async login(data: LoginDto): Promise<ILoginData> {
     return this.handleLogin(data, UserType.ADMIN);
   }
 
-  async loginStudent(data: AdminLoginDto): Promise<ILoginData> {
+  async loginStudent(data: LoginDto): Promise<ILoginData> {
     return this.handleLogin(data, UserType.STUDENT);
   }
 
-  async loginTutor(data: AdminLoginDto): Promise<ILoginData> {
+  async loginTutor(data: LoginDto): Promise<ILoginData> {
     return this.handleLogin(data, UserType.TUTOR);
   }
 
@@ -57,7 +57,7 @@ export class AuthService {
    * Reusable login handler for all user types
    */
   private async handleLogin(
-    data: AdminLoginDto,
+    data: LoginDto,
     userType: UserType,
   ): Promise<ILoginData> {
     const { email, password, rememberMe } = data;

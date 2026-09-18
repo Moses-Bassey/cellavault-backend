@@ -4,12 +4,10 @@ import {
   SignUpOtpEmailEvent,
   ForgetPasswordEmailEvent,
   WelcomeEmailEvent,
-  BookingConfirmationEmailEvent,
-  DriverVerificationEmailEvent,
   PasswordChangedEmailEvent,
   NewLoginEmailEvent,
   NewDeviceLoginOtpEmailEvent,
-  AdminInviteEmailEvent,
+  TutorInviteEmailEvent,
 } from './events/email.events';
 
 @Injectable()
@@ -29,38 +27,6 @@ export class EmailEventService {
   async emitWelcomeEmail(email: string, fullName: string) {
     const event = new WelcomeEmailEvent(email, fullName);
     this.eventEmitter.emit('email.welcome', event);
-  }
-
-  async emitBookingConfirmationEmail(
-    email: string,
-    bookingId: string,
-    driverName: string,
-    pickupTime: string,
-    pickupLocation: string,
-  ) {
-    const event = new BookingConfirmationEmailEvent(
-      email,
-      bookingId,
-      driverName,
-      pickupTime,
-      pickupLocation,
-    );
-    this.eventEmitter.emit('email.booking-confirmation', event);
-  }
-
-  async emitDriverVerificationEmail(
-    email: string,
-    fullName: string,
-    verificationStatus: 'approved' | 'rejected',
-    reason?: string,
-  ) {
-    const event = new DriverVerificationEmailEvent(
-      email,
-      fullName,
-      verificationStatus,
-      reason,
-    );
-    this.eventEmitter.emit('email.driver-verification', event);
   }
 
   async emitPasswordChangedEmail(
@@ -94,14 +60,16 @@ export class EmailEventService {
     this.eventEmitter.emit('email.new-device-login-otp', event);
   }
 
-  async sendAdminInviteEmail(payload: {
-    email: string,
-    fullName: string,
-    inviteUrl: string,
-    role: string,
+  sendTutorInviteEmail(payload: {
+    email: string;
+    name: string;
+    loginUrl: string;
+    temporaryPassword: string;
   }) {
-    const { email, fullName, inviteUrl, role } = payload;
-    const event = new AdminInviteEmailEvent(email, fullName, inviteUrl, role);
-    this.eventEmitter.emit('email.new-admin-invite', event);
+    const { email, name, loginUrl, temporaryPassword } = payload;
+    const event = new TutorInviteEmailEvent(email, name, loginUrl, temporaryPassword);
+    // synchronous emit is fine for fire-and-forget; listener handles actual sending
+    this.eventEmitter.emit('email.new-tutor-invite', event);
   }
 }
+

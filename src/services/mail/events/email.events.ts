@@ -20,25 +20,6 @@ export class WelcomeEmailEvent {
   ) {}
 }
 
-export class BookingConfirmationEmailEvent {
-  constructor(
-    public readonly email: string,
-    public readonly bookingId: string,
-    public readonly driverName: string,
-    public readonly pickupTime: string,
-    public readonly pickupLocation: string,
-  ) {}
-}
-
-export class DriverVerificationEmailEvent {
-  constructor(
-    public readonly email: string,
-    public readonly fullName: string,
-    public readonly verificationStatus: 'approved' | 'rejected',
-    public readonly reason?: string,
-  ) {}
-}
-
 export class PasswordChangedEmailEvent {
   constructor(
     public readonly email: string,
@@ -64,11 +45,11 @@ export class NewDeviceLoginOtpEmailEvent {
   ) {}
 }
 
-export class AdminInviteEmailEvent {
+export class TutorInviteEmailEvent {
   constructor(
     public readonly email: string,
-    public readonly fullName: string,
-    public readonly inviteUrl: string,
-    public readonly role: string,
+    public readonly name: string,
+    public readonly loginUrl: string,
+    public readonly temporaryPassword: string,
   ) {}
 }
