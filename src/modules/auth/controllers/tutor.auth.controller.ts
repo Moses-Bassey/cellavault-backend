@@ -18,7 +18,7 @@ import {
 } from '@nestjs/swagger';
 import type { Request as ExpressRequest } from 'express';
 import { JwtAuthPayload } from '../auth.interface';
-import { CreateAdminDto, InviteAdminDto, CompleteAdminOnboardingDto, AdminLoginDto, LoginOtpDto } from '../dto/auth.dto';
+import { CreateAdminDto, InviteAdminDto, CompleteAdminOnboardingDto, LoginDto, LoginOtpDto } from '../dto/auth.dto';
 import { Auth } from '../../auth/decorators/auth.decorator';
 import { AuthGuard } from '../../auth/guards/auth.guard';
 import { RolesGuard } from '../../auth/guards/roles.guard';
@@ -35,7 +35,7 @@ export class TutorAuthController {
 
   @Post()
   @HttpCode(HttpStatus.OK)
-  async login(@Body() input: AdminLoginDto, @Req() request: ExpressRequest) {
+  async login(@Body() input: LoginDto) {
     const data = await this.authService.loginTutor(input);
     return ResponseUtil.handleResponse(data, 'Login successful', HttpStatus.OK);
   }

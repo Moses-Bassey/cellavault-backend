@@ -10,6 +10,7 @@ import {
   IsObject,
 } from 'class-validator';
 import { UserType } from '../../../enums/user-type.enum';
+
 export class CreateAdminDto {
   @ApiProperty({
     description: "Admin's fullname",
@@ -48,7 +49,7 @@ export class CompleteAdminOnboardingDto {
   password: string;
 }
 
-export class AdminLoginDto {
+export class LoginDto {
   @ApiProperty({ description: "Admin's Email", example: 'example@gmail.com' })
   @IsEmail()
   email: string;
