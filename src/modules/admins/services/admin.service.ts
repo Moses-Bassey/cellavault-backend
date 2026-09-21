@@ -1,5 +1,6 @@
 import {
   Injectable,
+  ConflictException,
   NotFoundException,
   BadRequestException,
   UnauthorizedException,
@@ -7,19 +8,20 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { Admin } from '../entities/admin.entity';
 import { AdminRepository } from '../repositories/admin.repository';
-import { deriveUserStatus } from '../../../utils/user-status.util';
-import { UserListItemDto, UserListPageDto } from '../dto/admin.dto';
-import { UserStatusFilter } from '../../../enums/user-status.enum';
 // import { PasswordUtil } from 'src/utils/password.util';
 import { decodeCursor } from '../../../utils/cursor.util';
 import { parseISODateOrUndefined } from '../../../utils/date.util';
 import { PasswordUtil } from '../../../utils/password.util';
 
+import {
+  AdminProfile,
+  ChangeAdminPasswordData,
+  UpdateAdminProfileData,
+} from '../interfaces/admin.interface';
 @Injectable()
 export class AdminService {
   constructor(
     private readonly adminRepository: AdminRepository,
-    private readonly configService: ConfigService,
   ) {}
 
   async fetchAdmin(id: string): Promise<Admin | null> {
@@ -75,9 +77,104 @@ export class AdminService {
   //   };
   // }
 
-  // async findById(id: string) {
-  //   const user = await this.userService.fetchUser(id);
-  //   return user;
-  // }
+  async getMyProfile(adminId: string): Promise<AdminProfile> {
+    const admin = await this.adminRepository.findProfileById(adminId);
 
+    if (!admin) {
+      throw new NotFoundException('Admin account not found');
+    }
+
+    return admin;
+  }
+
+  async updateMyProfile(
+    adminId: string,
+    data: UpdateAdminProfileData,
+  ): Promise<AdminProfile> {
+    const admin = await this.adminRepository.findById(adminId);
+
+    if (!admin) {
+      throw new NotFoundException('Admin account not found');
+    }
+
+    if (!admin.isActive) {
+      throw new UnauthorizedException('Admin account is inactive');
+    }
+
+    const updateData: Partial<Admin> = {};
+
+    if (data.email !== undefined) {
+      const email = data.email.trim().toLowerCase();
+
+      if (email !== admin.email.toLowerCase()) {
+        const existingAdmin =
+          await this.adminRepository.findByEmailExcludingId(
+            email,
+            adminId,
+          );
+
+        if (existingAdmin) {
+          throw new ConflictException(
+            'An admin account with this email already exists',
+          );
+        }
+
+        updateData.email = email;
+      }
+    }
+
+    if (Object.keys(updateData).length > 0) {
+      await this.adminRepository.update(adminId, updateData);
+    }
+
+    const updatedAdmin =
+      await this.adminRepository.findProfileById(adminId);
+
+    if (!updatedAdmin) {
+      throw new NotFoundException('Admin account not found');
+    }
+
+    return updatedAdmin;
+  }
+
+  async changeMyPassword(
+    adminId: string,
+    data: ChangeAdminPasswordData,
+  ): Promise<void> {
+    const admin = await this.adminRepository.findById(adminId);
+
+    if (!admin) {
+      throw new NotFoundException('Admin account not found');
+    }
+
+    if (!admin.isActive) {
+      throw new UnauthorizedException('Admin account is inactive');
+    }
+
+    const isCurrentPasswordValid =
+      await PasswordUtil.verifyPassword(
+        data.currentPassword,
+        admin.password,
+      );
+
+    if (!isCurrentPasswordValid) {
+      throw new UnauthorizedException(
+        'Current password is incorrect',
+      );
+    }
+
+    if (data.currentPassword === data.newPassword) {
+      throw new BadRequestException(
+        'New password must be different from the current password',
+      );
+    }
+
+    const hashedPassword = await PasswordUtil.hashPassword(
+      data.newPassword,
+    );
+
+    await this.adminRepository.update(adminId, {
+      password: hashedPassword,
+    });
+  }
 }

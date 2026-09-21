@@ -3,11 +3,12 @@ import {
   Post,
   Body,
   Get,
-  Req, 
   UseGuards, 
   HttpCode,
   HttpStatus,
   Query,
+  Patch,
+  Request,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -16,14 +17,20 @@ import {
   ApiBearerAuth,
 } from '@nestjs/swagger';
 import { TutorService } from '../services/tutor.service';
-import { Tutor } from '../entities/tutor.entity';
 import { Auth } from '../../auth/decorators/auth.decorator';
 import { AuthGuard } from '../../auth/guards/auth.guard';
 import { RolesGuard } from '../../auth/guards/roles.guard';
 import { Roles } from '../../auth/decorators/roles.decorator';
+import type { AuthenticatedRequest } from '../../auth/auth.interface';
 import { UserType } from '../../../enums/user-type.enum';
-import { CreateTutorDto, GetTutorsQueryDto } from '../dto/tutor.dto';
+import {
+  CreateTutorDto,
+  GetTutorsQueryDto,
+  ChangeTutorPasswordDto,
+  UpdateTutorProfileDto,
+} from '../dto/tutor.dto';
 import { ResponseUtil } from 'src/utils/response.utils';
+import { Validators } from '../../../utils/validators.utils';
 
 @ApiTags('Tutors')
 @ApiBearerAuth()
@@ -70,6 +77,125 @@ export class TutorController {
     return ResponseUtil.handleResponse(
       data,
       'Tutors retrieved successfully',
+      HttpStatus.OK,
+    );
+  }
+
+  @Roles(UserType.TUTOR)
+  @Get('profile')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Get authenticated tutor profile',
+  })
+  @ApiResponse({
+    status: 200,
+    description:
+      'Tutor profile retrieved successfully',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Tutor account not found',
+  })
+  async getMyProfile(@Request() req: AuthenticatedRequest) {
+    const tutorId = Validators.validateUuid(
+      req.user.userId,
+    );
+
+    const data =
+      await this.tutorService.getMyProfile(tutorId);
+
+    return ResponseUtil.handleResponse(
+      data,
+      'Tutor profile retrieved successfully',
+      HttpStatus.OK,
+    );
+  }
+
+  @Roles(UserType.TUTOR)
+  @Patch('profile')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Update authenticated tutor profile',
+  })
+  @ApiResponse({
+    status: 200,
+    description:
+      'Tutor profile updated successfully',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid profile data',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized',
+  })
+  @ApiResponse({
+    status: 409,
+    description: 'Email already exists',
+  })
+  async updateMyProfile(
+    @Request() req: AuthenticatedRequest,
+    @Body() body: UpdateTutorProfileDto,
+  ) {
+    const tutorId = Validators.validateUuid(
+      req.user.userId,
+    );
+
+    const data =
+      await this.tutorService.updateMyProfile(
+        tutorId,
+        body,
+      );
+
+    return ResponseUtil.handleResponse(
+      data,
+      'Tutor profile updated successfully',
+      HttpStatus.OK,
+    );
+  }
+
+  @Roles(UserType.TUTOR)
+  @Patch('profile/password')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Change authenticated tutor password',
+  })
+  @ApiResponse({
+    status: 200,
+    description:
+      'Tutor password changed successfully',
+  })
+  @ApiResponse({
+    status: 400,
+    description:
+      'Invalid password change request',
+  })
+  @ApiResponse({
+    status: 401,
+    description:
+      'Current password is incorrect',
+  })
+  async changeMyPassword(
+    @Request() req: AuthenticatedRequest,
+    @Body() body: ChangeTutorPasswordDto,
+  ) {
+    const tutorId = Validators.validateUuid(
+      req.user.userId,
+    );
+
+    await this.tutorService.changeMyPassword(
+      tutorId,
+      body,
+    );
+
+    return ResponseUtil.handleResponse(
+      null,
+      'Tutor password changed successfully',
       HttpStatus.OK,
     );
   }

@@ -1,6 +1,7 @@
 import { Injectable, ConflictException, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Student } from '../entities/student.entity';
+import { Programme } from '../../programmes/entities/programme.entity';
 import { Op, WhereOptions } from 'sequelize';
 import { PaginationOptions } from 'src/shared/interfaces/pagination-options.interface';
 import { encodeCursor } from 'src/utils/cursor.util';
@@ -33,6 +34,35 @@ export class StudentRepository {
     return await this.studentModel.findByPk(id, { raw: true });
   }
 
+  async findProfileById(
+    id: string,
+  ): Promise<Student | null> {
+    return await this.studentModel.findByPk(id, {
+      attributes: [
+        'id',
+        'name',
+        'email',
+        'phone',
+        'guardianPhoneOrEmail',
+        'gender',
+        'photoUrl',
+        'role',
+        'isActive',
+        'createdAt',
+        'updatedAt',
+      ],
+      include: [
+        {
+          model: Programme,
+          attributes: ['id', 'name'],
+          through: {
+            attributes: [],
+          },
+        },
+      ],
+    });
+  }
+
   async fetchStudent(id: string): Promise<Student | null> {
     const user = await this.studentModel.findByPk(id, {
       attributes: {
@@ -47,6 +77,22 @@ export class StudentRepository {
       where: { email },
     });
     return user ? (user.toJSON() as Student) : null;
+  }
+
+  async findByEmailExcludingId(
+    email: string,
+    id: string,
+  ): Promise<Student | null> {
+    return await this.studentModel.findOne({
+      where: {
+        email,
+        id: {
+          [Op.ne]: id,
+        },
+      },
+      attributes: ['id'],
+      raw: true,
+    });
   }
 
   async delete(id: string): Promise<number> {

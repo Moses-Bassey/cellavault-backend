@@ -3,6 +3,8 @@ import {
   InternalServerErrorException,
   ConflictException,
   NotFoundException,
+  BadRequestException,
+  UnauthorizedException,
   Logger,
  } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
@@ -17,7 +19,12 @@ import { Utils } from 'src/utils/utils';
 import { decodeCursor } from '../../../utils/cursor.util';
 import { PasswordUtil, generatePassword } from '../../../utils/password.util';
 import { QueryOptions } from '../../../shared/interfaces/query-options.interface';
-import { ICreateTutorInput } from '../interfaces/tutor.interface';
+import {
+  ICreateTutorInput,
+  ChangeTutorPasswordData,
+  TutorProfile,
+  UpdateTutorProfileData,
+} from '../interfaces/tutor.interface';
 import { TutorCreatedEvent } from '../events/tutor.event';
 
 @Injectable()
@@ -27,9 +34,7 @@ export class TutorService {
   constructor(
     private readonly tutorRepository: TutorRepository,
     private readonly eventEmitter: EventEmitter2,
-    private readonly emailEventService: EmailEventService,
     private readonly configService: ConfigService,
-    private readonly tokenService: TokenService,
   ) {}
 
   async getAllTutors(
@@ -108,5 +113,138 @@ export class TutorService {
 
     // 5. Return minimal confirmation (avoid returning password or full entity)
     return data;
+  }
+
+  async getMyProfile(
+    tutorId: string,
+  ): Promise<TutorProfile> {
+    const tutor =
+      await this.tutorRepository.findProfileById(tutorId);
+
+    if (!tutor) {
+      throw new NotFoundException(
+        'Tutor account not found',
+      );
+    }
+
+    return tutor as TutorProfile;
+  }
+
+  async updateMyProfile(
+    tutorId: string,
+    data: UpdateTutorProfileData,
+  ): Promise<TutorProfile> {
+    const tutor =
+      await this.tutorRepository.findById(tutorId);
+
+    if (!tutor) {
+      throw new NotFoundException(
+        'Tutor account not found',
+      );
+    }
+
+    if (!tutor.isActive) {
+      throw new UnauthorizedException(
+        'Tutor account is inactive',
+      );
+    }
+
+    const updateData: Partial<Tutor> = {};
+
+    if (data.name !== undefined) {
+      updateData.name = data.name.trim();
+    }
+
+    if (data.email !== undefined) {
+      const email = data.email.trim().toLowerCase();
+
+      if (email !== tutor.email.toLowerCase()) {
+        const existingTutor =
+          await this.tutorRepository.findByEmailExcludingId(
+            email,
+            tutorId,
+          );
+
+        if (existingTutor) {
+          throw new ConflictException(
+            'A tutor account with this email already exists',
+          );
+        }
+
+        updateData.email = email;
+      }
+    }
+
+    if (data.phone !== undefined) {
+      updateData.phone =
+        data.phone?.trim() || undefined;
+    }
+
+    if (Object.keys(updateData).length > 0) {
+      await this.tutorRepository.update(
+        tutorId,
+        updateData,
+      );
+    }
+
+    const updatedTutor =
+      await this.tutorRepository.findProfileById(
+        tutorId,
+      );
+
+    if (!updatedTutor) {
+      throw new NotFoundException(
+        'Tutor account not found',
+      );
+    }
+
+    return updatedTutor as TutorProfile;
+  }
+
+  async changeMyPassword(
+    tutorId: string,
+    data: ChangeTutorPasswordData,
+  ): Promise<void> {
+    const tutor =
+      await this.tutorRepository.findById(tutorId);
+
+    if (!tutor) {
+      throw new NotFoundException(
+        'Tutor account not found',
+      );
+    }
+
+    if (!tutor.isActive) {
+      throw new UnauthorizedException(
+        'Tutor account is inactive',
+      );
+    }
+
+    const isCurrentPasswordValid =
+      await PasswordUtil.verifyPassword(
+        data.currentPassword,
+        tutor.password,
+      );
+
+    if (!isCurrentPasswordValid) {
+      throw new UnauthorizedException(
+        'Current password is incorrect',
+      );
+    }
+
+    if (data.currentPassword === data.newPassword) {
+      throw new BadRequestException(
+        'New password must be different from the current password',
+      );
+    }
+
+    const hashedPassword =
+      await PasswordUtil.hashPassword(
+        data.newPassword,
+      );
+
+    await this.tutorRepository.update(tutorId, {
+      password: hashedPassword,
+    });
   }
 }

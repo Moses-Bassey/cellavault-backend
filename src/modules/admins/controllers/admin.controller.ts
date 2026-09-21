@@ -1,265 +1,159 @@
 import {
+  Body,
   Controller,
   Get,
-  Param,
-  Patch,
-  Delete,
-  Query,
-  Body,
-  UseGuards,
-  Request,
   HttpCode,
   HttpStatus,
-  NotFoundException,
-  Post,
+  Patch,
+  Request,
+  UseGuards,
 } from '@nestjs/common';
-// import type { Request as ExpressRequest } from 'express';
+import type { Request as ExpressRequest } from 'express';
 import {
   ApiTags,
   ApiOperation,
   ApiResponse,
   ApiBearerAuth,
 } from '@nestjs/swagger';
-// // import { User } from '../entities/user.entity';
-// import { UserService } from '../services/admin.service';
 import { Auth } from '../../auth/decorators/auth.decorator';
 import { AuthGuard } from '../../auth/guards/auth.guard';
 import { RolesGuard } from '../../auth/guards/roles.guard';
 import { Roles } from '../../auth/decorators/roles.decorator';
+
 import { UserType } from '../../../enums/user-type.enum';
-// import { ResponseUtil } from 'src/utils/response.utils';
-// // import { JwtAuthPayload } from '../../auth/auth.interface';
-// // import { Validators } from 'src/utils/validators.utils';
+import { ResponseUtil } from 'src/utils/response.utils';
+import type { AuthenticatedRequest } from '../../auth/auth.interface';
+import { Validators } from 'src/utils/validators.utils';
 // // import { DashboardDto, UpdateImageUrlDto } from '../dto/user.dto';
 // import { UuidValidationPipe } from '../../../shared/pipes/uuid.validator.pipe';
 // import { TripStatus } from 'src/enums/ride-status.enum';
 // import { GetUsersQueryDto } from '../dto/admin.dto';
 
-@ApiTags('Users')
+import { AdminService } from '../services/admin.service';
+import {
+  ChangeAdminPasswordDto,
+  UpdateAdminProfileDto,
+} from '../dto/admin.dto';
+
+@ApiTags('Admin')
 @ApiBearerAuth()
 @Auth()
 @UseGuards(AuthGuard, RolesGuard)
-@Roles(UserType.SUPER_ADMIN, UserType.ADMIN)
+@Roles(UserType.ADMIN, UserType.SUPER_ADMIN)
 @Controller('admin')
 export class AdminController {
-//   constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly adminService: AdminService,
+  ) {}
 
-//   // ======== metrics ========== //
-//   @Get('summary')
-//   @HttpCode(HttpStatus.OK)
-//   @ApiOperation({ summary: 'Get all users metrics' })
-//   @ApiResponse({
-//     status: 200,
-//     description: 'Users metrics retrieved successfully',
-//   })
-//   @ApiResponse({ status: 404, description: 'Users metrics not found' })
-//   @UseGuards(AuthGuard)
-//   @Roles(UserType.PEPP_ADMIN, UserType.SUPER_ADMIN, UserType.PEPP_MANAGER)
-//   async getUsersData() {
-//     const data = await this.userService.getUsersData();
-//     return ResponseUtil.handleResponse(
-//       data,
-//       'Users data retrieved successfully',
-//       HttpStatus.OK,
-//     );
-//   }
+  @Get('profile')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Get authenticated admin profile',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Admin profile retrieved successfully',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Admin account not found',
+  })
+  async getMyProfile(@Request() req: AuthenticatedRequest) {
+    const adminId = Validators.validateUuid(
+      req.user.userId,
+    );
 
-//   @Get()
-//   @HttpCode(HttpStatus.OK)
-//   @UseGuards(AuthGuard)
-//   @Roles(UserType.PEPP_ADMIN, UserType.SUPER_ADMIN, UserType.PEPP_MANAGER)
-//   async getAllUsers(@Query() query: GetUsersQueryDto) {
-//     const data = await this.userService.findAll({
-//       search: query.search,
-//       status: query.status,
-//       limit: query.limit ? Number(query.limit) : undefined,
-//       cursor: query.cursor,
-//     });
+    const data = await this.adminService.getMyProfile(
+      adminId,
+    );
 
-//     return ResponseUtil.handleResponse(
-//       data,
-//       'Users retrieved successfully',
-//       HttpStatus.OK,
-//     );
-//   }
+    return ResponseUtil.handleResponse(
+      data,
+      'Admin profile retrieved successfully',
+      HttpStatus.OK,
+    );
+  }
 
-//   @Get(':id')
-//   @ApiOperation({ summary: 'Get User account' })
-//   @ApiResponse({ status: 200, description: 'User fetchced successfully' })
-//   @ApiResponse({ status: 404, description: 'User not found' })
-//   @HttpCode(HttpStatus.OK)
-//   @UseGuards(AuthGuard)
-//   @Roles(UserType.PEPP_ADMIN, UserType.SUPER_ADMIN, UserType.PEPP_MANAGER)
-//   async getUserById(@Param('id', UuidValidationPipe) id: string) {
-//     const data = await this.userService.getPassengerAccount(id);
+  @Patch('profile')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Update authenticated admin profile',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Admin profile updated successfully',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid profile data',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized',
+  })
+  @ApiResponse({
+    status: 409,
+    description: 'Email already exists',
+  })
+  async updateMyProfile(
+    @Request() req: AuthenticatedRequest,
+    @Body() body: UpdateAdminProfileDto,
+  ) {
+    const adminId = Validators.validateUuid(
+      req.user.userId,
+    );
 
-//     return ResponseUtil.handleResponse(
-//       data,
-//       'User retrieved successfully',
-//       HttpStatus.OK,
-//     );
-//   }
+    const data = await this.adminService.updateMyProfile(
+      adminId,
+      body,
+    );
 
-//   // Account screen
-//   // @Get(':userId')
-//   // @ApiOperation({ summary: 'Get User account' })
-//   // @ApiResponse({ status: 200, description: 'User fetchced successfully' })
-//   // @ApiResponse({ status: 404, description: 'User not found' })
-//   // async getPassenger(@Param('userId', UuidValidationPipe) passengerId: string) {
-//   //   const data = await this.userService.getPassengerAccount(passengerId);
-//   //   return ResponseUtil.handleResponse(
-//   //     data,
-//   //     'User details retrieved',
-//   //     HttpStatus.OK,
-//   //   );
-//   // }
+    return ResponseUtil.handleResponse(
+      data,
+      'Admin profile updated successfully',
+      HttpStatus.OK,
+    );
+  }
 
-//   // @Patch(':userId')
-//   // @ApiOperation({ summary: 'Update user details' })
-//   // @ApiResponse({
-//   //   status: 200,
-//   //   description: 'User details updated successfully',
-//   // })
-//   // @ApiResponse({ status: 404, description: 'User not found' })
-//   // async updatePassenger(
-//   //   @Param('userId', UuidValidationPipe) passengerId: string,
-//   //   @Body()
-//   //   body: {
-//   //     fullName?: string;
-//   //     email?: string;
-//   //     phoneNo?: string;
-//   //     imageUrl?: string;
-//   //     shortDescription?: string;
-//   //   },
-//   // ) {
-//   //   const data = await this.userService.updatePassengerAccount(
-//   //     passengerId,
-//   //     body,
-//   //   );
-//   //   return ResponseUtil.handleResponse(
-//   //     data,
-//   //     'User details updated',
-//   //     HttpStatus.OK,
-//   //   );
-//   // }
+  @Patch('profile/password')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Change authenticated admin password',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Admin password changed successfully',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid password change request',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Current password is incorrect',
+  })
+  async changeMyPassword(
+    @Request() req: AuthenticatedRequest,
+    @Body() body: ChangeAdminPasswordDto,
+  ) {
+    const adminId = Validators.validateUuid(
+      req.user.userId,
+    );
 
-//   // @Post(':userId/suspend')
-//   // @ApiOperation({ summary: 'Suspend user account' })
-//   // @ApiResponse({ status: 200, description: 'User account suspended' })
-//   // @ApiResponse({ status: 400, description: 'Failed to suspend user account' })
-//   // @HttpCode(HttpStatus.OK)
-//   // async suspendPassenger(
-//   //   @Param('userId', UuidValidationPipe) passengerId: string,
-//   //   @Body() body: { reason?: string },
-//   // ) {
-//   //   const data = await this.userService.suspendPassenger(passengerId, body);
-//   //   return ResponseUtil.handleResponse(
-//   //     data,
-//   //     'User account suspended',
-//   //     HttpStatus.OK,
-//   //   );
-//   // }
+    await this.adminService.changeMyPassword(
+      adminId,
+      body,
+    );
 
-//   // @Post(':userId/unsuspend')
-//   // @ApiOperation({ summary: 'Enable user account' })
-//   // @ApiResponse({ status: 200, description: 'User account enabled' })
-//   // @ApiResponse({ status: 400, description: 'Failed to enable user account' })
-//   // @HttpCode(HttpStatus.OK)
-//   // async unsuspendPassenger(
-//   //   @Param('userId', UuidValidationPipe) passengerId: string,
-//   // ) {
-//   //   const data = await this.userService.unsuspendPassenger(passengerId);
-//   //   return ResponseUtil.handleResponse(
-//   //     data,
-//   //     'User account enabled',
-//   //     HttpStatus.OK,
-//   //   );
-//   // }
-
-//   // Activity screen
-
-//   @Get(':userId/summary')
-//   @ApiOperation({ summary: "Fetch user's ride activity" })
-//   @ApiResponse({
-//     status: 200,
-//     description: "User's ride activity retrieved successfully",
-//   })
-//   @ApiResponse({
-//     status: 400,
-//     description: "Failed to retrieve user's ride activity",
-//   })
-//   @ApiResponse({ status: 404, description: "User's ride activity not found" })
-//   async getActivitySummary(
-//     @Param('userId', UuidValidationPipe) passengerId: string,
-//     @Query('from') from?: string,
-//     @Query('to') to?: string,
-//   ) {
-//     const data = await this.userService.getPassengerActivitySummary({
-//       passengerId,
-//       from,
-//       to,
-//     });
-//     return ResponseUtil.handleResponse(
-//       data,
-//       "User's ride activity retrieved successfully",
-//       HttpStatus.OK,
-//     );
-//   }
-
-//   @Get(':userId/rides')
-//   @ApiOperation({ summary: "Fetch user's ride history" })
-//   @ApiResponse({
-//     status: 200,
-//     description: "User's ride history retrieved successfully",
-//   })
-//   @ApiResponse({
-//     status: 400,
-//     description: "Failed to retrieve user's ride history",
-//   })
-//   @ApiResponse({ status: 404, description: "User's ride history not found" })
-//   async listRides(
-//     @Param('userId', UuidValidationPipe) passengerId: string,
-//     @Query('from') from?: string,
-//     @Query('to') to?: string,
-//     @Query('status') status?: TripStatus,
-//     @Query('limit') limit?: string,
-//     @Query('cursor') cursor?: string,
-//   ) {
-//     const data = await this.userService.listPassengerRides({
-//       passengerId,
-//       from,
-//       to,
-//       status,
-//       limit: limit ? Number(limit) : undefined,
-//       cursor,
-//     });
-//     return ResponseUtil.handleResponse(
-//       data,
-//       "User's ride history retrieved successfully",
-//       HttpStatus.OK,
-//     );
-//   }
-
-//   @Get(':userId/rides/:rideId')
-//   @ApiOperation({ summary: 'Fetch ride details' })
-//   @ApiResponse({
-//     status: 200,
-//     description: 'Ride details retrieved successfully',
-//   })
-//   @ApiResponse({
-//     status: 400,
-//     description: "Failed to retrieve ride's details",
-//   })
-//   @ApiResponse({ status: 404, description: 'Ride details not found' })
-//   async getRideDetails(
-//     @Param('userId', UuidValidationPipe) passengerId: string,
-//     @Param('rideId', UuidValidationPipe) rideId: string,
-//   ) {
-//     const data = await this.userService.getRideDetails(passengerId, rideId);
-//     return ResponseUtil.handleResponse(
-//       data,
-//       'Ride details retrieved successfully',
-//       HttpStatus.OK,
-//     );
-//   }
+    return ResponseUtil.handleResponse(
+      null,
+      'Admin password changed successfully',
+      HttpStatus.OK,
+    );
+  }
 }

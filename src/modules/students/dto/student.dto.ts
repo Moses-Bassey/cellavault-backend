@@ -1,5 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsEmail, IsOptional, IsString, MinLength, IsIn, IsInt, Min } from 'class-validator';
+import { IsEmail, IsOptional, IsString, MinLength,
+  IsUrl, IsIn, IsInt, Min } from 'class-validator';
 
 export class CreateStudentDto {
   @ApiProperty({ example: 'Jane Doe', description: 'Full name of the student' })
@@ -80,4 +81,72 @@ export class GetStudentsQueryDto {
   @IsOptional()
   @IsString()
   cursor?: string;
+}
+
+export class UpdateStudentProfileDto {
+  @ApiPropertyOptional({
+    example: 'John Doe',
+    description: 'Student full name',
+  })
+  @IsOptional()
+  @IsString()
+  @MinLength(2)
+  name?: string;
+
+  @ApiPropertyOptional({
+    example: 'john.doe@example.com',
+    description: 'Student email address',
+  })
+  @IsOptional()
+  @IsEmail()
+  email?: string;
+
+  @ApiPropertyOptional({
+    example: '08012345678',
+    nullable: true,
+  })
+  @IsOptional()
+  @IsString()
+  phone?: string;
+
+  @ApiPropertyOptional({
+    example: '08098765432',
+    nullable: true,
+    description: 'Guardian phone number or email address',
+  })
+  @IsOptional()
+  @IsString()
+  guardianPhoneOrEmail?: string;
+
+  @ApiPropertyOptional({
+    example: 'Male',
+    nullable: true,
+  })
+  @IsOptional()
+  @IsString()
+  gender?: string;
+
+  @ApiPropertyOptional({
+    example: 'https://example.com/profile.jpg',
+    nullable: true,
+  })
+  @IsOptional()
+  @IsUrl()
+  photoUrl?: string;
+}
+
+export class ChangeStudentPasswordDto {
+  @ApiProperty({
+    example: 'CurrentPassword123!',
+  })
+  @IsString()
+  @MinLength(1)
+  currentPassword: string;
+
+  @ApiProperty({
+    example: 'NewPassword123!',
+  })
+  @IsString()
+  @MinLength(8)
+  newPassword: string;
 }

@@ -18,6 +18,24 @@ export class TutorRepository {
     return await this.tutorModel.findByPk(id, { raw: true });
   }
 
+  async findProfileById(
+    id: string,
+  ): Promise<Tutor | null> {
+    return await this.tutorModel.findByPk(id, {
+      attributes: [
+        'id',
+        'name',
+        'email',
+        'phone',
+        'role',
+        'isActive',
+        'createdAt',
+        'updatedAt',
+      ],
+      raw: true,
+    });
+  }
+
   async fetchUser(id: string): Promise<Tutor | null> {
     const user = await this.tutorModel.findByPk(id, {
       attributes: {
@@ -32,6 +50,22 @@ export class TutorRepository {
       where: { email },
     });
     return user ? (user.toJSON() as Tutor) : null;
+  }
+
+  async findByEmailExcludingId(
+    email: string,
+    id: string,
+  ): Promise<Tutor | null> {
+    return await this.tutorModel.findOne({
+      where: {
+        email,
+        id: {
+          [Op.ne]: id,
+        },
+      },
+      attributes: ['id'],
+      raw: true,
+    });
   }
 
   async create(userData: Partial<Tutor>): Promise<Tutor> {

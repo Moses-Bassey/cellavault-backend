@@ -63,3 +63,49 @@ export class GetTutorsQueryDto {
   @IsString()
   cursor?: string;
 }
+
+export class UpdateTutorProfileDto {
+  @ApiPropertyOptional({
+    example: 'John Doe',
+    description: 'Tutor full name',
+  })
+  @IsOptional()
+  @IsString()
+  @MinLength(2)
+  name?: string;
+
+  @ApiPropertyOptional({
+    example: 'john.doe@example.com',
+    description: 'Tutor email address',
+  })
+  @IsOptional()
+  @IsEmail()
+  email?: string;
+
+  @ApiPropertyOptional({
+    example: '08012345678',
+    nullable: true,
+    description: 'Tutor phone number',
+  })
+  @IsOptional()
+  @IsString()
+  phone?: string;
+}
+
+export class ChangeTutorPasswordDto {
+  @ApiProperty({
+    example: 'CurrentPassword123!',
+    description: 'Tutor current password',
+  })
+  @IsString()
+  @MinLength(1)
+  currentPassword: string;
+
+  @ApiProperty({
+    example: 'NewPassword123!',
+    description: 'Tutor new password',
+  })
+  @IsString()
+  @MinLength(8)
+  newPassword: string;
+}

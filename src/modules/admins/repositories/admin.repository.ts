@@ -27,6 +27,20 @@ export class AdminRepository {
     return await this.adminModel.findByPk(id, { raw: true });
   }
 
+  async findProfileById(id: string): Promise<Admin | null> {
+    return await this.adminModel.findByPk(id, {
+      attributes: [
+        'id',
+        'email',
+        'role',
+        'isActive',
+        'createdAt',
+        'updatedAt',
+      ],
+      raw: true,
+    });
+  }
+
   async fetchUser(id: string): Promise<Admin | null> {
     const user = await this.adminModel.findByPk(id, {
       attributes: {
@@ -60,6 +74,22 @@ export class AdminRepository {
     });
   }
 
+  async findByEmailExcludingId(
+    email: string,
+    id: string,
+  ): Promise<Admin | null> {
+    return await this.adminModel.findOne({
+      where: {
+        email,
+        id: {
+          [Op.ne]: id,
+        },
+      },
+      attributes: ['id'],
+      raw: true,
+    });
+  }
+
   // async create(userData: Partial<Admin>): Promise<Admin> {
   //   const user = await this.adminModel.create(userData as any, {
   //     raw: true,
@@ -76,5 +106,4 @@ export class AdminRepository {
     if (affectedRows === 0) return null;
     return affectedRows;
   }
-
 }
