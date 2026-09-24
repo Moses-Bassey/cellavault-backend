@@ -63,12 +63,24 @@ module.exports = {
       },
     });
 
+    await queryInterface.sequelize.query(`
+      ALTER TABLE "users"
+      ADD CONSTRAINT "users_email_or_phone_required"
+      CHECK ("email" IS NOT NULL OR "phoneNo" IS NOT NULL);
+    `);
+
     await queryInterface.addIndex('users', ['email']);
     await queryInterface.addIndex('users', ['phoneNo']);
     await queryInterface.addIndex('users', ['role']);
+
   },
 
   down: async (queryInterface) => {
+    await queryInterface.sequelize.query(`
+      ALTER TABLE "users"
+      DROP CONSTRAINT IF EXISTS "users_email_or_phone_required";
+    `);
+
     await queryInterface.dropTable('users');
   },
 };

@@ -3,25 +3,19 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 import { MailModule } from 'src/services/mail/mail.module';
 import { TokenModule } from 'src/services/token/token.module';
 import { AuthController } from './controllers/auth.controller';
-import { StudentAuthController } from './controllers/vendor.auth.controller';
-import { TutorAuthController } from './controllers/customer.auth.controller';
 import { AuthListener } from './listeners/auth.listener';
 import { AuthService } from './auth.service';
-import { AdminsModule } from '../admins/admin.module';
-import { StudentsModule } from '../students/student.module';
-import { TutorsModule } from '../tutors/tutor.module';
+import { UserModule } from '../users/user.module';
 
 @Module({
   imports: [
     EventEmitterModule.forRoot(),
     TokenModule,
     MailModule,
-    AdminsModule,
-    StudentsModule,
-    TutorsModule,
+    UserModule
   ],
   providers: [AuthService, AuthListener],
-  controllers: [AuthController, StudentAuthController, TutorAuthController],
+  controllers: [AuthController],
   exports: [],
 })
 export class AuthModule {}
