@@ -8,11 +8,12 @@ import { ConfigService } from '@nestjs/config';
 import type { StringValue } from 'ms';
 import { RefreshTokenService } from './services/refresh-token.service';
 import { RefreshTokenRepository } from './repositories/refresh-token.repository';
+import { RefreshToken } from './entities/refresh-token.entity';
 
 @Global()
 @Module({
   imports: [
-    SequelizeModule.forFeature([Token]),
+    SequelizeModule.forFeature([Token, RefreshToken]),
     JwtModule.registerAsync({
       global: true,
       inject: [ConfigService],

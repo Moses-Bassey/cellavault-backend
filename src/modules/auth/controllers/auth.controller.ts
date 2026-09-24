@@ -194,7 +194,7 @@ export class AuthController {
       refreshToken,
       {
         httpOnly: true,
-        secure: true,
+        secure: false,
         sameSite: 'lax',
         path: '/auth',
       },
