@@ -12,10 +12,11 @@ import {
   BelongsTo,
   AllowNull,
 } from 'sequelize-typescript';
+
 import { User } from '../../users/entities/user.entity';
 
 @Table({
-  tableName: 'admins',
+  tableName: 'vendors',
   timestamps: true,
   paranoid: true,
   defaultScope: {
@@ -24,7 +25,7 @@ import { User } from '../../users/entities/user.entity';
     },
   },
 })
-export class Admin extends Model<Admin> {
+export class Vendor extends Model<Vendor> {
   @PrimaryKey
   @Default(DataType.UUIDV4)
   @Column(DataType.UUID)
@@ -39,31 +40,25 @@ export class Admin extends Model<Admin> {
   declare user: User;
 
   @AllowNull(false)
-  @Column(DataType.STRING(100))
-  declare firstName: string;
+  @Column(DataType.STRING(200))
+  declare businessName: string;
 
-  @AllowNull(false)
-  @Column(DataType.STRING(100))
-  declare lastName: string;
+  @AllowNull(true)
+  @Column(DataType.STRING(500))
+  declare businessAddress: string | null;
 
   @CreatedAt
-  @Column({
-    type: DataType.DATE,
-    allowNull: false,
-  })
+  @AllowNull(false)
+  @Column(DataType.DATE)
   declare createdAt: Date;
 
   @UpdatedAt
-  @Column({
-    type: DataType.DATE,
-    allowNull: false,
-  })
+  @AllowNull(false)
+  @Column(DataType.DATE)
   declare updatedAt: Date;
 
   @DeletedAt
-  @Column({
-    type: DataType.DATE,
-    allowNull: true,
-  })
+  @AllowNull(true)
+  @Column(DataType.DATE)
   declare deletedAt: Date | null;
 }

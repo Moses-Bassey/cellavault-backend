@@ -1,8 +1,7 @@
 export enum UserType {
-  SUPER_ADMIN = 'SUPER_ADMIN',
   ADMIN = 'ADMIN',
-  TUTOR = 'TUTOR',
-  STUDENT = 'STUDENT',
+  VENDOR = 'VENDOR',
+  CUSTOMER = 'CUSTOMER',
 }
 
 export enum UserLoginIdentityType {
