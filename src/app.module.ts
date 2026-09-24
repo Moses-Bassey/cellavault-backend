@@ -15,6 +15,8 @@ import { TokenModule } from './services/token/token.module';
 import { MailModule } from './services/mail/mail.module';
 import { ApiKeyInterceptor } from './interceptors/api-key.interceptors';
 import { UserModule } from './modules/users/user.module';
+import { CustomerModule } from './modules/customers/customer.module';
+import { VendorModule } from './modules/vendors/vendor.module';
 
 @Module({
   imports: [
@@ -52,6 +54,8 @@ import { UserModule } from './modules/users/user.module';
     TokenModule,
     MailModule,
     UserModule,
+    CustomerModule,
+    VendorModule,
   ],
   controllers: [AppController],
   providers: [
