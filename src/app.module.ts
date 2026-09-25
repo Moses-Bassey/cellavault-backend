@@ -18,8 +18,10 @@ import { CountriesModule } from './modules/countries/countries.module';
 import { TokenModule } from './services/token/token.module';
 import { MailModule } from './services/mail/mail.module';
 import { ApiKeyInterceptor } from './interceptors/api-key.interceptors';
-import { UsersModule } from './modules/users/user.module';
+import { UserModule } from './modules/users/user.module';
 import { CategoriesModule } from './modules/categories/categories.module';
+import { ProductsModule } from './modules/products/product.module';
+import { Product } from './modules/products/entities/product.entities';
 
 @Module({
   imports: [
@@ -62,8 +64,9 @@ import { CategoriesModule } from './modules/categories/categories.module';
     CountriesModule,
     TokenModule,
     MailModule,
-    UsersModule,
-    CategoriesModule
+    UserModule,
+    CategoriesModule,
+    ProductsModule
   ],
   controllers: [AppController],
   providers: [

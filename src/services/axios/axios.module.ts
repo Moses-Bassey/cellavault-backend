@@ -4,7 +4,7 @@ import { HttpModule } from '@nestjs/axios';
 
 @Module({
   imports: [HttpModule],
-  providers: [AxiosService],
-  exports: [AxiosService],
+ // providers: [AxiosService],
+ // exports: [AxiosService],
 })
 export class AxiosModule {}

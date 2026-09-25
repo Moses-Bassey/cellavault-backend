@@ -25,7 +25,7 @@ export class CategoriesController {
         return ResponseUtil.handleResponse(data, 'Category created successfully', HttpStatus.OK);
     }
 
-    @UseGuards(AuthGuard)
+    //@UseGuards(AuthGuard)
     @Get()
     async findAll() {
         const data = await this.categoriesService.getAllCategories();
