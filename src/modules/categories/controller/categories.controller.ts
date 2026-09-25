@@ -17,30 +17,30 @@ export class CategoriesController {
         private readonly categoriesService: CategoriesService,
     ) { }
 
-    //@UseGuards(AuthGuard, RolesGuard)
-    // @Roles(UserType.ADMIN)
+    @UseGuards(AuthGuard, RolesGuard)
+    @Roles(UserType.ADMIN)
     @Post()
     async create(@Body() createCategoryDto: CategoriesDto) {
         const data = await this.categoriesService.create(createCategoryDto);
         return ResponseUtil.handleResponse(data, 'Category created successfully', HttpStatus.OK);
     }
 
-    //@UseGuards(AuthGuard)
+    @UseGuards(AuthGuard)
     @Get()
     async findAll() {
         const data = await this.categoriesService.getAllCategories();
         return ResponseUtil.handleResponse(data, 'Categories retrieved successfully', HttpStatus.OK);
     }
 
-    //@UseGuards(AuthGuard)
+    @UseGuards(AuthGuard)
     @Get(':id')
     async findOne(@Param('id') id: string) {
         const data = await this.categoriesService.getCategoryById(id);
         return ResponseUtil.handleResponse(data, 'Category returned successfully', HttpStatus.OK)
     }
 
-    //@UseGuards(AuthGuard, RolesGuard)
-    //@Roles(UserType.ADMIN)
+    @UseGuards(AuthGuard, RolesGuard)
+    @Roles(UserType.ADMIN)
     @Patch(':id')
     async update(
         @Param('id') id: string,
@@ -50,8 +50,8 @@ export class CategoriesController {
         return ResponseUtil.handleResponse(data, 'Category updated successfully', HttpStatus.OK)
     }
 
-    //@UseGuards(AuthGuard, RolesGuard)
-    //@Roles(UserType.ADMIN)
+    @UseGuards(AuthGuard, RolesGuard)
+    @Roles(UserType.ADMIN)
     @Delete(':id')
     async delete(@Param('id') id: string) {
         const data = await this.categoriesService.delete(id);
