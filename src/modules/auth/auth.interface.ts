@@ -3,7 +3,7 @@ import { Request } from 'express';
 
 export interface JwtAuthPayload {
   sub: string;
-  email: string;
+  identity: string;
   userType: UserType;
   userId: string;
   iat?: number;

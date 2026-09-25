@@ -1,11 +1,13 @@
 import { UserType } from 'src/enums';
+import { User } from 'src/modules/users/entities/user.entity';
 
 export interface ILoginData {
-  token: string;
-  user: {
-    id: string;
-    role: UserType;
-    email: string;
-    name?: string;
-  };
+  accessToken: string;
+    refreshToken: string;
+    user: {
+      id: string;
+      email: string | null;
+      phoneNo: string | null;
+      role: User['role'];
+    };
 }
