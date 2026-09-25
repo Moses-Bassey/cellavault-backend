@@ -1,15 +1,4 @@
-import {
-  Table,
-  Column,
-  Model,
-  DataType,
-  PrimaryKey,
-  Default,
-  CreatedAt,
-  UpdatedAt,
-  DeletedAt,
-  Unique,
-  AllowNull,
+import { Table, Column, Model, DataType, PrimaryKey, Default, CreatedAt, UpdatedAt, DeletedAt, Unique, AllowNull,
 } from 'sequelize-typescript';
 import { UserType } from 'src/enums';
 

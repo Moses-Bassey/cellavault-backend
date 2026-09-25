@@ -5,18 +5,10 @@ import { Admin } from './entities/admin.entity';
 // import { AdminService } from './services/admin.service';
 // import { AdminRepository } from './repositories/admin.repository';
 
-// @Module({
-//   imports: [SequelizeModule.forFeature([Admin])],
-//   controllers: [AdminController],
-//   providers: [AdminService, AdminRepository],
-//   exports: [SequelizeModule, AdminService, AdminRepository],
-// })
-// export class AdminsModule {}
-
 @Module({
   imports: [SequelizeModule.forFeature([Admin])],
-  controllers: [],
-  providers: [],
-  exports: [SequelizeModule],
+  // controllers: [AdminController],
+  // providers: [AdminService, AdminRepository],
+  // exports: [SequelizeModule, AdminService, AdminRepository],
 })
 export class AdminsModule {}
