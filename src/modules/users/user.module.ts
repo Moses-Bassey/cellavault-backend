@@ -1,15 +1,15 @@
 import { Module } from '@nestjs/common';
 import { SequelizeModule } from '@nestjs/sequelize';
-import { Vendor } from './entities/vendor.entity';
+import { User } from './entities/user.entity';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { MailModule } from 'src/services/mail/mail.module';
 import { TokenModule } from 'src/services/token/token.module';
-// import { CustomerRepository } from './repositories/customer.repository';
+import { UserRepository } from './repositories/user.repository';
 
 @Module({
-  imports: [SequelizeModule.forFeature([Vendor])],
-  providers: [],
+  imports: [SequelizeModule.forFeature([User])],
+  providers: [UserRepository],
   controllers: [],
-  exports: [],
+  exports: [UserRepository],
 })
-export class VendorModule {}
+export class UserModule {}

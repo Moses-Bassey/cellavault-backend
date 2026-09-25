@@ -52,7 +52,7 @@ export class CompleteAdminOnboardingDto {
 export class LoginDto {
   @ApiProperty({ description: "Admin's Email", example: 'example@gmail.com' })
   @IsEmail()
-  email: string;
+  identity: string;
 
   @ApiProperty({ description: "Admin's password", example: '32rvn39nved' })
   @IsString()

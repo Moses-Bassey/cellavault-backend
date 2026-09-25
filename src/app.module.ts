@@ -10,14 +10,13 @@ import appConfig from './config/app.config';
 
 import { AuthModule } from './modules/auth/auth.module';
 import { AdminsModule } from './modules/admins/admin.module';
-import { TutorsModule } from './modules/tutors/tutor.module';
-import { StudentsModule } from './modules/students/student.module';
-import { StudentProgrammeModule } from './modules/student-programme/student-programme.module';
-import { ProgrammeModule } from './modules/programmes/programme.module';
 import { CountriesModule } from './modules/countries/countries.module';
 import { TokenModule } from './services/token/token.module';
 import { MailModule } from './services/mail/mail.module';
 import { ApiKeyInterceptor } from './interceptors/api-key.interceptors';
+import { UserModule } from './modules/users/user.module';
+import { CustomerModule } from './modules/customers/customer.module';
+import { VendorModule } from './modules/vendors/vendor.module';
 
 @Module({
   imports: [
@@ -51,13 +50,12 @@ import { ApiKeyInterceptor } from './interceptors/api-key.interceptors';
     }),
     AuthModule,
     AdminsModule,
-    TutorsModule,
-    StudentsModule,
-    StudentProgrammeModule,
-    ProgrammeModule,
     CountriesModule,
     TokenModule,
     MailModule,
+    UserModule,
+    CustomerModule,
+    VendorModule,
   ],
   controllers: [AppController],
   providers: [
