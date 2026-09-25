@@ -10,14 +10,16 @@ import appConfig from './config/app.config';
 
 import { AuthModule } from './modules/auth/auth.module';
 import { AdminsModule } from './modules/admins/admin.module';
-import { TutorsModule } from './modules/tutors/tutor.module';
-import { StudentsModule } from './modules/students/student.module';
-import { StudentProgrammeModule } from './modules/student-programme/student-programme.module';
-import { ProgrammeModule } from './modules/programmes/programme.module';
+// import { TutorsModule } from './modules/tutors/tutor.module';
+// import { StudentsModule } from './modules/students/student.module';
+// import { StudentProgrammeModule } from './modules/student-programme/student-programme.module';
+// import { ProgrammeModule } from './modules/programmes/programme.module';
 import { CountriesModule } from './modules/countries/countries.module';
 import { TokenModule } from './services/token/token.module';
 import { MailModule } from './services/mail/mail.module';
 import { ApiKeyInterceptor } from './interceptors/api-key.interceptors';
+import { UsersModule } from './modules/users/user.module';
+import { CategoriesModule } from './modules/categories/categories.module';
 
 @Module({
   imports: [
@@ -26,7 +28,9 @@ import { ApiKeyInterceptor } from './interceptors/api-key.interceptors';
       isGlobal: true,
       load: [appConfig],
     }),
+    
     SequelizeModule.forRoot({
+      
       dialect: 'postgres', // Change dialect to postgres
       uri: process.env.DATABASE_URL, // Use the full connection string URL
       autoLoadModels: true,
@@ -51,13 +55,15 @@ import { ApiKeyInterceptor } from './interceptors/api-key.interceptors';
     }),
     AuthModule,
     AdminsModule,
-    TutorsModule,
-    StudentsModule,
-    StudentProgrammeModule,
-    ProgrammeModule,
+    // TutorsModule,
+    // StudentsModule,
+    // StudentProgrammeModule,
+    // ProgrammeModule,
     CountriesModule,
     TokenModule,
     MailModule,
+    UsersModule,
+    CategoriesModule
   ],
   controllers: [AppController],
   providers: [
@@ -68,4 +74,5 @@ import { ApiKeyInterceptor } from './interceptors/api-key.interceptors';
     // },
   ],
 })
+
 export class AppModule {}

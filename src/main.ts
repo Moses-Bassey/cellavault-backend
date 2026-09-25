@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import { Logger, ValidationPipe, VersioningType } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { HttpExceptionFilter } from './utils/exceptionFilter';
 // import { ApiKeyInterceptor } from './interceptors/api-key.interceptors';
 
 async function bootstrap() {
@@ -78,6 +79,9 @@ async function bootstrap() {
       },
     });
   }
+
+  // Filter for handling errors
+  app.useGlobalFilters(new HttpExceptionFilter());
 
   // Start server
   const port = configService.get<number>('app.port');

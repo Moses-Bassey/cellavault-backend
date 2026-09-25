@@ -2,14 +2,14 @@ import { Module } from '@nestjs/common';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { MailModule } from 'src/services/mail/mail.module';
 import { TokenModule } from 'src/services/token/token.module';
-import { AuthController } from './controllers/auth.controller';
-import { StudentAuthController } from './controllers/vendor.auth.controller';
-import { TutorAuthController } from './controllers/customer.auth.controller';
+// import { AuthController } from './controllers/auth.controller';
+// import { StudentAuthController } from './controllers/vendor.auth.controller';
+// import { TutorAuthController } from './controllers/customer.auth.controller';
 import { AuthListener } from './listeners/auth.listener';
-import { AuthService } from './auth.service';
+// import { AuthService } from './auth.service';
 import { AdminsModule } from '../admins/admin.module';
-import { StudentsModule } from '../students/student.module';
-import { TutorsModule } from '../tutors/tutor.module';
+// import { StudentsModule } from '../students/student.module';
+// import { TutorsModule } from '../tutors/tutor.module';
 
 @Module({
   imports: [
@@ -17,11 +17,11 @@ import { TutorsModule } from '../tutors/tutor.module';
     TokenModule,
     MailModule,
     AdminsModule,
-    StudentsModule,
-    TutorsModule,
+    // StudentsModule,
+    // TutorsModule,
   ],
-  providers: [AuthService, AuthListener],
-  controllers: [AuthController, StudentAuthController, TutorAuthController],
+  providers: [ AuthListener],
+  controllers: [],
   exports: [],
 })
 export class AuthModule {}
